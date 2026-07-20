@@ -1313,27 +1313,27 @@ export default function ButtonMapping() {
               hoveredTooltipId={hoveredTooltipId}
             />
 
-            {/* LD3 - D Pad Left */}
+            {/* LD3 - D Pad Down */}
             {viewMode !== 'back' && (
               <HotspotMarker
                 name="LD3"
                 style={{ left: `${hotspotPositions['D Pad Left'].left}px`, top: `${hotspotPositions['D Pad Left'].top + controllerYOffset}px` }}
                 isSelected={false}
-                isHovered={hoveredTooltipId === 'dPadLeft'}
-                tooltipId="dPadLeft"
+                isHovered={hoveredTooltipId === 'dPadDown'}
+                tooltipId="dPadDown"
                 onHoverChange={setHoveredTooltipId}
                 hoveredTooltipId={hoveredTooltipId}
               />
             )}
 
-            {/* LD4 - D Pad Down */}
+            {/* LD4 - D Pad Left */}
             <HotspotMarker
               key={`LD4-${viewMode}`}
               name="LD4"
               style={{ left: `${hotspotPositions['D Pad Down'].left}px`, top: `${hotspotPositions['D Pad Down'].top + controllerYOffset}px` }}
               isSelected={false}
-              isHovered={hoveredTooltipId === 'dPadDown'}
-              tooltipId="dPadDown"
+              isHovered={hoveredTooltipId === 'dPadLeft'}
+              tooltipId="dPadLeft"
               onHoverChange={setHoveredTooltipId}
               hoveredTooltipId={hoveredTooltipId}
               isEditMode={isEditMode}
@@ -2439,14 +2439,27 @@ function LeaderLinePath({ points, lineId, hoveredTooltipId, transform }) {
 
 // Control Points Layer - renders all control points for all lines in one top layer
 function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate, controllerYOffset }) {
-  const [draggingLine, setDraggingLine] = useState(null); // {lineId, pointIndex}
+  const [draggingLine, setDraggingLine] = useState(null); // {lineId, pointIndex, offsetX, offsetY, initialY}
   const svgRef = useRef(null);
 
-  const handleMouseDown = (e, lineId, pointIndex) => {
+  const handleMouseDown = (e, lineId, pointIndex, point) => {
     if (!isEditMode) return;
     e.preventDefault();
     e.stopPropagation();
-    setDraggingLine({ lineId, pointIndex });
+
+    // Calculate offset between mouse position and control point position
+    const svgContainer = svgRef.current.parentElement;
+    const rect = svgContainer.getBoundingClientRect();
+    const mouseX = ((e.clientX - rect.left) / rect.width) * 567.5;
+    const mouseY = ((e.clientY - rect.top) / rect.height) * 351.5;
+
+    setDraggingLine({
+      lineId,
+      pointIndex,
+      offsetX: mouseX - point.x,
+      offsetY: mouseY - point.y,
+      initialY: point.y  // Store initial Y for horizontal constraint
+    });
   };
 
   useEffect(() => {
@@ -2461,11 +2474,19 @@ function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate, controllerYO
       const rect = svgContainer.getBoundingClientRect();
 
       // Simple coordinate calculation (works for all transforms)
-      const scaleX = 567.5 / (rect.width * 0.8085);
-      const scaleY = 351.5 / (rect.height * 0.8085);
+      const mouseX = ((e.clientX - rect.left) / rect.width) * 567.5;
+      const mouseY = ((e.clientY - rect.top) / rect.height) * 351.5;
 
-      const x = ((e.clientX - rect.left) / rect.width) * 567.5;
-      const y = ((e.clientY - rect.top) / rect.height) * 351.5;
+      // Apply the offset so the point stays under the cursor
+      const x = mouseX - draggingLine.offsetX;
+      let y = mouseY - draggingLine.offsetY;
+
+      // If Shift is held, lock Y to the OTHER point's Y position (horizontal constraint)
+      if (e.shiftKey && line.points.length >= 2) {
+        // Find the other point: if dragging point 0, lock to point 1's Y, and vice versa
+        const otherPointIndex = draggingLine.pointIndex === 0 ? 1 : 0;
+        y = line.points[otherPointIndex].y;
+      }
 
       onLineUpdate(draggingLine.lineId, draggingLine.pointIndex, {
         x: Math.round(x * 10) / 10,
@@ -2515,16 +2536,16 @@ function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate, controllerYO
                   r="20"
                   fill="transparent"
                   style={{ cursor: 'move' }}
-                  onMouseDown={(e) => handleMouseDown(e, line.id, index)}
+                  onMouseDown={(e) => handleMouseDown(e, line.id, index, point)}
                 />
                 {/* Visible control point */}
                 <circle
                   cx={point.x}
                   cy={point.y}
-                  r="7"
+                  r="3"
                   fill={isDragging ? "#00b6fa" : "#ff6b00"}
                   stroke="white"
-                  strokeWidth="3"
+                  strokeWidth="1.5"
                   style={{
                     cursor: 'move',
                     pointerEvents: 'none'

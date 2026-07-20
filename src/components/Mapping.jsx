@@ -1474,7 +1474,7 @@ export default function Mapping() {
                       <circle
                         cx={pos.x}
                         cy={pos.y}
-                        r="16"
+                        r="12"
                         fill="#00b6fa"
                         style={{
                           pointerEvents: 'none',
@@ -1486,10 +1486,10 @@ export default function Mapping() {
                       <circle
                         cx={pos.x}
                         cy={pos.y}
-                        r="6"
+                        r="3"
                         fill="white"
                         stroke="#00b6fa"
-                        strokeWidth="2"
+                        strokeWidth="1.5"
                         style={{
                           pointerEvents: 'auto',
                           cursor: 'pointer'
