@@ -142,22 +142,22 @@ export default function ButtonMapping() {
       return JSON.parse(saved);
     }
     return {
-      'Left Stick': { left: 459, top: 371 },
-      'Left Bumper': { left: 361, top: 125 },
-      'D Pad Up': { left: 351, top: 184 },
-      'D Pad Left': { left: 351, top: 329 },
-      'D Pad Down': { left: 278, top: 257 },
-      'D Pad Right': { left: 423, top: 257 },
-      'Right Bumper': { left: 818, top: 177 },
-      'Button Y': { left: 821, top: 125 },
-      'Button B': { left: 892, top: 257 },
-      'Button X': { left: 740, top: 257 },
-      'Button A': { left: 818, top: 340 },
-      'Right Stick': { left: 706, top: 371 },
-      'Left Trigger': { left: 473, top: 122 },
-      'Right Trigger': { left: 697, top: 122 },
-      'Menu Button': { left: 450, top: 159 },
-      'View Button': { left: 711, top: 159 },
+      'Left Stick': { left: 459, top: 379 },
+      'Left Bumper': { left: 361, top: 133 },
+      'D Pad Up': { left: 351, top: 192 },
+      'D Pad Left': { left: 351, top: 337 },
+      'D Pad Down': { left: 278, top: 265 },
+      'D Pad Right': { left: 423, top: 265 },
+      'Right Bumper': { left: 818, top: 185 },
+      'Button Y': { left: 821, top: 133 },
+      'Button B': { left: 892, top: 265 },
+      'Button X': { left: 740, top: 265 },
+      'Button A': { left: 818, top: 348 },
+      'Right Stick': { left: 706, top: 379 },
+      'Left Trigger': { left: 473, top: 130 },
+      'Right Trigger': { left: 697, top: 130 },
+      'Menu Button': { left: 450, top: 167 },
+      'View Button': { left: 711, top: 167 },
     };
   });
   const tooltipRefs = useRef([]);
@@ -412,6 +412,7 @@ export default function ButtonMapping() {
 
   // Edit mode state for leader lines and tooltips
   const [isEditMode, setIsEditMode] = useState(false);
+  const [controllerYOffset, setControllerYOffset] = useState(8);
   const [tooltipPositions, setTooltipPositions] = useState(() => {
     const saved = localStorage.getItem('buttonMappingTooltipPositions');
     if (saved) {
@@ -1212,6 +1213,24 @@ export default function ButtonMapping() {
             </button>
             {isEditMode && (
               <>
+                <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#242424]">
+                  <span className="font-logitech font-bold text-sm text-white">Controller Y Offset:</span>
+                  <input
+                    type="range"
+                    min="-100"
+                    max="100"
+                    value={controllerYOffset}
+                    onChange={(e) => setControllerYOffset(parseInt(e.target.value))}
+                    className="w-48"
+                  />
+                  <input
+                    type="number"
+                    value={controllerYOffset}
+                    onChange={(e) => setControllerYOffset(parseInt(e.target.value) || 0)}
+                    className="w-20 px-2 py-1 rounded bg-[#333] text-white font-logitech text-sm text-center"
+                  />
+                  <span className="font-logitech text-sm text-[#a7a7a8]">px</span>
+                </div>
                 <button
                   onClick={() => {
                     console.log('=== TOOLTIP POSITIONS ===');
@@ -1252,7 +1271,7 @@ export default function ButtonMapping() {
               src="/ghost-controller-white.png"
               alt="Ghost Controller with leader lines"
               className="absolute inset-0 w-full h-full object-contain"
-              style={{ pointerEvents: 'none' }}
+              style={{ pointerEvents: 'none', transform: `translateY(${controllerYOffset}px)` }}
             />
 
 
@@ -1261,7 +1280,7 @@ export default function ButtonMapping() {
             <HotspotMarker
               key={`LD1-${viewMode}`}
               name="LD1"
-              style={{ left: `${hotspotPositions['Left Stick'].left}px`, top: `${hotspotPositions['Left Stick'].top}px` }}
+              style={{ left: `${hotspotPositions['Left Stick'].left}px`, top: `${hotspotPositions['Left Stick'].top + controllerYOffset}px` }}
               isSelected={false}
               isHovered={hoveredTooltipId === 'leftStick'}
               tooltipId="leftStick"
@@ -1273,7 +1292,7 @@ export default function ButtonMapping() {
             {viewMode !== 'back' && (
               <HotspotMarker
                 name="LB"
-                style={{ left: `${hotspotPositions['Left Bumper'].left}px`, top: `${hotspotPositions['Left Bumper'].top}px` }}
+                style={{ left: `${hotspotPositions['Left Bumper'].left}px`, top: `${hotspotPositions['Left Bumper'].top + controllerYOffset}px` }}
                 isSelected={false}
                 isHovered={hoveredTooltipId === 'leftBumper'}
                 tooltipId="leftBumper"
@@ -1286,7 +1305,7 @@ export default function ButtonMapping() {
             <HotspotMarker
               key={`LD2-${viewMode}`}
               name="LD2"
-              style={{ left: `${hotspotPositions['D Pad Up'].left}px`, top: `${hotspotPositions['D Pad Up'].top}px` }}
+              style={{ left: `${hotspotPositions['D Pad Up'].left}px`, top: `${hotspotPositions['D Pad Up'].top + controllerYOffset}px` }}
               isSelected={false}
               isHovered={hoveredTooltipId === 'dPadUp'}
               tooltipId="dPadUp"
@@ -1298,7 +1317,7 @@ export default function ButtonMapping() {
             {viewMode !== 'back' && (
               <HotspotMarker
                 name="LD3"
-                style={{ left: `${hotspotPositions['D Pad Left'].left}px`, top: `${hotspotPositions['D Pad Left'].top}px` }}
+                style={{ left: `${hotspotPositions['D Pad Left'].left}px`, top: `${hotspotPositions['D Pad Left'].top + controllerYOffset}px` }}
                 isSelected={false}
                 isHovered={hoveredTooltipId === 'dPadLeft'}
                 tooltipId="dPadLeft"
@@ -1311,7 +1330,7 @@ export default function ButtonMapping() {
             <HotspotMarker
               key={`LD4-${viewMode}`}
               name="LD4"
-              style={{ left: `${hotspotPositions['D Pad Down'].left}px`, top: `${hotspotPositions['D Pad Down'].top}px` }}
+              style={{ left: `${hotspotPositions['D Pad Down'].left}px`, top: `${hotspotPositions['D Pad Down'].top + controllerYOffset}px` }}
               isSelected={false}
               isHovered={hoveredTooltipId === 'dPadDown'}
               tooltipId="dPadDown"
@@ -1330,7 +1349,7 @@ export default function ButtonMapping() {
             {viewMode !== 'back' && (
               <HotspotMarker
                 name="LD5"
-                style={{ left: `${hotspotPositions['D Pad Right'].left}px`, top: `${hotspotPositions['D Pad Right'].top}px` }}
+                style={{ left: `${hotspotPositions['D Pad Right'].left}px`, top: `${hotspotPositions['D Pad Right'].top + controllerYOffset}px` }}
                 isSelected={false}
                 isHovered={hoveredTooltipId === 'dPadRight'}
                 tooltipId="dPadRight"
@@ -1350,7 +1369,7 @@ export default function ButtonMapping() {
             {viewMode !== 'back' && (
               <HotspotMarker
                 name="RB"
-                style={{ left: `${hotspotPositions['Right Bumper'].left}px`, top: `${hotspotPositions['Right Bumper'].top}px` }}
+                style={{ left: `${hotspotPositions['Right Bumper'].left}px`, top: `${hotspotPositions['Right Bumper'].top + controllerYOffset}px` }}
                 isSelected={false}
                 isHovered={hoveredTooltipId === 'rightBumper'}
                 tooltipId="rightBumper"
@@ -1369,7 +1388,7 @@ export default function ButtonMapping() {
             {/* RD1 - Button Y */}
             <HotspotMarker
               name="RD1"
-              style={{ left: `${hotspotPositions['Button Y'].left}px`, top: `${hotspotPositions['Button Y'].top}px` }}
+              style={{ left: `${hotspotPositions['Button Y'].left}px`, top: `${hotspotPositions['Button Y'].top + controllerYOffset}px` }}
               isSelected={false}
               isHovered={hoveredTooltipId === 'buttonY'}
               tooltipId="buttonY"
@@ -1388,7 +1407,7 @@ export default function ButtonMapping() {
             {viewMode !== 'back' && (
               <HotspotMarker
                 name="RD2"
-                style={{ left: `${hotspotPositions['Button B'].left}px`, top: `${hotspotPositions['Button B'].top}px` }}
+                style={{ left: `${hotspotPositions['Button B'].left}px`, top: `${hotspotPositions['Button B'].top + controllerYOffset}px` }}
                 isSelected={false}
                 isHovered={hoveredTooltipId === 'buttonB'}
                 tooltipId="buttonB"
@@ -1408,7 +1427,7 @@ export default function ButtonMapping() {
             {viewMode !== 'back' && (
               <HotspotMarker
                 name="RD3"
-                style={{ left: `${hotspotPositions['Button X'].left}px`, top: `${hotspotPositions['Button X'].top}px` }}
+                style={{ left: `${hotspotPositions['Button X'].left}px`, top: `${hotspotPositions['Button X'].top + controllerYOffset}px` }}
                 isSelected={false}
                 isHovered={hoveredTooltipId === 'buttonX'}
                 tooltipId="buttonX"
@@ -1429,7 +1448,7 @@ export default function ButtonMapping() {
             <HotspotMarker
               key={`RD4-${viewMode}`}
               name="RD4"
-              style={{ left: `${hotspotPositions['Button A'].left}px`, top: `${hotspotPositions['Button A'].top}px` }}
+              style={{ left: `${hotspotPositions['Button A'].left}px`, top: `${hotspotPositions['Button A'].top + controllerYOffset}px` }}
               isSelected={false}
               isHovered={hoveredTooltipId === 'buttonA'}
               tooltipId="buttonA"
@@ -1448,7 +1467,7 @@ export default function ButtonMapping() {
             <HotspotMarker
               key={`RD5-${viewMode}`}
               name="RD5"
-              style={{ left: `${hotspotPositions['Right Stick'].left}px`, top: `${hotspotPositions['Right Stick'].top}px` }}
+              style={{ left: `${hotspotPositions['Right Stick'].left}px`, top: `${hotspotPositions['Right Stick'].top + controllerYOffset}px` }}
               isSelected={false}
               isHovered={hoveredTooltipId === 'rightStick'}
               tooltipId="rightStick"
@@ -1464,7 +1483,7 @@ export default function ButtonMapping() {
             />
 
             {/* All Leader Lines in one SVG layer */}
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', zIndex: 1, overflow: 'visible' }}>
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', zIndex: 1, overflow: 'visible', transform: `translateY(${controllerYOffset}px)` }}>
               {/* L1 - Top Left (Left Stick) */}
               <LeaderLinePath
                 points={leaderLinePositions.leftStick}
@@ -1639,6 +1658,7 @@ export default function ButtonMapping() {
                 }
               ]}
               isEditMode={isEditMode}
+              controllerYOffset={controllerYOffset}
               onLineUpdate={(lineId, pointIndex, newPoint) => {
                 setLeaderLinePositions(prev => {
                   const newPoints = [...prev[lineId]];
@@ -2493,7 +2513,7 @@ function LeaderLinePath({ points, lineId, hoveredTooltipId, transform }) {
 }
 
 // Control Points Layer - renders all control points for all lines in one top layer
-function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate }) {
+function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate, controllerYOffset }) {
   const [draggingLine, setDraggingLine] = useState(null); // {lineId, pointIndex}
   const svgRef = useRef(null);
 
@@ -2553,7 +2573,8 @@ function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate }) {
       style={{
         pointerEvents: 'auto',
         zIndex: 100,
-        overflow: 'visible'
+        overflow: 'visible',
+        transform: `translateY(${controllerYOffset}px)`
       }}
     >
       {lines.map(line => (
