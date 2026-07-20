@@ -1,0 +1,28 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 300 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="trigger range">
+<path id="Subtract" d="M292 0C296.418 0 300.022 3.58435 299.787 7.99635C298.881 24.9618 295.098 41.6702 288.582 57.4023C281.044 75.6012 269.995 92.1376 256.066 106.066C242.138 119.995 225.601 131.044 207.402 138.582C189.204 146.12 169.698 150 150 150C130.302 150 110.796 146.12 92.5977 138.582C74.3988 131.044 57.8624 119.995 43.9336 106.066C30.0048 92.1376 18.9562 75.6012 11.418 57.4023C4.90154 41.6702 1.11896 24.9618 0.213281 7.99635C-0.0222472 3.58436 3.58172 0 8 0H42C46.4183 0 49.9667 3.59436 50.3152 7.99887C54.3902 59.4874 97.464 100 150 100C202.536 100 245.61 59.4874 249.685 7.99887C250.033 3.59437 253.582 0 258 0H292Z" fill="var(--fill-0, #35383F)"/>
+<path id="Subtract_2" d="M49.3298 26.4025C51.4675 25.8411 53.6476 27.1232 54.2933 29.2369C66.8052 70.1898 104.895 99.9775 149.943 99.9775C176.747 99.9775 201.086 89.4306 219.041 72.2623C220.637 70.7357 223.164 70.6853 224.753 72.2198L254.967 101.398C256.557 102.933 256.604 105.469 255.028 107.017C237.018 124.698 214.821 137.564 190.48 144.396C164.855 151.589 137.777 151.834 112.026 145.106C86.2751 138.378 62.7775 124.919 43.9453 106.111C26.0576 88.2465 12.9905 66.1665 5.93092 41.9362C5.31298 39.8152 6.5954 37.6261 8.73208 37.065L49.3298 26.4025Z" fill="var(--fill-0, #1D3044)"/>
+<path id="[Linked] Line 5403" d="M289.696 18.7451L262.411 15.0212" stroke="var(--stroke-0, #A7A7A8)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_2" d="M285.837 37.4482L259.317 30.0287" stroke="var(--stroke-0, #A7A7A8)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_3" d="M279.449 55.4502L254.197 44.4665" stroke="var(--stroke-0, #A7A7A8)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_4" d="M270.67 72.3926L247.151 58.0675" stroke="var(--stroke-0, #A7A7A8)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_5" d="M259.678 87.9707L238.318 70.59" stroke="var(--stroke-0, #A7A7A8)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_6" d="M246.688 101.908L227.871 81.8015" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_7" d="M231.93 113.967L216.005 91.5002" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_8" d="M215.66 123.921L202.937 99.4981" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_9" d="M198.167 131.573L188.904 105.64" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_10" d="M179.781 136.758L174.16 109.8" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_11" d="M160.885 139.381L158.981 111.909" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_12" d="M141.872 139.433L143.659 111.953" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_13" d="M122.962 136.916L128.466 109.934" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_14" d="M104.548 131.832L113.698 105.859" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_15" d="M87.0107 124.278L99.6279 99.8008" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_16" d="M70.6865 114.412L86.5145 91.8773" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_17" d="M55.8633 102.437L74.5937 82.2496" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_18" d="M42.7969 88.5684L64.0824 71.0964" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_19" d="M31.7207 73.0537L55.1776 58.6275" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_20" d="M22.8457 56.1602L48.0506 45.0671" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_21" d="M16.3594 38.1943L42.8466 30.6597" stroke="var(--stroke-0, #2CCBFF)" stroke-linecap="round"/>
+<path id="[Linked] Line 5403_22" d="M12.3945 19.5117L39.6633 15.6702" stroke="var(--stroke-0, #A7A7A8)" stroke-linecap="round"/>
+</g>
+</svg>
