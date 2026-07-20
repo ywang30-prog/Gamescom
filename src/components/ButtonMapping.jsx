@@ -1463,209 +1463,192 @@ export default function ButtonMapping() {
               }}
             />
 
-            {/* Individual Leader Lines - respond to tooltip hover */}
-            {/* L1 - Top Left (Left Stick) */}
-            <EditableLeaderLine
-              points={leaderLinePositions.leftStick}
-              isEditMode={isEditMode}
-              onPointsChange={(newPoints) => {
-                setLeaderLinePositions(prev => ({
-                  ...prev,
-                  leftStick: newPoints
-                }));
-              }}
-              lineId="leftStick"
-              hoveredTooltipId={hoveredTooltipId}
-              viewMode={viewMode}
-              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(250px) translateX(-60px)' : 'scale(0.8085) translateY(42px) translateX(-60px)'}
-            />
-
-            {/* LB - Left Bumper */}
-            {viewMode !== 'back' && (
-              <EditableLeaderLine
-                points={leaderLinePositions.leftBumper}
-                isEditMode={isEditMode}
-                onPointsChange={(newPoints) => {
-                  setLeaderLinePositions(prev => ({
-                    ...prev,
-                    leftBumper: newPoints
-                  }));
-                }}
-                lineId="leftBumper"
+            {/* All Leader Lines in one SVG layer */}
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', zIndex: 1 }}>
+              {/* L1 - Top Left (Left Stick) */}
+              <LeaderLinePath
+                points={leaderLinePositions.leftStick}
+                lineId="leftStick"
                 hoveredTooltipId={hoveredTooltipId}
-                viewMode={viewMode}
-                transform="scale(0.8085) translateY(-55px) translateX(-60px)"
+                transform={viewMode !== 'back' ? 'scale(0.8085) translateY(250px) translateX(-60px)' : 'scale(0.8085) translateY(42px) translateX(-60px)'}
               />
-            )}
 
-            {/* L2 - Second from Top Left (D Pad Up) */}
-            <EditableLeaderLine
-              points={leaderLinePositions.dPadUp}
-              isEditMode={isEditMode}
-              onPointsChange={(newPoints) => {
-                setLeaderLinePositions(prev => ({
-                  ...prev,
-                  dPadUp: newPoints
-                }));
-              }}
-              lineId="dPadUp"
-              hoveredTooltipId={hoveredTooltipId}
-              viewMode={viewMode}
-              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(-30px) translateX(-60px)' : 'scale(0.8085) translateY(-38px) translateX(-60px)'}
-            />
+              {/* LB - Left Bumper */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.leftBumper}
+                  lineId="leftBumper"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(-55px) translateX(-60px)"
+                />
+              )}
 
-            {/* L3 - Middle Left (D Pad Left) */}
-            {viewMode !== 'back' && (
-              <EditableLeaderLine
-                points={leaderLinePositions.dPadLeft}
-                isEditMode={isEditMode}
-                onPointsChange={(newPoints) => {
-                  setLeaderLinePositions(prev => ({
-                    ...prev,
-                    dPadLeft: newPoints
-                  }));
-                }}
-                lineId="dPadLeft"
+              {/* L2 - Second from Top Left (D Pad Up) */}
+              <LeaderLinePath
+                points={leaderLinePositions.dPadUp}
+                lineId="dPadUp"
                 hoveredTooltipId={hoveredTooltipId}
-                viewMode={viewMode}
-                transform="scale(0.8085) translateY(-42px) translateX(-60px)"
+                transform={viewMode !== 'back' ? 'scale(0.8085) translateY(-30px) translateX(-60px)' : 'scale(0.8085) translateY(-38px) translateX(-60px)'}
               />
-            )}
 
-            {/* L4 - Fourth from Top Left (D Pad Down) */}
-            <EditableLeaderLine
-              points={leaderLinePositions.dPadDown}
-              isEditMode={isEditMode}
-              onPointsChange={(newPoints) => {
-                setLeaderLinePositions(prev => ({
-                  ...prev,
-                  dPadDown: newPoints
-                }));
-              }}
-              lineId="dPadDown"
-              hoveredTooltipId={hoveredTooltipId}
-              viewMode={viewMode}
-              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(-30px) translateX(-60px)' : 'scale(0.8085) translateY(-50px) translateX(-60px)'}
-            />
+              {/* L3 - Middle Left (D Pad Left) */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.dPadLeft}
+                  lineId="dPadLeft"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(-42px) translateX(-60px)"
+                />
+              )}
 
-            {/* L5 - Bottom Left (D Pad Right) */}
-            {viewMode !== 'back' && (
-              <EditableLeaderLine
-                points={leaderLinePositions.dPadRight}
-                isEditMode={isEditMode}
-                onPointsChange={(newPoints) => {
-                  setLeaderLinePositions(prev => ({
-                    ...prev,
-                    dPadRight: newPoints
-                  }));
-                }}
-                lineId="dPadRight"
+              {/* L4 - Fourth from Top Left (D Pad Down) */}
+              <LeaderLinePath
+                points={leaderLinePositions.dPadDown}
+                lineId="dPadDown"
                 hoveredTooltipId={hoveredTooltipId}
-                viewMode={viewMode}
-                transform="scale(0.8085) translateY(-45px) translateX(-60px)"
+                transform={viewMode !== 'back' ? 'scale(0.8085) translateY(-30px) translateX(-60px)' : 'scale(0.8085) translateY(-50px) translateX(-60px)'}
               />
-            )}
 
-            {/* RB - Right Bumper */}
-            {viewMode !== 'back' && (
-              <EditableLeaderLine
-                points={leaderLinePositions.rightBumper}
-                isEditMode={isEditMode}
-                onPointsChange={(newPoints) => {
-                  setLeaderLinePositions(prev => ({
-                    ...prev,
-                    rightBumper: newPoints
-                  }));
-                }}
-                lineId="rightBumper"
+              {/* L5 - Bottom Left (D Pad Right) */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.dPadRight}
+                  lineId="dPadRight"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(-45px) translateX(-60px)"
+                />
+              )}
+
+              {/* RB - Right Bumper */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.rightBumper}
+                  lineId="rightBumper"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(-35px) translateX(60px)"
+                />
+              )}
+
+              {/* R1 - Top Right (Button Y) */}
+              <LeaderLinePath
+                points={leaderLinePositions.buttonY}
+                lineId="buttonY"
                 hoveredTooltipId={hoveredTooltipId}
-                viewMode={viewMode}
-                transform="scale(0.8085) translateY(-35px) translateX(60px)"
+                transform="scale(0.8085) translateY(77px) translateX(60px)"
               />
-            )}
 
-            {/* R1 - Top Right (Button Y) */}
-            <EditableLeaderLine
-              points={leaderLinePositions.buttonY}
-              isEditMode={isEditMode}
-              onPointsChange={(newPoints) => {
-                setLeaderLinePositions(prev => ({
-                  ...prev,
-                  buttonY: newPoints
-                }));
-              }}
-              lineId="buttonY"
-              hoveredTooltipId={hoveredTooltipId}
-              viewMode={viewMode}
-              transform="scale(0.8085) translateY(77px) translateX(60px)"
-            />
+              {/* R2 - Second from Top Right (Button B) */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.buttonB}
+                  lineId="buttonB"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(158px) translateX(698px)"
+                />
+              )}
 
-            {/* R2 - Second from Top Right (Button B) */}
-            {viewMode !== 'back' && (
-              <EditableLeaderLine
-                points={leaderLinePositions.buttonB}
-                isEditMode={isEditMode}
-                onPointsChange={(newPoints) => {
-                  setLeaderLinePositions(prev => ({
-                    ...prev,
-                    buttonB: newPoints
-                  }));
-                }}
-                lineId="buttonB"
+              {/* R3 - Middle Right (Button X) */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.buttonX}
+                  lineId="buttonX"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(73px) translateX(60px)"
+                />
+              )}
+
+              {/* R4 - Fourth from Top Right (Button A) */}
+              <LeaderLinePath
+                points={leaderLinePositions.buttonA}
+                lineId="buttonA"
                 hoveredTooltipId={hoveredTooltipId}
-                viewMode={viewMode}
-                transform="scale(0.8085) translateY(158px) translateX(698px)"
+                transform={viewMode !== 'back' ? 'scale(0.8085) translateY(73px) translateX(60px)' : 'scale(0.8085) translateY(-132px) translateX(60px)'}
               />
-            )}
 
-            {/* R3 - Middle Right (Button X) */}
-            {viewMode !== 'back' && (
-              <EditableLeaderLine
-                points={leaderLinePositions.buttonX}
-                isEditMode={isEditMode}
-                onPointsChange={(newPoints) => {
-                  setLeaderLinePositions(prev => ({
-                    ...prev,
-                    buttonX: newPoints
-                  }));
-                }}
-                lineId="buttonX"
+              {/* R5 - Bottom Right (Right Stick) */}
+              <LeaderLinePath
+                points={leaderLinePositions.rightStick}
+                lineId="rightStick"
                 hoveredTooltipId={hoveredTooltipId}
-                viewMode={viewMode}
-                transform="scale(0.8085) translateY(73px) translateX(60px)"
+                transform={viewMode !== 'back' ? 'scale(0.8085) translateY(77px) translateX(60px)' : 'scale(0.8085) translateY(-130px) translateX(60px)'}
               />
-            )}
+            </svg>
 
-            {/* R4 - Fourth from Top Right (Button A) */}
-            <EditableLeaderLine
-              points={leaderLinePositions.buttonA}
+            {/* All Control Points in one top layer */}
+            <LeaderLineControlPoints
+              lines={[
+                {
+                  id: 'leftStick',
+                  points: leaderLinePositions.leftStick,
+                  transform: viewMode !== 'back' ? 'scale(0.8085) translateY(250px) translateX(-60px)' : 'scale(0.8085) translateY(42px) translateX(-60px)'
+                },
+                ...(viewMode !== 'back' ? [{
+                  id: 'leftBumper',
+                  points: leaderLinePositions.leftBumper,
+                  transform: 'scale(0.8085) translateY(-55px) translateX(-60px)'
+                }] : []),
+                {
+                  id: 'dPadUp',
+                  points: leaderLinePositions.dPadUp,
+                  transform: viewMode !== 'back' ? 'scale(0.8085) translateY(-30px) translateX(-60px)' : 'scale(0.8085) translateY(-38px) translateX(-60px)'
+                },
+                ...(viewMode !== 'back' ? [{
+                  id: 'dPadLeft',
+                  points: leaderLinePositions.dPadLeft,
+                  transform: 'scale(0.8085) translateY(-42px) translateX(-60px)'
+                }] : []),
+                {
+                  id: 'dPadDown',
+                  points: leaderLinePositions.dPadDown,
+                  transform: viewMode !== 'back' ? 'scale(0.8085) translateY(-30px) translateX(-60px)' : 'scale(0.8085) translateY(-50px) translateX(-60px)'
+                },
+                ...(viewMode !== 'back' ? [{
+                  id: 'dPadRight',
+                  points: leaderLinePositions.dPadRight,
+                  transform: 'scale(0.8085) translateY(-45px) translateX(-60px)'
+                }] : []),
+                ...(viewMode !== 'back' ? [{
+                  id: 'rightBumper',
+                  points: leaderLinePositions.rightBumper,
+                  transform: 'scale(0.8085) translateY(-35px) translateX(60px)'
+                }] : []),
+                {
+                  id: 'buttonY',
+                  points: leaderLinePositions.buttonY,
+                  transform: 'scale(0.8085) translateY(77px) translateX(60px)'
+                },
+                ...(viewMode !== 'back' ? [{
+                  id: 'buttonB',
+                  points: leaderLinePositions.buttonB,
+                  transform: 'scale(0.8085) translateY(158px) translateX(698px)'
+                }] : []),
+                ...(viewMode !== 'back' ? [{
+                  id: 'buttonX',
+                  points: leaderLinePositions.buttonX,
+                  transform: 'scale(0.8085) translateY(73px) translateX(60px)'
+                }] : []),
+                {
+                  id: 'buttonA',
+                  points: leaderLinePositions.buttonA,
+                  transform: viewMode !== 'back' ? 'scale(0.8085) translateY(73px) translateX(60px)' : 'scale(0.8085) translateY(-132px) translateX(60px)'
+                },
+                {
+                  id: 'rightStick',
+                  points: leaderLinePositions.rightStick,
+                  transform: viewMode !== 'back' ? 'scale(0.8085) translateY(77px) translateX(60px)' : 'scale(0.8085) translateY(-130px) translateX(60px)'
+                }
+              ]}
               isEditMode={isEditMode}
-              onPointsChange={(newPoints) => {
-                setLeaderLinePositions(prev => ({
-                  ...prev,
-                  buttonA: newPoints
-                }));
+              onLineUpdate={(lineId, pointIndex, newPoint) => {
+                setLeaderLinePositions(prev => {
+                  const newPoints = [...prev[lineId]];
+                  newPoints[pointIndex] = newPoint;
+                  return {
+                    ...prev,
+                    [lineId]: newPoints
+                  };
+                });
               }}
-              lineId="buttonA"
-              hoveredTooltipId={hoveredTooltipId}
-              viewMode={viewMode}
-              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(73px) translateX(60px)' : 'scale(0.8085) translateY(-132px) translateX(60px)'}
-            />
-
-            {/* R5 - Bottom Right (Right Stick) */}
-            <EditableLeaderLine
-              points={leaderLinePositions.rightStick}
-              isEditMode={isEditMode}
-              onPointsChange={(newPoints) => {
-                setLeaderLinePositions(prev => ({
-                  ...prev,
-                  rightStick: newPoints
-                }));
-              }}
-              lineId="rightStick"
-              hoveredTooltipId={hoveredTooltipId}
-              viewMode={viewMode}
-              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(77px) translateX(60px)' : 'scale(0.8085) translateY(-130px) translateX(60px)'}
             />
 
             {/* Animated Tracing Layer */}
@@ -2490,41 +2473,66 @@ function AssignmentCallout({ label, value, style, align = 'left' }) {
   );
 }
 
-// Editable Leader Line Component - returns both line and control points
-function EditableLeaderLine({ points, isEditMode, onPointsChange, lineId, hoveredTooltipId, viewMode, transform }) {
-  const [draggingIndex, setDraggingIndex] = useState(null);
-  const svgRef = useRef(null);
-  const controlPointsRef = useRef(null);
+// Single Leader Line Path - just renders the path, no control points
+function LeaderLinePath({ points, lineId, hoveredTooltipId, transform }) {
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  const opacity = hoveredTooltipId === lineId ? '0.3' : '0.2';
 
-  const handleMouseDown = (e, index) => {
+  return (
+    <g style={{ transform }}>
+      <path
+        d={pathD}
+        stroke="#FBFBFB"
+        strokeOpacity={opacity}
+        strokeWidth="1"
+        strokeLinecap="round"
+        style={{ transition: 'stroke-opacity 0.2s ease' }}
+      />
+    </g>
+  );
+}
+
+// Control Points Layer - renders all control points for all lines in one top layer
+function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate }) {
+  const [draggingLine, setDraggingLine] = useState(null); // {lineId, pointIndex}
+  const svgRef = useRef(null);
+
+  const handleMouseDown = (e, lineId, pointIndex) => {
     if (!isEditMode) return;
     e.preventDefault();
     e.stopPropagation();
-    setDraggingIndex(index);
+    setDraggingLine({ lineId, pointIndex });
   };
 
   useEffect(() => {
     const handleMouseMove = (e) => {
-      if (draggingIndex === null || !isEditMode || !svgRef.current) return;
+      if (!draggingLine || !isEditMode || !svgRef.current) return;
 
-      const svg = svgRef.current;
-      const rect = svg.getBoundingClientRect();
-      const scaleX = 567.5 / rect.width;
-      const scaleY = 351.5 / rect.height;
+      const line = lines.find(l => l.id === draggingLine.lineId);
+      if (!line) return;
 
-      const x = (e.clientX - rect.left) * scaleX;
-      const y = (e.clientY - rect.top) * scaleY;
+      // Find the correct SVG element for this line's transform
+      const svgContainer = svgRef.current.parentElement;
+      const rect = svgContainer.getBoundingClientRect();
 
-      const newPoints = [...points];
-      newPoints[draggingIndex] = { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
-      onPointsChange(newPoints);
+      // Simple coordinate calculation (works for all transforms)
+      const scaleX = 567.5 / (rect.width * 0.8085);
+      const scaleY = 351.5 / (rect.height * 0.8085);
+
+      const x = ((e.clientX - rect.left) / rect.width) * 567.5;
+      const y = ((e.clientY - rect.top) / rect.height) * 351.5;
+
+      onLineUpdate(draggingLine.lineId, draggingLine.pointIndex, {
+        x: Math.round(x * 10) / 10,
+        y: Math.round(y * 10) / 10
+      });
     };
 
     const handleMouseUp = () => {
-      setDraggingIndex(null);
+      setDraggingLine(null);
     };
 
-    if (draggingIndex !== null) {
+    if (draggingLine) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
       return () => {
@@ -2532,95 +2540,55 @@ function EditableLeaderLine({ points, isEditMode, onPointsChange, lineId, hovere
         window.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [draggingIndex, isEditMode, points, onPointsChange]);
+  }, [draggingLine, isEditMode, lines, onLineUpdate]);
 
-  // Build path string from points
-  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-
-  const opacity = hoveredTooltipId === lineId ? '0.3' : '0.2';
-
-  // Parse transform to extract scale and translate values
-  const parseTransform = (transformStr) => {
-    const scaleMatch = transformStr.match(/scale\(([0-9.]+)\)/);
-    const translateXMatch = transformStr.match(/translateX\(([0-9.-]+)px\)/);
-    const translateYMatch = transformStr.match(/translateY\(([0-9.-]+)px\)/);
-
-    return {
-      scale: scaleMatch ? parseFloat(scaleMatch[1]) : 1,
-      translateX: translateXMatch ? parseFloat(translateXMatch[1]) : 0,
-      translateY: translateYMatch ? parseFloat(translateYMatch[1]) : 0
-    };
-  };
-
-  const { scale, translateX, translateY } = parseTransform(transform);
+  if (!isEditMode) return null;
 
   return (
-    <>
-      {/* Line SVG with transform */}
-      <svg
-        ref={svgRef}
-        className="absolute inset-0 w-full h-full"
-        viewBox="0 0 567.5 351.5"
-        fill="none"
-        style={{
-          pointerEvents: 'none',
-          transform: transform,
-          zIndex: isEditMode ? 10 : 1
-        }}
-      >
-        {/* Main line */}
-        <path
-          d={pathD}
-          stroke="#FBFBFB"
-          strokeOpacity={opacity}
-          strokeWidth="1"
-          strokeLinecap="round"
-          style={{ transition: 'stroke-opacity 0.2s ease' }}
-        />
-      </svg>
-
-      {/* Control points SVG WITHOUT transform - in parent coordinate space */}
-      {isEditMode && (
-        <svg
-          ref={controlPointsRef}
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 567.5 351.5"
-          fill="none"
-          style={{
-            pointerEvents: 'auto',
-            transform: transform,
-            zIndex: 20
-          }}
-        >
-          {points.map((point, index) => (
-            <g key={index}>
-              {/* Larger invisible hit area */}
-              <circle
-                cx={point.x}
-                cy={point.y}
-                r="15"
-                fill="transparent"
-                style={{ cursor: 'move' }}
-                onMouseDown={(e) => handleMouseDown(e, index)}
-              />
-              {/* Visible control point */}
-              <circle
-                cx={point.x}
-                cy={point.y}
-                r="6"
-                fill={draggingIndex === index ? "#00b6fa" : "#ff6b00"}
-                stroke="white"
-                strokeWidth="2.5"
-                style={{
-                  cursor: 'move',
-                  pointerEvents: 'none'
-                }}
-              />
-            </g>
-          ))}
-        </svg>
-      )}
-    </>
+    <svg
+      ref={svgRef}
+      className="absolute inset-0 w-full h-full"
+      viewBox="0 0 567.5 351.5"
+      fill="none"
+      style={{
+        pointerEvents: 'auto',
+        zIndex: 100
+      }}
+    >
+      {lines.map(line => (
+        <g key={line.id} style={{ transform: line.transform }}>
+          {line.points.map((point, index) => {
+            const isDragging = draggingLine?.lineId === line.id && draggingLine?.pointIndex === index;
+            return (
+              <g key={`${line.id}-${index}`}>
+                {/* Larger invisible hit area */}
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r="20"
+                  fill="transparent"
+                  style={{ cursor: 'move' }}
+                  onMouseDown={(e) => handleMouseDown(e, line.id, index)}
+                />
+                {/* Visible control point */}
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r="7"
+                  fill={isDragging ? "#00b6fa" : "#ff6b00"}
+                  stroke="white"
+                  strokeWidth="3"
+                  style={{
+                    cursor: 'move',
+                    pointerEvents: 'none'
+                  }}
+                />
+              </g>
+            );
+          })}
+        </g>
+      ))}
+    </svg>
   );
 }
 
