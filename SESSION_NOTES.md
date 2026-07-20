@@ -30,6 +30,8 @@
    - Tooltip positions saved separately from hotspots
    - "Copy Tooltip Positions" and "Copy Leader Line Positions" buttons for exporting
    - Visual indicators: yellow ring (hover), green ring (pinned), blue ring (dragging)
+   - Live Y offset editor with slider and number input (default: 8px)
+   - Clean hover states without animated borders (TracingAnimationLayer removed)
 
 4. **Leader Line Editing - Button Remapping Page ✅ NEW**
    - SVG leader lines are now fully editable in edit mode
@@ -216,7 +218,8 @@ Status-Design-Exploration/
 - ✅ Tooltip editing working with pin/drag/coordinate inputs
 - ✅ Live Y offset editor available (default: 8px on Button Remapping)
 - ✅ All positions saved to localStorage and code defaults
-- ✅ Latest commit: 13b4140 "Add live Y offset editor and apply 8px permanent offset"
+- ✅ TracingAnimationLayer removed (no more weird tooltip animations)
+- ✅ Latest commit: f1aa0c0 "Remove TracingAnimationLayer to fix weird tooltip animation"
 
 **Quick Start for New Context:**
 1. Run `npm run dev` to start dev server (http://localhost:5173)
