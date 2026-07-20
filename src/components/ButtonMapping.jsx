@@ -1715,8 +1715,7 @@ export default function ButtonMapping() {
               }}
             />
 
-            {/* Animated Tracing Layer */}
-            <TracingAnimationLayer hoveredTooltipId={hoveredTooltipId} tooltipRefs={tooltipRefs} />
+            {/* Animated Tracing Layer - REMOVED (was causing weird animation on tooltips) */}
 
             {/* Tooltip next to top left leader line */}
             {showResetButton === 'leftStick' && (
@@ -2187,125 +2186,7 @@ export default function ButtonMapping() {
 }
 
 // Tracing Animation Layer - creates traveling 5px glowing segment
-function TracingAnimationLayer({ hoveredTooltipId, tooltipRefs }) {
-  if (!hoveredTooltipId) return null;
-
-  // Mapping of tooltip IDs to their hotspot positions
-  const tooltipConfigs = {
-    leftStick: { tooltipIndex: 0, align: 'right', hotspotPos: { x: 268, y: 254 } },
-    leftBumper: { tooltipIndex: 1, align: 'right', hotspotPos: { x: 200, y: 45 } },
-    dPadUp: { tooltipIndex: 2, align: 'right', hotspotPos: { x: 173, y: 115 } },
-    dPadLeft: { tooltipIndex: 3, align: 'right', hotspotPos: { x: 122, y: 166 } },
-    dPadDown: { tooltipIndex: 4, align: 'right', hotspotPos: { x: 175, y: 217 } },
-    dPadRight: { tooltipIndex: 5, align: 'right', hotspotPos: { x: 227, y: 166 } },
-    rightBumper: { tooltipIndex: 6, align: 'left', hotspotPos: { x: 550, y: 45 } },
-    buttonY: { tooltipIndex: 7, align: 'left', hotspotPos: { x: 560, y: 106 } },
-    buttonB: { tooltipIndex: 8, align: 'left', hotspotPos: { x: 623, y: 167 } },
-    buttonX: { tooltipIndex: 9, align: 'left', hotspotPos: { x: 488, y: 166 } },
-    buttonA: { tooltipIndex: 10, align: 'left', hotspotPos: { x: 560, y: 223 } },
-    rightStick: { tooltipIndex: 11, align: 'left', hotspotPos: { x: 467, y: 252 } },
-  };
-
-  const config = tooltipConfigs[hoveredTooltipId];
-  if (!config) return null;
-
-  const tooltipEl = tooltipRefs.current[config.tooltipIndex];
-  if (!tooltipEl) return null;
-
-  const tooltipRect = tooltipEl.getBoundingClientRect();
-  const containerEl = tooltipEl.parentElement;
-  if (!containerEl) return null;
-
-  const containerRect = containerEl.getBoundingClientRect();
-
-  // Convert tooltip position to relative coordinates
-  const tooltipX = tooltipRect.left - containerRect.left;
-  const tooltipY = tooltipRect.top - containerRect.top;
-  const tooltipW = tooltipRect.width;
-  const tooltipH = tooltipRect.height;
-
-  // Hotspot center (add 12px to get to center of 24px hotspot)
-  const hotspotCenterX = config.hotspotPos.x + 12;
-  const hotspotCenterY = config.hotspotPos.y + 12;
-
-  // Create path: tooltip border - different starting points to ensure all edges are visible
-  let completePath;
-  if (config.align === 'right') {
-    // Right-aligned (left side): start at RIGHT-bottom corner, travel left to ensure left edge is covered
-    completePath = `
-      M ${tooltipX + tooltipW} ${tooltipY + tooltipH}
-      L ${tooltipX + tooltipW} ${tooltipY}
-      L ${tooltipX} ${tooltipY}
-      L ${tooltipX} ${tooltipY + tooltipH}
-      L ${tooltipX + tooltipW} ${tooltipY + tooltipH}
-    `;
-  } else {
-    // Left-aligned (right side): start at LEFT-bottom corner, travel right to ensure right edge is covered
-    completePath = `
-      M ${tooltipX} ${tooltipY + tooltipH}
-      L ${tooltipX} ${tooltipY}
-      L ${tooltipX + tooltipW} ${tooltipY}
-      L ${tooltipX + tooltipW} ${tooltipY + tooltipH}
-      L ${tooltipX} ${tooltipY + tooltipH}
-    `;
-  }
-
-  // Create mask path - the actual tooltip border outline
-  const maskPath = completePath;
-
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 100 }}>
-      <defs>
-        {/* Mask that defines the 1px border area */}
-        <mask id={`borderMask-${hoveredTooltipId}`}>
-          <rect x="0" y="0" width="100%" height="100%" fill="black" />
-          <path
-            d={maskPath}
-            stroke="white"
-            strokeWidth="2"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </mask>
-
-        <filter id="glowFilter">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
-          <feComponentTransfer>
-            <feFuncA type="linear" slope="2.5" />
-          </feComponentTransfer>
-        </filter>
-
-        <style>
-          {`
-            @keyframes traceAnimation {
-              to {
-                stroke-dashoffset: 0;
-              }
-            }
-          `}
-        </style>
-      </defs>
-
-      {/* Traveling glowing segment masked to border area */}
-      <path
-        d={completePath}
-        stroke="rgba(255, 255, 255, 0.15)"
-        strokeWidth="8"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeDasharray="8 2000"
-        strokeDashoffset="2008"
-        mask={`url(#borderMask-${hoveredTooltipId})`}
-        style={{
-          filter: 'url(#glowFilter)',
-          animation: 'traceAnimation 15.6s ease-out infinite'
-        }}
-      />
-    </svg>
-  );
-}
+// TracingAnimationLayer removed - was causing weird animated line on tooltips
 
 // Tooltip Component with all states (default, hover, press, active)
 // Supports both left and right alignment
