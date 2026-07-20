@@ -433,11 +433,84 @@ export default function ButtonMapping() {
     };
   });
 
+  // Leader line positions - control points for the SVG paths
+  const [leaderLinePositions, setLeaderLinePositions] = useState(() => {
+    const saved = localStorage.getItem('buttonMappingLeaderLinePositions');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    // Default leader line paths - store as arrays of {x, y} points
+    return {
+      leftStick: [
+        { x: 0, y: 218.789 },
+        { x: 92, y: 218.789 },
+        { x: 233.71, y: 18.38 }
+      ],
+      leftBumper: [
+        { x: 162, y: 37 },
+        { x: 85, y: 20 },
+        { x: 1, y: 20 }
+      ],
+      dPadUp: [
+        { x: 136, y: 90 },
+        { x: 85, y: 83.5 },
+        { x: 1, y: 83.5 }
+      ],
+      dPadLeft: [
+        { x: 91, y: 162 },
+        { x: 83.5, y: 173.5 },
+        { x: 1.5, y: 173.5 }
+      ],
+      dPadDown: [
+        { x: 133, y: 198 },
+        { x: 55, y: 251 },
+        { x: 1.5, y: 251 }
+      ],
+      dPadRight: [
+        { x: 195, y: 160 },
+        { x: 101, y: 347.5 },
+        { x: 1, y: 347.5 }
+      ],
+      rightBumper: [
+        { x: 566.5, y: 1 },
+        { x: 480, y: 1 },
+        { x: 418, y: 25 }
+      ],
+      buttonY: [
+        { x: 566.5, y: 1 },
+        { x: 481, y: 1 },
+        { x: 426, y: 1 }
+      ],
+      buttonB: [
+        { x: 3.432, y: 5.447 },
+        { x: 15.4331, y: 26.2499 },
+        { x: 77.9331, y: 26.2499 }
+      ],
+      buttonX: [
+        { x: 358, y: 54 },
+        { x: 417, y: 94.5 },
+        { x: 514, y: 172.5 },
+        { x: 566.5, y: 172.5 }
+      ],
+      buttonA: [
+        { x: 566.5, y: 261.5 },
+        { x: 502.5, y: 261.5 },
+        { x: 420, y: 121 }
+      ],
+      rightStick: [
+        { x: 566.5, y: 350.5 },
+        { x: 481, y: 350.5 },
+        { x: 337, y: 142.6 }
+      ]
+    };
+  });
+
   const handleToggleEditMode = () => {
     if (isEditMode) {
       // Exiting edit mode - save positions
       localStorage.setItem('buttonMappingTooltipPositions', JSON.stringify(tooltipPositions));
-      console.log('✅ Tooltip positions saved!');
+      localStorage.setItem('buttonMappingLeaderLinePositions', JSON.stringify(leaderLinePositions));
+      console.log('✅ Tooltip and leader line positions saved!');
     }
     setIsEditMode(!isEditMode);
   };
@@ -1138,18 +1211,33 @@ export default function ButtonMapping() {
               {isEditMode ? 'Save & Exit Edit Mode' : 'Edit Layout'}
             </button>
             {isEditMode && (
-              <button
-                onClick={() => {
-                  console.log('=== TOOLTIP POSITIONS ===');
-                  Object.entries(tooltipPositions).forEach(([name, pos]) => {
-                    console.log(`${name}: { left: ${pos.left}, top: ${pos.top} },`);
-                  });
-                  console.log('========================');
-                }}
-                className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
-              >
-                Copy Positions to Console
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    console.log('=== TOOLTIP POSITIONS ===');
+                    Object.entries(tooltipPositions).forEach(([name, pos]) => {
+                      console.log(`${name}: { left: ${pos.left}, top: ${pos.top} },`);
+                    });
+                    console.log('========================');
+                  }}
+                  className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
+                >
+                  Copy Tooltip Positions
+                </button>
+                <button
+                  onClick={() => {
+                    console.log('=== LEADER LINE POSITIONS ===');
+                    Object.entries(leaderLinePositions).forEach(([name, points]) => {
+                      const pointsStr = points.map(p => `{ x: ${p.x}, y: ${p.y} }`).join(', ');
+                      console.log(`${name}: [${pointsStr}],`);
+                    });
+                    console.log('============================');
+                  }}
+                  className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
+                >
+                  Copy Leader Line Positions
+                </button>
+              </>
             )}
           </div>
 
@@ -1376,107 +1464,209 @@ export default function ButtonMapping() {
             />
 
             {/* Individual Leader Lines - respond to tooltip hover */}
-            {/* L1 - Top Left */}
-            {viewMode !== 'back' ? (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(250px) translateX(-60px)' }}>
-                <path d="M0 218.789H92L233.71 18.38" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'leftStick' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            ) : (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(42px) translateX(-60px)' }}>
-                <path d="M1 218.789H145.71" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'leftStick' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            )}
+            {/* L1 - Top Left (Left Stick) */}
+            <EditableLeaderLine
+              points={leaderLinePositions.leftStick}
+              isEditMode={isEditMode}
+              onPointsChange={(newPoints) => {
+                setLeaderLinePositions(prev => ({
+                  ...prev,
+                  leftStick: newPoints
+                }));
+              }}
+              lineId="leftStick"
+              hoveredTooltipId={hoveredTooltipId}
+              viewMode={viewMode}
+              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(250px) translateX(-60px)' : 'scale(0.8085) translateY(42px) translateX(-60px)'}
+            />
 
             {/* LB - Left Bumper */}
             {viewMode !== 'back' && (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-55px) translateX(-60px)' }}>
-                <path d="M162 37L85 20H1" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'leftBumper' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
+              <EditableLeaderLine
+                points={leaderLinePositions.leftBumper}
+                isEditMode={isEditMode}
+                onPointsChange={(newPoints) => {
+                  setLeaderLinePositions(prev => ({
+                    ...prev,
+                    leftBumper: newPoints
+                  }));
+                }}
+                lineId="leftBumper"
+                hoveredTooltipId={hoveredTooltipId}
+                viewMode={viewMode}
+                transform="scale(0.8085) translateY(-55px) translateX(-60px)"
+              />
             )}
 
-            {/* L2 - Second from Top Left */}
-            {viewMode !== 'back' ? (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-30px) translateX(-60px)' }}>
-                <path d="M136 90L85 83.5H1" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'dPadUp' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            ) : (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-38px) translateX(-60px)' }}>
-                <path d="M136 90H1" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'dPadUp' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            )}
+            {/* L2 - Second from Top Left (D Pad Up) */}
+            <EditableLeaderLine
+              points={leaderLinePositions.dPadUp}
+              isEditMode={isEditMode}
+              onPointsChange={(newPoints) => {
+                setLeaderLinePositions(prev => ({
+                  ...prev,
+                  dPadUp: newPoints
+                }));
+              }}
+              lineId="dPadUp"
+              hoveredTooltipId={hoveredTooltipId}
+              viewMode={viewMode}
+              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(-30px) translateX(-60px)' : 'scale(0.8085) translateY(-38px) translateX(-60px)'}
+            />
 
-            {/* L3 - Middle Left */}
+            {/* L3 - Middle Left (D Pad Left) */}
             {viewMode !== 'back' && (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-42px) translateX(-60px)' }}>
-                <path d="M91 162L83.5 173.5H1.5" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'dPadLeft' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
+              <EditableLeaderLine
+                points={leaderLinePositions.dPadLeft}
+                isEditMode={isEditMode}
+                onPointsChange={(newPoints) => {
+                  setLeaderLinePositions(prev => ({
+                    ...prev,
+                    dPadLeft: newPoints
+                  }));
+                }}
+                lineId="dPadLeft"
+                hoveredTooltipId={hoveredTooltipId}
+                viewMode={viewMode}
+                transform="scale(0.8085) translateY(-42px) translateX(-60px)"
+              />
             )}
 
-            {/* L4 - Fourth from Top Left */}
-            {viewMode !== 'back' ? (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-30px) translateX(-60px)' }}>
-                <path d="M133 198L55 251H1.5" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'dPadDown' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            ) : (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-50px) translateX(-60px)' }}>
-                <path d="M158 198H1.5" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'dPadDown' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            )}
+            {/* L4 - Fourth from Top Left (D Pad Down) */}
+            <EditableLeaderLine
+              points={leaderLinePositions.dPadDown}
+              isEditMode={isEditMode}
+              onPointsChange={(newPoints) => {
+                setLeaderLinePositions(prev => ({
+                  ...prev,
+                  dPadDown: newPoints
+                }));
+              }}
+              lineId="dPadDown"
+              hoveredTooltipId={hoveredTooltipId}
+              viewMode={viewMode}
+              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(-30px) translateX(-60px)' : 'scale(0.8085) translateY(-50px) translateX(-60px)'}
+            />
 
-            {/* L5 - Bottom Left */}
+            {/* L5 - Bottom Left (D Pad Right) */}
             {viewMode !== 'back' && (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-45px) translateX(-60px)' }}>
-                <path d="M195 160L101 347.5H1" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'dPadRight' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
+              <EditableLeaderLine
+                points={leaderLinePositions.dPadRight}
+                isEditMode={isEditMode}
+                onPointsChange={(newPoints) => {
+                  setLeaderLinePositions(prev => ({
+                    ...prev,
+                    dPadRight: newPoints
+                  }));
+                }}
+                lineId="dPadRight"
+                hoveredTooltipId={hoveredTooltipId}
+                viewMode={viewMode}
+                transform="scale(0.8085) translateY(-45px) translateX(-60px)"
+              />
             )}
 
             {/* RB - Right Bumper */}
             {viewMode !== 'back' && (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-35px) translateX(60px)' }}>
-                <path d="M566.5 1H480L418 25" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'rightBumper' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
+              <EditableLeaderLine
+                points={leaderLinePositions.rightBumper}
+                isEditMode={isEditMode}
+                onPointsChange={(newPoints) => {
+                  setLeaderLinePositions(prev => ({
+                    ...prev,
+                    rightBumper: newPoints
+                  }));
+                }}
+                lineId="rightBumper"
+                hoveredTooltipId={hoveredTooltipId}
+                viewMode={viewMode}
+                transform="scale(0.8085) translateY(-35px) translateX(60px)"
+              />
             )}
 
-            {/* R1 - Top Right */}
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(77px) translateX(60px)' }}>
-              <path d="M566.5 1H481L426 1" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'buttonY' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-            </svg>
+            {/* R1 - Top Right (Button Y) */}
+            <EditableLeaderLine
+              points={leaderLinePositions.buttonY}
+              isEditMode={isEditMode}
+              onPointsChange={(newPoints) => {
+                setLeaderLinePositions(prev => ({
+                  ...prev,
+                  buttonY: newPoints
+                }));
+              }}
+              lineId="buttonY"
+              hoveredTooltipId={hoveredTooltipId}
+              viewMode={viewMode}
+              transform="scale(0.8085) translateY(77px) translateX(60px)"
+            />
 
-            {/* R2 - Second from Top Right */}
+            {/* R2 - Second from Top Right (Button B) */}
             {viewMode !== 'back' && (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(158px) translateX(698px)' }}>
-                <path d="M3.432 5.447L15.4331 26.2499H77.9331" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'buttonB' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
+              <EditableLeaderLine
+                points={leaderLinePositions.buttonB}
+                isEditMode={isEditMode}
+                onPointsChange={(newPoints) => {
+                  setLeaderLinePositions(prev => ({
+                    ...prev,
+                    buttonB: newPoints
+                  }));
+                }}
+                lineId="buttonB"
+                hoveredTooltipId={hoveredTooltipId}
+                viewMode={viewMode}
+                transform="scale(0.8085) translateY(158px) translateX(698px)"
+              />
             )}
 
-            {/* R3 - Middle Right */}
+            {/* R3 - Middle Right (Button X) */}
             {viewMode !== 'back' && (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(73px) translateX(60px)' }}>
-                <path d="M358 54L417 94.5L514 172.5H566.5" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'buttonX' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
+              <EditableLeaderLine
+                points={leaderLinePositions.buttonX}
+                isEditMode={isEditMode}
+                onPointsChange={(newPoints) => {
+                  setLeaderLinePositions(prev => ({
+                    ...prev,
+                    buttonX: newPoints
+                  }));
+                }}
+                lineId="buttonX"
+                hoveredTooltipId={hoveredTooltipId}
+                viewMode={viewMode}
+                transform="scale(0.8085) translateY(73px) translateX(60px)"
+              />
             )}
 
-            {/* R4 - Fourth from Top Right */}
-            {viewMode !== 'back' ? (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(73px) translateX(60px)' }}>
-                <path d="M566.5 261.5H502.5L420 121" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'buttonA' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            ) : (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-132px) translateX(60px)' }}>
-                <path d="M566.5 261.5H398" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'buttonA' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            )}
+            {/* R4 - Fourth from Top Right (Button A) */}
+            <EditableLeaderLine
+              points={leaderLinePositions.buttonA}
+              isEditMode={isEditMode}
+              onPointsChange={(newPoints) => {
+                setLeaderLinePositions(prev => ({
+                  ...prev,
+                  buttonA: newPoints
+                }));
+              }}
+              lineId="buttonA"
+              hoveredTooltipId={hoveredTooltipId}
+              viewMode={viewMode}
+              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(73px) translateX(60px)' : 'scale(0.8085) translateY(-132px) translateX(60px)'}
+            />
 
-            {/* R5 - Bottom Right */}
-            {viewMode !== 'back' ? (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(77px) translateX(60px)' }}>
-                <path d="M566.5 350.5H481L337 142.6" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'rightStick' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            ) : (
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', transform: 'scale(0.8085) translateY(-130px) translateX(60px)' }}>
-                <path d="M566.5 350.5H410" stroke="#FBFBFB" strokeOpacity={hoveredTooltipId === 'rightStick' ? '0.3' : '0.2'} strokeWidth="1" strokeLinecap="round" style={{ transition: 'stroke-opacity 0.2s ease' }}/>
-              </svg>
-            )}
+            {/* R5 - Bottom Right (Right Stick) */}
+            <EditableLeaderLine
+              points={leaderLinePositions.rightStick}
+              isEditMode={isEditMode}
+              onPointsChange={(newPoints) => {
+                setLeaderLinePositions(prev => ({
+                  ...prev,
+                  rightStick: newPoints
+                }));
+              }}
+              lineId="rightStick"
+              hoveredTooltipId={hoveredTooltipId}
+              viewMode={viewMode}
+              transform={viewMode !== 'back' ? 'scale(0.8085) translateY(77px) translateX(60px)' : 'scale(0.8085) translateY(-130px) translateX(60px)'}
+            />
 
             {/* Animated Tracing Layer */}
             <TracingAnimationLayer hoveredTooltipId={hoveredTooltipId} tooltipRefs={tooltipRefs} />
@@ -2297,6 +2487,107 @@ function AssignmentCallout({ label, value, style, align = 'left' }) {
         {value}
       </p>
     </div>
+  );
+}
+
+// Editable Leader Line Component
+function EditableLeaderLine({ points, isEditMode, onPointsChange, lineId, hoveredTooltipId, viewMode, transform }) {
+  const [draggingIndex, setDraggingIndex] = useState(null);
+  const svgRef = useRef(null);
+
+  const handleMouseDown = (e, index) => {
+    if (!isEditMode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setDraggingIndex(index);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (draggingIndex === null || !isEditMode || !svgRef.current) return;
+
+      const svg = svgRef.current;
+      const rect = svg.getBoundingClientRect();
+      const scaleX = 567.5 / rect.width;
+      const scaleY = 351.5 / rect.height;
+
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
+
+      const newPoints = [...points];
+      newPoints[draggingIndex] = { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+      onPointsChange(newPoints);
+    };
+
+    const handleMouseUp = () => {
+      setDraggingIndex(null);
+    };
+
+    if (draggingIndex !== null) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [draggingIndex, isEditMode, points, onPointsChange]);
+
+  // Build path string from points
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+
+  const opacity = hoveredTooltipId === lineId ? '0.3' : '0.2';
+
+  return (
+    <svg
+      ref={svgRef}
+      className="absolute inset-0 w-full h-full"
+      viewBox="0 0 567.5 351.5"
+      fill="none"
+      style={{
+        pointerEvents: isEditMode ? 'auto' : 'none',
+        transform: transform,
+        zIndex: isEditMode ? 10 : 1
+      }}
+    >
+      {/* Main line */}
+      <path
+        d={pathD}
+        stroke="#FBFBFB"
+        strokeOpacity={opacity}
+        strokeWidth="1"
+        strokeLinecap="round"
+        style={{ transition: 'stroke-opacity 0.2s ease' }}
+      />
+
+      {/* Control points - only visible in edit mode */}
+      {isEditMode && points.map((point, index) => (
+        <g key={index}>
+          {/* Larger invisible hit area */}
+          <circle
+            cx={point.x}
+            cy={point.y}
+            r="12"
+            fill="transparent"
+            style={{ cursor: 'move' }}
+            onMouseDown={(e) => handleMouseDown(e, index)}
+          />
+          {/* Visible control point */}
+          <circle
+            cx={point.x}
+            cy={point.y}
+            r="5"
+            fill={draggingIndex === index ? "#00b6fa" : "#ff6b00"}
+            stroke="white"
+            strokeWidth="2"
+            style={{
+              cursor: 'move',
+              pointerEvents: 'none'
+            }}
+          />
+        </g>
+      ))}
+    </svg>
   );
 }
 

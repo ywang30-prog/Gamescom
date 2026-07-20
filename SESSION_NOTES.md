@@ -28,10 +28,20 @@
    - Drag tooltips to reposition
    - Click tooltip to pin and edit X/Y coordinates
    - Tooltip positions saved separately from hotspots
-   - "Copy Positions to Console" for exporting
+   - "Copy Tooltip Positions" and "Copy Leader Line Positions" buttons for exporting
    - Visual indicators: yellow ring (hover), green ring (pinned), blue ring (dragging)
 
-4. **Shared Hotspot Positions**
+4. **Leader Line Editing - Button Remapping Page ✅ NEW**
+   - SVG leader lines are now fully editable in edit mode
+   - Each line has draggable control points (orange circles)
+   - Control points turn blue when dragging
+   - Click and drag any control point to reshape the line
+   - Line paths stored as arrays of {x, y} coordinates
+   - All 12 leader lines support editing (leftStick, leftBumper, dPadUp, dPadLeft, dPadDown, dPadRight, rightBumper, buttonY, buttonB, buttonX, buttonA, rightStick)
+   - Positions saved to localStorage on "Save & Exit Edit Mode"
+   - Separate export button for leader line coordinates
+
+5. **Shared Hotspot Positions**
    - Both pages load from same localStorage key: `hotspotPositions`
    - Code defaults in both files are identical and correct
    - Clearing localStorage will revert to correct defaults
@@ -75,6 +85,7 @@
 
 - `hotspotPositions` - Shared by Ghost Home and Button Remapping (hotspot dots)
 - `buttonMappingTooltipPositions` - Button Remapping page only (tooltip labels)
+- `buttonMappingLeaderLinePositions` - Button Remapping page only (SVG leader line paths)
 - `currentPreset` - Active profile (desktop, fps, p1, p2, p3, etc.)
 - `buttonMappings_{profile}` - Button assignments per profile
 - `tooltipAssignments_{profile}_{presetConfig}` - Tooltip assignments
@@ -101,13 +112,7 @@
 
 ### 📋 Next Steps / TODO
 
-1. **Leader Line Editing (Task #2 - Pending)**
-   - Make SVG leader lines editable
-   - Add draggable control points at path endpoints
-   - Save line coordinates to localStorage
-   - More complex than tooltip editing
-
-2. **Potential Improvements:**
+1. **Potential Improvements:**
    - Add preset configurations for different games
    - Export/import hotspot positions as JSON
    - Add undo/redo for position changes
@@ -116,7 +121,7 @@
 
 ### 🐛 Known Issues
 
-- None currently! Hotspot positions are fixed and committed.
+- None currently! All editing features are working as expected.
 
 ### 🔧 Development Tips
 
@@ -125,9 +130,9 @@
 - Or console: `localStorage.clear()`
 - Or console: `localStorage.removeItem('hotspotPositions')`
 
-**To export current hotspot positions:**
-1. Enter edit mode on Ghost Home page
-2. Click "Copy Positions to Console"
+**To export current positions:**
+1. Enter edit mode (Ghost Home or Button Remapping page)
+2. Click "Copy Tooltip Positions" or "Copy Leader Line Positions"
 3. Open DevTools (F12) → Console tab
 4. Copy the logged positions
 
@@ -165,5 +170,6 @@ Status-Design-Exploration/
 ---
 
 **Last verified working:** 2026-07-20
-**Latest commit:** 9221a4e "Update hotspot positions to correct values and add tooltip edit mode"
-**All changes pushed to GitHub:** ✅
+**Latest session:** Added leader line drag-and-drop editing with control points
+**Previous commit:** 9221a4e "Update hotspot positions to correct values and add tooltip edit mode"
+**Ready to commit:** ✅ Leader line editing feature complete
