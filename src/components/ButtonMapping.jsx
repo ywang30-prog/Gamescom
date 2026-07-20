@@ -48,6 +48,7 @@ const buttonMappings = [
   { id: 'buttonB', label: 'Button B', icon: imgButtonBIcon, defaultAssignment: 'Button B' },
   { id: 'buttonX', label: 'Button X', icon: imgButtonXIcon, defaultAssignment: 'Button X' },
   { id: 'buttonY', label: 'Button Y', icon: imgButtonAIcon, defaultAssignment: 'Button Y' },
+  { id: 'buttonShare', label: 'Button Share', icon: imgButtonAIcon, defaultAssignment: 'Share' },
 ];
 
 // Category-based actions
@@ -67,6 +68,7 @@ const categoryActions = {
     { id: 'buttonB', label: 'Button B' },
     { id: 'buttonX', label: 'Button X' },
     { id: 'buttonY', label: 'Button Y' },
+    { id: 'buttonShare', label: 'Button Share' },
   ],
   'Assignment': [
     { id: 'highContrast', label: 'High Contrast' },
@@ -137,11 +139,7 @@ export default function ButtonMapping() {
 
   // Load hotspot positions from localStorage (same as Home page)
   const [hotspotPositions, setHotspotPositions] = useState(() => {
-    const saved = localStorage.getItem('hotspotPositions');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    return {
+    const defaults = {
       'Left Stick': { left: 459, top: 379 },
       'Left Bumper': { left: 361, top: 133 },
       'D Pad Up': { left: 351, top: 192 },
@@ -158,7 +156,14 @@ export default function ButtonMapping() {
       'Right Trigger': { left: 697, top: 130 },
       'Menu Button': { left: 450, top: 167 },
       'View Button': { left: 711, top: 167 },
+      'Button Share': { left: 320, top: 167 },
     };
+    const saved = localStorage.getItem('hotspotPositions');
+    if (saved) {
+      // Merge saved data with defaults to include any new buttons
+      return { ...defaults, ...JSON.parse(saved) };
+    }
+    return defaults;
   });
   const tooltipRefs = useRef([]);
   const presetDropdownRef = useRef(null);
@@ -182,7 +187,8 @@ export default function ButtonMapping() {
       buttonA: 'Button A',
       rightStick: 'Right Stick',
       leftTrigger: 'Left Trigger',
-      rightTrigger: 'Right Trigger'
+      rightTrigger: 'Right Trigger',
+      buttonShare: 'Share'
     },
     'FPS config': {
       leftStick: 'Bunny Hop',
@@ -198,7 +204,8 @@ export default function ButtonMapping() {
       buttonA: 'Quick Buy',
       rightStick: 'Record',
       leftTrigger: 'Left Trigger',
-      rightTrigger: 'Right Trigger'
+      rightTrigger: 'Right Trigger',
+      buttonShare: 'Share'
     },
     'Racing config': {
       leftStick: 'Left Stick',
@@ -212,7 +219,10 @@ export default function ButtonMapping() {
       buttonB: 'Launch App',
       buttonX: 'Record',
       buttonA: 'Play or Pause',
-      rightStick: 'Right Stick'
+      rightStick: 'Right Stick',
+      leftTrigger: 'Left Trigger',
+      rightTrigger: 'Right Trigger',
+      buttonShare: 'Share'
     }
   };
 
@@ -294,7 +304,7 @@ export default function ButtonMapping() {
       // Map index to tooltip ID
       const tooltipIds = [
         'leftStick', 'leftBumper', 'dPadUp', 'dPadLeft', 'dPadDown', 'dPadRight',
-        'rightBumper', 'buttonY', 'buttonB', 'buttonX', 'buttonA', 'rightStick'
+        'rightBumper', 'buttonY', 'buttonB', 'buttonX', 'buttonA', 'rightStick', 'buttonShare'
       ];
       const tooltipId = tooltipIds[index];
 
@@ -414,68 +424,66 @@ export default function ButtonMapping() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [controllerYOffset, setControllerYOffset] = useState(8);
   const [tooltipPositions, setTooltipPositions] = useState(() => {
+    const defaults = {
+      leftStick: { left: 27, top: 660 },
+      leftBumper: { left: 27, top: 95 },
+      dPadUp: { left: 27, top: 186 },
+      dPadLeft: { left: 27, top: 282 },
+      dPadDown: { left: 27, top: 378 },
+      dPadRight: { left: 27, top: 473 },
+      rightBumper: { left: 1144, top: 33 },
+      buttonY: { left: 1143, top: 120 },
+      buttonB: { left: 1139, top: 226 },
+      buttonX: { left: 1152, top: 332 },
+      buttonA: { left: 1150, top: 731 },
+      rightStick: { left: 1159, top: 567 },
+      buttonShare: { left: 27, top: 567 },
+    };
     const saved = localStorage.getItem('buttonMappingTooltipPositions');
     if (saved) {
-      return JSON.parse(saved);
+      return { ...defaults, ...JSON.parse(saved) };
     }
-    return {
-      leftStick: { left: 27, top: 465 },
-      leftBumper: { left: 27, top: 0 },
-      dPadUp: { left: 27, top: 90 },
-      dPadLeft: { left: 26, top: 180 },
-      dPadDown: { left: 26, top: 273 },
-      dPadRight: { left: 27, top: 368 },
-      rightBumper: { left: 723, top: 0 },
-      buttonY: { left: 723, top: 90 },
-      buttonB: { left: 723, top: 180 },
-      buttonX: { left: 723, top: 273 },
-      buttonA: { left: 724, top: 368 },
-      rightStick: { left: 724, top: 465 },
-    };
+    return defaults;
   });
 
   // Leader line positions - control points for the SVG paths
   const [leaderLinePositions, setLeaderLinePositions] = useState(() => {
-    const saved = localStorage.getItem('buttonMappingLeaderLinePositions');
-    if (saved) {
-      return JSON.parse(saved);
-    }
     // Default leader line paths - store as arrays of {x, y} points
-    return {
+    const defaults = {
       leftStick: [
-        { x: 0, y: 218.789 },
-        { x: 92, y: 218.789 },
-        { x: 233.71, y: 18.38 }
+        { x: 81.7, y: 141.7 },
+        { x: 168.6, y: 142.2 },
+        { x: 330.6, y: -27.8 }
       ],
       leftBumper: [
-        { x: 162, y: 37 },
-        { x: 85, y: 20 },
-        { x: 1, y: 20 }
+        { x: 267.7, y: 124.5 },
+        { x: 152.2, y: 115.4 },
+        { x: 83.3, y: 115.4 }
       ],
       dPadUp: [
-        { x: 136, y: 90 },
-        { x: 85, y: 83.5 },
-        { x: 1, y: 83.5 }
+        { x: 264.6, y: 134 },
+        { x: 154.8, y: 143.1 },
+        { x: 83.1, y: 143.1 }
       ],
       dPadLeft: [
-        { x: 91, y: 162 },
-        { x: 83.5, y: 173.5 },
-        { x: 1.5, y: 173.5 }
+        { x: 220.2, y: 192.4 },
+        { x: 156.6, y: 212.5 },
+        { x: 82.7, y: 212.5 }
       ],
       dPadDown: [
-        { x: 133, y: 198 },
-        { x: 55, y: 251 },
-        { x: 1.5, y: 251 }
+        { x: 263.7, y: 220.2 },
+        { x: 158.1, y: 256.3 },
+        { x: 82.6, y: 256.3 }
       ],
       dPadRight: [
-        { x: 195, y: 160 },
-        { x: 101, y: 347.5 },
-        { x: 1, y: 347.5 }
+        { x: 314.3, y: 206.1 },
+        { x: 158.6, y: 328.7 },
+        { x: 83.6, y: 328.7 }
       ],
       rightBumper: [
-        { x: 566.5, y: 1 },
+        { x: 556, y: 1 },
         { x: 480, y: 1 },
-        { x: 418, y: 25 }
+        { x: 410.8, y: 37.5 }
       ],
       buttonY: [
         { x: 566.5, y: 1 },
@@ -502,8 +510,18 @@ export default function ButtonMapping() {
         { x: 566.5, y: 350.5 },
         { x: 481, y: 350.5 },
         { x: 337, y: 142.6 }
+      ],
+      buttonShare: [
+        { x: 353.5, y: 202.6 },
+        { x: 164.8, y: 378.6 },
+        { x: 82.7, y: 378.6 }
       ]
     };
+    const saved = localStorage.getItem('buttonMappingLeaderLinePositions');
+    if (saved) {
+      return { ...defaults, ...JSON.parse(saved) };
+    }
+    return defaults;
   });
 
   const handleToggleEditMode = () => {
@@ -1275,7 +1293,7 @@ export default function ButtonMapping() {
             />
 
 
-            {/* Hotspots at line endpoints - using positions from Home page */}}
+            {/* Hotspots at line endpoints - using positions from Home page */}
             {/* LD1 - Left Stick */}
             <HotspotMarker
               key={`LD1-${viewMode}`}
@@ -1482,6 +1500,19 @@ export default function ButtonMapping() {
               }}
             />
 
+            {/* Share Button */}
+            {viewMode !== 'back' && (
+              <HotspotMarker
+                name="SHARE"
+                style={{ left: `${hotspotPositions['Button Share'].left}px`, top: `${hotspotPositions['Button Share'].top + controllerYOffset}px` }}
+                isSelected={false}
+                isHovered={hoveredTooltipId === 'buttonShare'}
+                tooltipId="buttonShare"
+                onHoverChange={setHoveredTooltipId}
+                hoveredTooltipId={hoveredTooltipId}
+              />
+            )}
+
             {/* Left Trigger */}
             <HotspotMarker
               name="Left Trigger"
@@ -1635,6 +1666,16 @@ export default function ButtonMapping() {
                 hoveredTooltipId={hoveredTooltipId}
                 transform={viewMode !== 'back' ? 'scale(0.8085) translateY(77px) translateX(60px)' : 'scale(0.8085) translateY(-130px) translateX(60px)'}
               />
+
+              {/* Share Button */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.buttonShare}
+                  lineId="buttonShare"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(-40px) translateX(-60px)"
+                />
+              )}
             </svg>
 
             {/* All Control Points in one top layer */}
@@ -1699,7 +1740,12 @@ export default function ButtonMapping() {
                   id: 'rightStick',
                   points: leaderLinePositions.rightStick,
                   transform: viewMode !== 'back' ? 'scale(0.8085) translateY(77px) translateX(60px)' : 'scale(0.8085) translateY(-130px) translateX(60px)'
-                }
+                },
+                ...(viewMode !== 'back' ? [{
+                  id: 'buttonShare',
+                  points: leaderLinePositions.buttonShare,
+                  transform: 'scale(0.8085) translateY(-40px) translateX(-60px)'
+                }] : [])
               ]}
               isEditMode={isEditMode}
               controllerYOffset={controllerYOffset}
@@ -2100,13 +2146,48 @@ export default function ButtonMapping() {
                 }));
               }}
             />
+
+            {/* Tooltip 11 - Share Button */}
+            {viewMode !== 'back' && (
+              <>
+                {showResetButton === 'buttonShare' && (
+                  <ResetButton
+                    position={tooltipPositions.buttonShare}
+                    align="right"
+                    onClick={() => handleResetTooltip('buttonShare')}
+                  />
+                )}
+                <HotspotTooltip
+                  key={`buttonShare-${viewMode}`}
+                  label="Button"
+                  value={tooltipAssignments.buttonShare || 'Share'}
+                  position={tooltipPositions.buttonShare}
+                  isActive={activeTooltip === 'buttonShare'}
+                  isModified={tooltipAssignments.buttonShare !== defaultTooltipAssignments.buttonShare}
+                  align="right"
+                  isHoveredByDrag={hoveredTooltipIndex === 12}
+                  tooltipRef={(el) => tooltipRefs.current[12] = el}
+                  onClick={() => handleTooltipClick('buttonShare', 'Button')}
+                  tooltipId="buttonShare"
+                  onHoverChange={setHoveredTooltipId}
+                  hoveredTooltipId={hoveredTooltipId}
+                  isEditMode={isEditMode}
+                  onPositionChange={(newPos) => {
+                    setTooltipPositions(prev => ({
+                      ...prev,
+                      buttonShare: newPos
+                    }));
+                  }}
+                />
+              </>
+            )}
           </div>
 
           {/* Reset to Default Button - moved from top */}
           <button
             onClick={handleResetAllTooltips}
             className="bg-[#242424] rounded-lg shadow-[4px_4px_10px_0px_rgba(0,0,0,0.4)] px-4 py-2 hover:bg-[#2e2e2e] transition-colors relative"
-            style={{ bottom: '515px' }}
+            style={{ bottom: '715px' }}
           >
             <span className="font-logitech text-xs font-bold tracking-[0.36px] uppercase text-[#e6e6e6] whitespace-nowrap">
               RESET ALL TO DEFAULT
@@ -2210,6 +2291,10 @@ function HotspotTooltip({ label, value, position, isActive, isModified, align = 
   };
 
   const handleMouseDown = (e) => {
+    // Don't start dragging if clicking on input fields or close button
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') {
+      return;
+    }
     if (isEditMode && onPositionChange) {
       e.preventDefault();
       setIsDragging(true);
@@ -2251,7 +2336,8 @@ function HotspotTooltip({ label, value, position, isActive, isModified, align = 
       className="absolute"
       style={{
         left: `${position.left}px`,
-        top: `${position.top}px`
+        top: `${position.top}px`,
+        zIndex: (isPinned || isActive) ? 1000 : 1
       }}
       onMouseEnter={() => !isPinned && isEditMode && setShowEditTooltip(true)}
       onMouseLeave={() => !isPinned && isEditMode && setShowEditTooltip(false)}
@@ -2311,15 +2397,21 @@ function HotspotTooltip({ label, value, position, isActive, isModified, align = 
         </p>
       </div>
       {isEditMode && (showEditTooltip || isPinned) && (
-        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white px-3 py-2 rounded-lg shadow-xl flex gap-2 items-center border-2 border-blue-500 z-50">
+        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white px-3 py-2 rounded-lg shadow-xl flex gap-2 items-center border-2 border-blue-500" style={{ zIndex: 1001, pointerEvents: 'auto' }}>
           {isPinned && (
             <button
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 setIsPinned(false);
                 setShowEditTooltip(false);
               }}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-red-600"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-red-600 cursor-pointer"
+              style={{ pointerEvents: 'auto' }}
             >
               ×
             </button>
@@ -2481,11 +2573,18 @@ function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate, controllerYO
       const x = mouseX - draggingLine.offsetX;
       let y = mouseY - draggingLine.offsetY;
 
-      // If Shift is held, lock Y to the OTHER point's Y position (horizontal constraint)
+      // If Shift is held, lock Y to the adjacent point's Y position (horizontal constraint)
       if (e.shiftKey && line.points.length >= 2) {
-        // Find the other point: if dragging point 0, lock to point 1's Y, and vice versa
-        const otherPointIndex = draggingLine.pointIndex === 0 ? 1 : 0;
-        y = line.points[otherPointIndex].y;
+        // Find the adjacent point: prefer next point, or previous if this is the last point
+        let adjacentPointIndex;
+        if (draggingLine.pointIndex < line.points.length - 1) {
+          // Not the last point, use next point
+          adjacentPointIndex = draggingLine.pointIndex + 1;
+        } else {
+          // Last point, use previous point
+          adjacentPointIndex = draggingLine.pointIndex - 1;
+        }
+        y = line.points[adjacentPointIndex].y;
       }
 
       onLineUpdate(draggingLine.lineId, draggingLine.pointIndex, {
