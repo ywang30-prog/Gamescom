@@ -58,8 +58,9 @@
 **Utilities:**
 - `public/clear-storage.html` - Utility page to clear localStorage
 
-### 🎯 Correct Hotspot Positions (in code)
+### 🎯 Default Hotspot Positions (in code defaults)
 
+**Ghost Home Page** (`src/components/Home.jsx` - lines 56-72):
 ```javascript
 {
   'Left Stick': { left: 459, top: 371 },
@@ -81,15 +82,51 @@
 }
 ```
 
-### 💾 localStorage Keys
+**Button Remapping Page** (`src/components/ButtonMapping.jsx` - lines 145-161):
+Same positions BUT with +8px Y offset applied:
+```javascript
+{
+  'Left Stick': { left: 459, top: 379 },      // +8px
+  'Left Bumper': { left: 361, top: 133 },     // +8px
+  'D Pad Up': { left: 351, top: 192 },        // +8px
+  'D Pad Left': { left: 351, top: 337 },      // +8px
+  'D Pad Down': { left: 278, top: 265 },      // +8px
+  'D Pad Right': { left: 423, top: 265 },     // +8px
+  'Right Bumper': { left: 818, top: 185 },    // +8px
+  'Button Y': { left: 821, top: 133 },        // +8px
+  'Button B': { left: 892, top: 265 },        // +8px
+  'Button X': { left: 740, top: 265 },        // +8px
+  'Button A': { left: 818, top: 348 },        // +8px
+  'Right Stick': { left: 706, top: 379 },     // +8px
+  'Left Trigger': { left: 473, top: 130 },    // +8px
+  'Right Trigger': { left: 697, top: 130 },   // +8px
+  'Menu Button': { left: 450, top: 167 },     // +8px
+  'View Button': { left: 711, top: 167 },     // +8px
+}
+```
 
-- `hotspotPositions` - Shared by Ghost Home and Button Remapping (hotspot dots)
-- `buttonMappingTooltipPositions` - Button Remapping page only (tooltip labels)
-- `buttonMappingLeaderLinePositions` - Button Remapping page only (SVG leader line paths)
+**Controller Y Offset:** Default is 8px on Button Remapping page to match Ghost Home positioning.
+All hotspots, leader lines, and control points move together with this offset.
+
+### 💾 localStorage Keys (User Edits Persist Here)
+
+**Shared Between Pages:**
+- `hotspotPositions` - Hotspot dot positions (shared by Ghost Home and Button Remapping)
 - `currentPreset` - Active profile (desktop, fps, p1, p2, p3, etc.)
+- `hasUnsavedChanges` - Global unsaved changes flag
+
+**Button Remapping Page Only:**
+- `buttonMappingTooltipPositions` - Tooltip label positions
+- `buttonMappingLeaderLinePositions` - SVG leader line path coordinates
 - `buttonMappings_{profile}` - Button assignments per profile
 - `tooltipAssignments_{profile}_{presetConfig}` - Tooltip assignments
-- `hasUnsavedChanges` - Global unsaved changes flag
+
+**Important:** All edit mode changes are saved to localStorage automatically. When you:
+1. Edit hotspot positions on Ghost Home → Saved to `hotspotPositions`
+2. Edit tooltip positions in edit mode → Saved to `buttonMappingTooltipPositions`
+3. Edit leader line control points → Saved to `buttonMappingLeaderLinePositions`
+4. Adjust controller Y offset → Applied immediately via transform
+5. Click "Save & Exit Edit Mode" → All positions persist across sessions
 
 ### 🚀 To Start Working Again
 
@@ -169,7 +206,29 @@ Status-Design-Exploration/
 
 ---
 
+## 📝 For Next Context / Session Continuity
+
 **Last verified working:** 2026-07-20
-**Latest session:** Added leader line drag-and-drop editing with control points
-**Previous commit:** 9221a4e "Update hotspot positions to correct values and add tooltip edit mode"
-**Ready to commit:** ✅ Leader line editing feature complete
+
+**Current State:**
+- ✅ All 16 hotspots positioned correctly on both pages
+- ✅ Leader line editing fully functional with draggable control points
+- ✅ Tooltip editing working with pin/drag/coordinate inputs
+- ✅ Live Y offset editor available (default: 8px on Button Remapping)
+- ✅ All positions saved to localStorage and code defaults
+- ✅ Latest commit: 13b4140 "Add live Y offset editor and apply 8px permanent offset"
+
+**Quick Start for New Context:**
+1. Run `npm run dev` to start dev server (http://localhost:5173)
+2. All hotspot positions are already correct in code defaults
+3. localStorage will override defaults if user has made edits
+4. To reset to defaults: visit http://localhost:5173/clear-storage.html
+5. Edit mode available on both Ghost Home and Button Remapping pages
+
+**What's Saved Where:**
+- **Code defaults** = Initial positions for fresh clones/users
+- **localStorage** = User's custom edits (takes precedence over defaults)
+- **Git commits** = Code defaults are version controlled
+- To update defaults: edit the code, then commit to git
+
+**Repository:** https://github.com/ywang30-prog/Gamescom

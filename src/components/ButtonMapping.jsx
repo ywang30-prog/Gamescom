@@ -1482,6 +1482,50 @@ export default function ButtonMapping() {
               }}
             />
 
+            {/* Left Trigger */}
+            <HotspotMarker
+              name="Left Trigger"
+              style={{ left: `${hotspotPositions['Left Trigger'].left}px`, top: `${hotspotPositions['Left Trigger'].top + controllerYOffset}px` }}
+              isSelected={false}
+              isHovered={hoveredTooltipId === 'leftTrigger'}
+              tooltipId="leftTrigger"
+              onHoverChange={setHoveredTooltipId}
+              hoveredTooltipId={hoveredTooltipId}
+            />
+
+            {/* Right Trigger */}
+            <HotspotMarker
+              name="Right Trigger"
+              style={{ left: `${hotspotPositions['Right Trigger'].left}px`, top: `${hotspotPositions['Right Trigger'].top + controllerYOffset}px` }}
+              isSelected={false}
+              isHovered={hoveredTooltipId === 'rightTrigger'}
+              tooltipId="rightTrigger"
+              onHoverChange={setHoveredTooltipId}
+              hoveredTooltipId={hoveredTooltipId}
+            />
+
+            {/* Menu Button */}
+            <HotspotMarker
+              name="Menu Button"
+              style={{ left: `${hotspotPositions['Menu Button'].left}px`, top: `${hotspotPositions['Menu Button'].top + controllerYOffset}px` }}
+              isSelected={false}
+              isHovered={hoveredTooltipId === 'menuButton'}
+              tooltipId="menuButton"
+              onHoverChange={setHoveredTooltipId}
+              hoveredTooltipId={hoveredTooltipId}
+            />
+
+            {/* View Button */}
+            <HotspotMarker
+              name="View Button"
+              style={{ left: `${hotspotPositions['View Button'].left}px`, top: `${hotspotPositions['View Button'].top + controllerYOffset}px` }}
+              isSelected={false}
+              isHovered={hoveredTooltipId === 'viewButton'}
+              tooltipId="viewButton"
+              onHoverChange={setHoveredTooltipId}
+              hoveredTooltipId={hoveredTooltipId}
+            />
+
             {/* All Leader Lines in one SVG layer */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', zIndex: 1, overflow: 'visible', transform: `translateY(${controllerYOffset}px)` }}>
               {/* L1 - Top Left (Left Stick) */}
