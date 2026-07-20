@@ -2490,10 +2490,11 @@ function AssignmentCallout({ label, value, style, align = 'left' }) {
   );
 }
 
-// Editable Leader Line Component
+// Editable Leader Line Component - returns both line and control points
 function EditableLeaderLine({ points, isEditMode, onPointsChange, lineId, hoveredTooltipId, viewMode, transform }) {
   const [draggingIndex, setDraggingIndex] = useState(null);
   const svgRef = useRef(null);
+  const controlPointsRef = useRef(null);
 
   const handleMouseDown = (e, index) => {
     if (!isEditMode) return;
@@ -2538,56 +2539,88 @@ function EditableLeaderLine({ points, isEditMode, onPointsChange, lineId, hovere
 
   const opacity = hoveredTooltipId === lineId ? '0.3' : '0.2';
 
-  return (
-    <svg
-      ref={svgRef}
-      className="absolute inset-0 w-full h-full"
-      viewBox="0 0 567.5 351.5"
-      fill="none"
-      style={{
-        pointerEvents: isEditMode ? 'auto' : 'none',
-        transform: transform,
-        zIndex: isEditMode ? 10 : 1
-      }}
-    >
-      {/* Main line */}
-      <path
-        d={pathD}
-        stroke="#FBFBFB"
-        strokeOpacity={opacity}
-        strokeWidth="1"
-        strokeLinecap="round"
-        style={{ transition: 'stroke-opacity 0.2s ease' }}
-      />
+  // Parse transform to extract scale and translate values
+  const parseTransform = (transformStr) => {
+    const scaleMatch = transformStr.match(/scale\(([0-9.]+)\)/);
+    const translateXMatch = transformStr.match(/translateX\(([0-9.-]+)px\)/);
+    const translateYMatch = transformStr.match(/translateY\(([0-9.-]+)px\)/);
 
-      {/* Control points - only visible in edit mode */}
-      {isEditMode && points.map((point, index) => (
-        <g key={index}>
-          {/* Larger invisible hit area */}
-          <circle
-            cx={point.x}
-            cy={point.y}
-            r="12"
-            fill="transparent"
-            style={{ cursor: 'move' }}
-            onMouseDown={(e) => handleMouseDown(e, index)}
-          />
-          {/* Visible control point */}
-          <circle
-            cx={point.x}
-            cy={point.y}
-            r="5"
-            fill={draggingIndex === index ? "#00b6fa" : "#ff6b00"}
-            stroke="white"
-            strokeWidth="2"
-            style={{
-              cursor: 'move',
-              pointerEvents: 'none'
-            }}
-          />
-        </g>
-      ))}
-    </svg>
+    return {
+      scale: scaleMatch ? parseFloat(scaleMatch[1]) : 1,
+      translateX: translateXMatch ? parseFloat(translateXMatch[1]) : 0,
+      translateY: translateYMatch ? parseFloat(translateYMatch[1]) : 0
+    };
+  };
+
+  const { scale, translateX, translateY } = parseTransform(transform);
+
+  return (
+    <>
+      {/* Line SVG with transform */}
+      <svg
+        ref={svgRef}
+        className="absolute inset-0 w-full h-full"
+        viewBox="0 0 567.5 351.5"
+        fill="none"
+        style={{
+          pointerEvents: 'none',
+          transform: transform,
+          zIndex: isEditMode ? 10 : 1
+        }}
+      >
+        {/* Main line */}
+        <path
+          d={pathD}
+          stroke="#FBFBFB"
+          strokeOpacity={opacity}
+          strokeWidth="1"
+          strokeLinecap="round"
+          style={{ transition: 'stroke-opacity 0.2s ease' }}
+        />
+      </svg>
+
+      {/* Control points SVG WITHOUT transform - in parent coordinate space */}
+      {isEditMode && (
+        <svg
+          ref={controlPointsRef}
+          className="absolute inset-0 w-full h-full"
+          viewBox="0 0 567.5 351.5"
+          fill="none"
+          style={{
+            pointerEvents: 'auto',
+            transform: transform,
+            zIndex: 20
+          }}
+        >
+          {points.map((point, index) => (
+            <g key={index}>
+              {/* Larger invisible hit area */}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r="15"
+                fill="transparent"
+                style={{ cursor: 'move' }}
+                onMouseDown={(e) => handleMouseDown(e, index)}
+              />
+              {/* Visible control point */}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r="6"
+                fill={draggingIndex === index ? "#00b6fa" : "#ff6b00"}
+                stroke="white"
+                strokeWidth="2.5"
+                style={{
+                  cursor: 'move',
+                  pointerEvents: 'none'
+                }}
+              />
+            </g>
+          ))}
+        </svg>
+      )}
+    </>
   );
 }
 
