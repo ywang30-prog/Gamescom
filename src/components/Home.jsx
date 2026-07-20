@@ -53,22 +53,22 @@ export default function Home() {
       return JSON.parse(saved);
     }
     return {
-      'Left Stick': { left: 419, top: 352 },
-      'Left Bumper': { left: 312, top: 26 },
-      'D Pad Up': { left: 270, top: 135 },
-      'D Pad Left': { left: 190, top: 216 },
-      'D Pad Down': { left: 273, top: 295 },
-      'D Pad Right': { left: 354, top: 216 },
-      'Right Bumper': { left: 858, top: 26 },
-      'Button Y': { left: 874, top: 122 },
-      'Button B': { left: 972, top: 217 },
-      'Button X': { left: 762, top: 216 },
-      'Button A': { left: 874, top: 304 },
-      'Right Stick': { left: 728, top: 350 },
-      'Left Trigger': { left: 50, top: 100 },
-      'Right Trigger': { left: 50, top: 150 },
-      'Menu Button': { left: 50, top: 200 },
-      'View Button': { left: 50, top: 250 },
+      'Left Stick': { left: 459, top: 371 },
+      'Left Bumper': { left: 361, top: 125 },
+      'D Pad Up': { left: 351, top: 184 },
+      'D Pad Left': { left: 351, top: 329 },
+      'D Pad Down': { left: 278, top: 257 },
+      'D Pad Right': { left: 423, top: 257 },
+      'Right Bumper': { left: 818, top: 177 },
+      'Button Y': { left: 821, top: 125 },
+      'Button B': { left: 892, top: 257 },
+      'Button X': { left: 740, top: 257 },
+      'Button A': { left: 818, top: 340 },
+      'Right Stick': { left: 706, top: 371 },
+      'Left Trigger': { left: 473, top: 122 },
+      'Right Trigger': { left: 697, top: 122 },
+      'Menu Button': { left: 450, top: 159 },
+      'View Button': { left: 711, top: 159 },
     };
   });
   const [draggingHotspot, setDraggingHotspot] = useState(null);
@@ -372,8 +372,8 @@ export default function Home() {
 
         {/* Device section */}
         <div className="flex-1 flex flex-col">
-          {/* Edit Mode Toggle - Hidden for now */}
-          {false && (
+          {/* Edit Mode Toggle */}
+          {true && (
             <div className="flex justify-end gap-2 items-center">
               <button
                 onClick={handleToggleEditMode}
@@ -389,10 +389,14 @@ export default function Home() {
                 <button
                   onClick={() => {
                     console.log('=== HOTSPOT POSITIONS ===');
+                    const positions = [];
                     Object.entries(hotspotPositions).forEach(([name, pos]) => {
-                      console.log(`'${name}': { left: ${pos.left}, top: ${pos.top} },`);
+                      const line = `'${name}': { left: ${pos.left}, top: ${pos.top} },`;
+                      console.log(line);
+                      positions.push(line);
                     });
                     console.log('========================');
+                    alert('Positions copied to console! Open DevTools (F12) → Console tab to see them.');
                   }}
                   className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
                 >

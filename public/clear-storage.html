@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear localStorage</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 40px;
+            background: #000;
+            color: #fff;
+        }
+        button {
+            background: #00b6fa;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #00a0e0;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #1a1a1a;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clear Hotspot Positions</h1>
+    <p>Click the button below to reset all hotspot positions to defaults:</p>
+    <button onclick="clearStorage()">Clear localStorage</button>
+    <div id="status" class="status" style="display: none;"></div>
+
+    <script>
+        function clearStorage() {
+            const status = document.getElementById('status');
+            
+            // Show what's currently stored
+            const hotspots = localStorage.getItem('hotspotPositions');
+            const tooltips = localStorage.getItem('buttonMappingTooltipPositions');
+            
+            console.log('Before clear:');
+            console.log('hotspotPositions:', hotspots);
+            console.log('buttonMappingTooltipPositions:', tooltips);
+            
+            // Clear the items
+            localStorage.removeItem('hotspotPositions');
+            localStorage.removeItem('buttonMappingTooltipPositions');
+            
+            // Show result
+            status.style.display = 'block';
+            status.innerHTML = `
+                ✅ Cleared localStorage!<br><br>
+                <strong>Removed:</strong><br>
+                - hotspotPositions<br>
+                - buttonMappingTooltipPositions<br><br>
+                <a href="/" style="color: #00b6fa;">Go back to home page</a>
+            `;
+            
+            console.log('After clear - localStorage is now clean');
+        }
+    </script>
+</body>
+</html>
