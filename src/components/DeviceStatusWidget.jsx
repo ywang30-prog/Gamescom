@@ -111,10 +111,10 @@ export default function DeviceStatusWidget() {
 
   return (
     <div className="flex items-start justify-end w-full shrink-0" style={{ height: '48px' }}>
-      {/* Hover target area - stays fixed size to prevent jitter */}
+      {/* Hover target area - matches collapsed widget size */}
       <div
         className="relative z-10"
-        style={{ width: '219px', height: '237px' }}
+        style={{ width: '219px', height: '48px' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

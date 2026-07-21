@@ -157,6 +157,7 @@ export default function ButtonMapping() {
       'Menu Button': { left: 711, top: 159 },
       'View Button': { left: 451, top: 159 },
       'Button Share': { left: 502, top: 272 },
+      'Profile Button': { left: 664, top: 273 },
     };
     const saved = localStorage.getItem('hotspotPositions');
     if (saved) {
@@ -189,7 +190,9 @@ export default function ButtonMapping() {
       leftTrigger: 'Left Trigger',
       rightTrigger: 'Right Trigger',
       buttonShare: 'Share',
-      viewButton: 'View'
+      viewButton: 'View',
+      menuButton: 'Menu',
+      profileButton: 'Profile'
     },
     'FPS config': {
       leftStick: 'Bunny Hop',
@@ -207,7 +210,9 @@ export default function ButtonMapping() {
       leftTrigger: 'Left Trigger',
       rightTrigger: 'Right Trigger',
       buttonShare: 'Share',
-      viewButton: 'View'
+      viewButton: 'View',
+      menuButton: 'Menu',
+      profileButton: 'Profile'
     },
     'Racing config': {
       leftStick: 'Left Stick',
@@ -225,7 +230,9 @@ export default function ButtonMapping() {
       leftTrigger: 'Left Trigger',
       rightTrigger: 'Right Trigger',
       buttonShare: 'Share',
-      viewButton: 'View'
+      viewButton: 'View',
+      menuButton: 'Menu',
+      profileButton: 'Profile'
     }
   };
 
@@ -307,7 +314,7 @@ export default function ButtonMapping() {
       // Map index to tooltip ID
       const tooltipIds = [
         'leftStick', 'leftBumper', 'dPadUp', 'dPadLeft', 'dPadDown', 'dPadRight',
-        'rightBumper', 'buttonY', 'buttonB', 'buttonX', 'buttonA', 'rightStick', 'buttonShare'
+        'rightBumper', 'buttonY', 'buttonB', 'buttonX', 'buttonA', 'rightStick', 'buttonShare', 'viewButton', 'menuButton', 'profileButton'
       ];
       const tooltipId = tooltipIds[index];
 
@@ -439,14 +446,16 @@ export default function ButtonMapping() {
       dPadLeft: { left: 27, top: 304 },
       dPadDown: { left: 27, top: 392 },
       dPadRight: { left: 27, top: 481 },
-      rightBumper: { left: 1144, top: 33 },
-      buttonY: { left: 1143, top: 120 },
-      buttonB: { left: 1139, top: 226 },
-      buttonX: { left: 1152, top: 332 },
-      buttonA: { left: 1150, top: 731 },
-      rightStick: { left: 1159, top: 567 },
+      rightBumper: { left: 1144, top: 36 },
+      buttonY: { left: 1146, top: 211 },
+      buttonB: { left: 1147, top: 304 },
+      buttonX: { left: 1147, top: 481 },
+      buttonA: { left: 1147, top: 392 },
+      rightStick: { left: 1147, top: 661 },
       buttonShare: { left: 27, top: 569 },
       viewButton: { left: -82, top: 124 },
+      menuButton: { left: 1253, top: 124 },
+      profileButton: { left: 1256, top: 569 },
     };
     const saved = localStorage.getItem('buttonMappingTooltipPositions');
     if (saved) {
@@ -490,35 +499,35 @@ export default function ButtonMapping() {
         { x: 79.8, y: 332.4 }
       ],
       rightBumper: [
-        { x: 556, y: 1 },
-        { x: 480, y: 1 },
-        { x: 410.8, y: 37.5 }
+        { x: 611, y: 58 },
+        { x: 543.1, y: 58 },
+        { x: 440, y: 99.5 }
       ],
       buttonY: [
-        { x: 566.5, y: 1 },
-        { x: 481, y: 1 },
-        { x: 426, y: 1 }
+        { x: 612.4, y: 51.6 },
+        { x: 545.9, y: 51.6 },
+        { x: 442.7, y: 26 }
       ],
       buttonB: [
-        { x: 3.432, y: 5.447 },
-        { x: 15.4331, y: 26.2499 },
-        { x: 77.9331, y: 26.2499 }
+        { x: -152.3, y: -7.8 },
+        { x: -91.6, y: 23.5 },
+        { x: -24.8, y: 23.5 }
       ],
       buttonX: [
         { x: 358, y: 54 },
-        { x: 417, y: 94.5 },
-        { x: 514, y: 172.5 },
-        { x: 566.5, y: 172.5 }
+        { x: 390.7, y: 88.1 },
+        { x: 552.2, y: 217.6 },
+        { x: 613.8, y: 217.6 }
       ],
       buttonA: [
-        { x: 566.5, y: 261.5 },
-        { x: 502.5, y: 261.5 },
-        { x: 420, y: 121 }
+        { x: 612.4, y: 161.7 },
+        { x: 548.4, y: 161.7 },
+        { x: 441, y: 127.4 }
       ],
       rightStick: [
-        { x: 566.5, y: 350.5 },
-        { x: 481, y: 350.5 },
-        { x: 337, y: 142.6 }
+        { x: 612.4, y: 317.7 },
+        { x: 553.6, y: 317.7 },
+        { x: 371.9, y: 145.3 }
       ],
       buttonShare: [
         { x: 351.1, y: 201.7 },
@@ -529,6 +538,16 @@ export default function ButtonMapping() {
         { x: -41.2, y: 2.2 },
         { x: 33.8, y: 2.2 },
         { x: 201.6, y: 15.1 }
+      ],
+      menuButton: [
+        { x: 635.8, y: 176.5 },
+        { x: 568.9, y: 176.5 },
+        { x: 419.5, y: 190.7 }
+      ],
+      profileButton: [
+        { x: 733.2, y: 371.1 },
+        { x: 672.6, y: 371.1 },
+        { x: 466.1, y: 196.5 }
       ]
     };
     const saved = localStorage.getItem('buttonMappingLeaderLinePositions');
@@ -1717,6 +1736,46 @@ export default function ButtonMapping() {
               }}
             />
 
+            {/* Menu Button */}
+            {viewMode !== 'back' && (
+              <HotspotMarker
+                name="Menu Button"
+                style={{ left: `${hotspotPositions['Menu Button'].left}px`, top: `${hotspotPositions['Menu Button'].top + controllerYOffset}px` }}
+                isSelected={false}
+                isHovered={hoveredTooltipId === 'menuButton'}
+                tooltipId="menuButton"
+                onHoverChange={setHoveredTooltipId}
+                hoveredTooltipId={hoveredTooltipId}
+                isEditMode={isEditMode}
+                onPositionChange={(newPos) => {
+                  setHotspotPositions(prev => ({
+                    ...prev,
+                    'Menu Button': { left: newPos.left, top: newPos.top - controllerYOffset }
+                  }));
+                }}
+              />
+            )}
+
+            {/* Profile Button */}
+            {viewMode !== 'back' && (
+              <HotspotMarker
+                name="Profile Button"
+                style={{ left: `${hotspotPositions['Profile Button'].left}px`, top: `${hotspotPositions['Profile Button'].top + controllerYOffset}px` }}
+                isSelected={false}
+                isHovered={hoveredTooltipId === 'profileButton'}
+                tooltipId="profileButton"
+                onHoverChange={setHoveredTooltipId}
+                hoveredTooltipId={hoveredTooltipId}
+                isEditMode={isEditMode}
+                onPositionChange={(newPos) => {
+                  setHotspotPositions(prev => ({
+                    ...prev,
+                    'Profile Button': { left: newPos.left, top: newPos.top - controllerYOffset }
+                  }));
+                }}
+              />
+            )}
+
             {/* All Leader Lines in one SVG layer */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', zIndex: 1, overflow: 'visible', transform: `translateY(${controllerYOffset}px)` }}>
               {/* L1 - Top Left (Left Stick) */}
@@ -1846,6 +1905,26 @@ export default function ButtonMapping() {
                   transform="scale(0.8085) translateY(73px) translateX(60px)"
                 />
               )}
+
+              {/* Menu Button */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.menuButton}
+                  lineId="menuButton"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(-100px) translateX(36px)"
+                />
+              )}
+
+              {/* Profile Button */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.profileButton}
+                  lineId="profileButton"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(-30px) translateX(-60px)"
+                />
+              )}
             </svg>
 
             {/* All Control Points in one top layer */}
@@ -1920,6 +1999,16 @@ export default function ButtonMapping() {
                   id: 'viewButton',
                   points: leaderLinePositions.viewButton,
                   transform: 'scale(0.8085) translateY(73px) translateX(60px)'
+                }] : []),
+                ...(viewMode !== 'back' ? [{
+                  id: 'menuButton',
+                  points: leaderLinePositions.menuButton,
+                  transform: 'scale(0.8085) translateY(-100px) translateX(36px)'
+                }] : []),
+                ...(viewMode !== 'back' ? [{
+                  id: 'profileButton',
+                  points: leaderLinePositions.profileButton,
+                  transform: 'scale(0.8085) translateY(-30px) translateX(-60px)'
                 }] : [])
               ]}
               isEditMode={isEditMode}
@@ -2386,6 +2475,76 @@ export default function ButtonMapping() {
                     setTooltipPositions(prev => ({
                       ...prev,
                       viewButton: newPos
+                    }));
+                  }}
+                />
+              </>
+            )}
+
+            {/* Tooltip 13 - Menu Button */}
+            {viewMode !== 'back' && (
+              <>
+                {showResetButton === 'menuButton' && (
+                  <ResetButton
+                    position={tooltipPositions.menuButton}
+                    align="right"
+                    onClick={() => handleResetTooltip('menuButton')}
+                  />
+                )}
+                <HotspotTooltip
+                  key={`menuButton-${viewMode}`}
+                  label="Button"
+                  value={tooltipAssignments.menuButton || 'Menu'}
+                  position={tooltipPositions.menuButton}
+                  isActive={activeTooltip === 'menuButton'}
+                  isModified={tooltipAssignments.menuButton !== defaultTooltipAssignments.menuButton}
+                  align="right"
+                  isHoveredByDrag={hoveredTooltipIndex === 14}
+                  tooltipRef={(el) => tooltipRefs.current[14] = el}
+                  onClick={() => handleTooltipClick('menuButton', 'Button')}
+                  tooltipId="menuButton"
+                  onHoverChange={setHoveredTooltipId}
+                  hoveredTooltipId={hoveredTooltipId}
+                  isEditMode={isEditMode}
+                  onPositionChange={(newPos) => {
+                    setTooltipPositions(prev => ({
+                      ...prev,
+                      menuButton: newPos
+                    }));
+                  }}
+                />
+              </>
+            )}
+
+            {/* Tooltip 14 - Profile Button */}
+            {viewMode !== 'back' && (
+              <>
+                {showResetButton === 'profileButton' && (
+                  <ResetButton
+                    position={tooltipPositions.profileButton}
+                    align="right"
+                    onClick={() => handleResetTooltip('profileButton')}
+                  />
+                )}
+                <HotspotTooltip
+                  key={`profileButton-${viewMode}`}
+                  label="Button"
+                  value={tooltipAssignments.profileButton || 'Profile'}
+                  position={tooltipPositions.profileButton}
+                  isActive={activeTooltip === 'profileButton'}
+                  isModified={tooltipAssignments.profileButton !== defaultTooltipAssignments.profileButton}
+                  align="right"
+                  isHoveredByDrag={hoveredTooltipIndex === 15}
+                  tooltipRef={(el) => tooltipRefs.current[15] = el}
+                  onClick={() => handleTooltipClick('profileButton', 'Button')}
+                  tooltipId="profileButton"
+                  onHoverChange={setHoveredTooltipId}
+                  hoveredTooltipId={hoveredTooltipId}
+                  isEditMode={isEditMode}
+                  onPositionChange={(newPos) => {
+                    setTooltipPositions(prev => ({
+                      ...prev,
+                      profileButton: newPos
                     }));
                   }}
                 />

@@ -67,8 +67,9 @@ export default function Home() {
       'Right Stick': { left: 706, top: 371 },
       'Left Trigger': { left: 473, top: 122 },
       'Right Trigger': { left: 697, top: 122 },
-      'Menu Button': { left: 450, top: 159 },
-      'View Button': { left: 711, top: 159 },
+      'Menu Button': { left: 711, top: 159 },
+      'View Button': { left: 451, top: 159 },
+      'Profile Button': { left: 664, top: 273 },
     };
   });
   const [draggingHotspot, setDraggingHotspot] = useState(null);
@@ -436,6 +437,7 @@ export default function Home() {
                 'Right Trigger': 'rightTrigger',
                 'Menu Button': 'menuButton',
                 'View Button': 'viewButton',
+                'Profile Button': 'profileButton',
               }).map(([name, tooltipId]) => (
                 <HotspotMarker
                   key={name}
