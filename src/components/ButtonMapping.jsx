@@ -117,6 +117,9 @@ const allModalActions = [
   ...categoryActions['Macros'],
 ];
 
+// Feature flags
+const ENABLE_EDIT_LAYOUT = false; // Set to true to enable Edit Layout feature
+
 export default function ButtonMapping() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -1469,105 +1472,107 @@ export default function ButtonMapping() {
         {/* Right Panel - Controller View */}
         <div className="flex-1 flex flex-col">
           {/* Edit Mode Toggle */}
-          <div className="flex justify-end gap-2 items-center mb-2">
-            {isEditMode && (
-              <div className="flex gap-2">
-                <button
-                  onClick={handleUndo}
-                  disabled={historyIndex <= 0}
-                  className={`px-3 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
-                    historyIndex > 0
-                      ? 'bg-[#242424] text-white hover:bg-[#333]'
-                      : 'bg-[#1a1a1a] text-[#666] cursor-not-allowed'
-                  }`}
-                  title="Undo (Cmd+Z)"
-                >
-                  ↶ Undo
-                </button>
-                <button
-                  onClick={handleRedo}
-                  disabled={historyIndex >= editHistory.length - 1}
-                  className={`px-3 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
-                    historyIndex < editHistory.length - 1
-                      ? 'bg-[#242424] text-white hover:bg-[#333]'
-                      : 'bg-[#1a1a1a] text-[#666] cursor-not-allowed'
-                  }`}
-                  title="Redo (Cmd+Shift+Z)"
-                >
-                  ↷ Redo
-                </button>
-              </div>
-            )}
-            <button
-              onClick={handleToggleEditMode}
-              className={`px-4 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
-                isEditMode
-                  ? 'bg-primary-default text-black'
-                  : 'bg-[#242424] text-white hover:bg-[#333]'
-              }`}
-            >
-              {isEditMode ? 'Save & Exit Edit Mode' : 'Edit Layout'}
-            </button>
-            {isEditMode && (
-              <>
-                <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#242424]">
-                  <span className="font-logitech font-bold text-sm text-white">Controller Y Offset:</span>
-                  <input
-                    type="range"
-                    min="-100"
-                    max="100"
-                    value={controllerYOffset}
-                    onChange={(e) => setControllerYOffset(parseInt(e.target.value))}
-                    className="w-48"
-                  />
-                  <input
-                    type="number"
-                    value={controllerYOffset}
-                    onChange={(e) => setControllerYOffset(parseInt(e.target.value) || 0)}
-                    className="w-20 px-2 py-1 rounded bg-[#333] text-white font-logitech text-sm text-center"
-                  />
-                  <span className="font-logitech text-sm text-[#a7a7a8]">px</span>
+          {ENABLE_EDIT_LAYOUT && (
+            <div className="flex justify-end gap-2 items-center mb-2">
+              {isEditMode && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleUndo}
+                    disabled={historyIndex <= 0}
+                    className={`px-3 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
+                      historyIndex > 0
+                        ? 'bg-[#242424] text-white hover:bg-[#333]'
+                        : 'bg-[#1a1a1a] text-[#666] cursor-not-allowed'
+                    }`}
+                    title="Undo (Cmd+Z)"
+                  >
+                    ↶ Undo
+                  </button>
+                  <button
+                    onClick={handleRedo}
+                    disabled={historyIndex >= editHistory.length - 1}
+                    className={`px-3 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
+                      historyIndex < editHistory.length - 1
+                        ? 'bg-[#242424] text-white hover:bg-[#333]'
+                        : 'bg-[#1a1a1a] text-[#666] cursor-not-allowed'
+                    }`}
+                    title="Redo (Cmd+Shift+Z)"
+                  >
+                    ↷ Redo
+                  </button>
                 </div>
-                <button
-                  onClick={() => {
-                    console.log(`=== TOOLTIP POSITIONS (${viewMode.toUpperCase()}) ===`);
-                    Object.entries(currentTooltipPositions).forEach(([name, pos]) => {
-                      console.log(`${name}: { left: ${pos.left}, top: ${pos.top} },`);
-                    });
-                    console.log('========================');
-                  }}
-                  className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
-                >
-                  Copy Tooltip Positions
-                </button>
-                <button
-                  onClick={() => {
-                    console.log(`=== LEADER LINE POSITIONS (${viewMode.toUpperCase()}) ===`);
-                    Object.entries(currentLeaderLinePositions).forEach(([name, points]) => {
-                      const pointsStr = points.map(p => `{ x: ${p.x}, y: ${p.y} }`).join(', ');
-                      console.log(`${name}: [${pointsStr}],`);
-                    });
-                    console.log('============================');
-                  }}
-                  className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
-                >
-                  Copy Leader Line Positions
-                </button>
-                <button
-                  onClick={() => {
-                    console.log(`=== HOTSPOT POSITIONS (${viewMode.toUpperCase()}) ===`);
-                    Object.entries(currentHotspotPositions).forEach(([name, pos]) => {
-                      console.log(`'${name}': { left: ${pos.left}, top: ${pos.top} },`);
-                    });
-                    console.log('========================');
-                  }}
-                  className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
-                >
-                  Copy Hotspot Positions
-                </button>
-              </>
-            )}
-          </div>
+              )}
+              <button
+                onClick={handleToggleEditMode}
+                className={`px-4 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
+                  isEditMode
+                    ? 'bg-primary-default text-black'
+                    : 'bg-[#242424] text-white hover:bg-[#333]'
+                }`}
+              >
+                {isEditMode ? 'Save & Exit Edit Mode' : 'Edit Layout'}
+              </button>
+              {isEditMode && (
+                <>
+                  <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#242424]">
+                    <span className="font-logitech font-bold text-sm text-white">Controller Y Offset:</span>
+                    <input
+                      type="range"
+                      min="-100"
+                      max="100"
+                      value={controllerYOffset}
+                      onChange={(e) => setControllerYOffset(parseInt(e.target.value))}
+                      className="w-48"
+                    />
+                    <input
+                      type="number"
+                      value={controllerYOffset}
+                      onChange={(e) => setControllerYOffset(parseInt(e.target.value) || 0)}
+                      className="w-20 px-2 py-1 rounded bg-[#333] text-white font-logitech text-sm text-center"
+                    />
+                    <span className="font-logitech text-sm text-[#a7a7a8]">px</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      console.log(`=== TOOLTIP POSITIONS (${viewMode.toUpperCase()}) ===`);
+                      Object.entries(currentTooltipPositions).forEach(([name, pos]) => {
+                        console.log(`${name}: { left: ${pos.left}, top: ${pos.top} },`);
+                      });
+                      console.log('========================');
+                    }}
+                    className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
+                  >
+                    Copy Tooltip Positions
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log(`=== LEADER LINE POSITIONS (${viewMode.toUpperCase()}) ===`);
+                      Object.entries(currentLeaderLinePositions).forEach(([name, points]) => {
+                        const pointsStr = points.map(p => `{ x: ${p.x}, y: ${p.y} }`).join(', ');
+                        console.log(`${name}: [${pointsStr}],`);
+                      });
+                      console.log('============================');
+                    }}
+                    className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
+                  >
+                    Copy Leader Line Positions
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log(`=== HOTSPOT POSITIONS (${viewMode.toUpperCase()}) ===`);
+                      Object.entries(currentHotspotPositions).forEach(([name, pos]) => {
+                        console.log(`'${name}': { left: ${pos.left}, top: ${pos.top} },`);
+                      });
+                      console.log('========================');
+                    }}
+                    className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
+                  >
+                    Copy Hotspot Positions
+                  </button>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Status Widget */}
           <DeviceStatusWidget />
