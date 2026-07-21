@@ -6,7 +6,7 @@
 - **Dev Server**: http://localhost:5173/
 - **Start Dev Server**: `npm run dev` (runs in background)
 
-## Current Status (Last Updated: 2026-07-21)
+## Current Status (Last Updated: 2026-07-21 - Session 2)
 
 ### ✅ Completed Features
 
@@ -53,33 +53,54 @@
    - Tracks all hotspot, tooltip, and leader line positions
    - History auto-clears when exiting edit mode
 
-6. **View Button ✅ NEW**
-   - Added View button tooltip on right side
+6. **Menu and Profile Buttons ✅ NEW**
+   - Added Menu button tooltip on right side (label: "Button" / "Menu")
+   - Added Profile button tooltip on right side (label: "Button" / "Profile")
+   - Both buttons have hotspots, tooltips, and leader lines
+   - Leader lines with editable control points
+   - Fully integrated into edit mode
+   - Included in all preset configurations (Default, FPS, Racing)
+
+7. **View Button ✅ NEW**
+   - Added View button tooltip on left side
    - Tooltip label: "Button" / "View"
    - Leader line with 3 editable control points
    - Fully integrated into edit mode
    - Included in all preset configurations
 
-7. **Shared Hotspot Positions**
+8. **BinaryToggle Component ✅ NEW**
+   - Front/Back view switcher created from Figma design
+   - Positioned at bottom center (64px from viewport bottom)
+   - Connected to viewMode state for switching between front/back views
+   - Styled with Logitech design system colors
+   - Smooth transitions and accessibility features
+
+9. **Shared Hotspot Positions**
    - Both pages load from same localStorage key: `hotspotPositions`
    - Code defaults in both files are identical and correct
    - Clearing localStorage will revert to correct defaults
+
+10. **DeviceStatusWidget Hover Fix ✅**
+   - Reduced hover trigger area from 237px to 48px height
+   - Widget now only expands when hovering directly over it
+   - Prevents unexpected expansion when cursor is near the widget
 
 ### 📁 Key Files
 
 **Components:**
 - `src/components/Home.jsx` - Ghost Home page with hotspot editor
 - `src/components/ButtonMapping.jsx` - Button Remapping page with tooltip/hotspot/leader line editor
+- `src/components/BinaryToggle.jsx` - Front/Back view toggle switch (NEW)
 - `src/components/HotspotDetailCard.jsx` - Hotspot detail popup
 - `src/components/ProfileSelector.jsx` - Profile switching
-- `src/components/DeviceStatusWidget.jsx` - Battery/connection status
+- `src/components/DeviceStatusWidget.jsx` - Battery/connection status (hover area fixed)
 
 **Utilities:**
 - `public/clear-storage.html` - Utility page to clear localStorage
 
 ### 🎯 Current Default Positions (in code defaults)
 
-**Tooltip Positions** (`src/components/ButtonMapping.jsx` - updated in commit `daf6d7e`):
+**Tooltip Positions** (`src/components/ButtonMapping.jsx` - updated in latest commits):
 ```javascript
 {
   leftStick: { left: 27, top: 661 },
@@ -88,18 +109,20 @@
   dPadLeft: { left: 27, top: 304 },
   dPadDown: { left: 27, top: 392 },
   dPadRight: { left: 27, top: 481 },
-  rightBumper: { left: 1144, top: 33 },
-  buttonY: { left: 1143, top: 120 },
-  buttonB: { left: 1139, top: 226 },
-  buttonX: { left: 1152, top: 332 },
-  buttonA: { left: 1150, top: 731 },
-  rightStick: { left: 1159, top: 567 },
+  rightBumper: { left: 1144, top: 36 },
+  buttonY: { left: 1146, top: 211 },
+  buttonB: { left: 1147, top: 304 },
+  buttonX: { left: 1147, top: 481 },
+  buttonA: { left: 1147, top: 392 },
+  rightStick: { left: 1147, top: 661 },
   buttonShare: { left: 27, top: 569 },
   viewButton: { left: -82, top: 124 },
+  menuButton: { left: 1253, top: 124 },
+  profileButton: { left: 1256, top: 569 },
 }
 ```
 
-**Hotspot Positions** (`src/components/ButtonMapping.jsx` - updated in commit `daf6d7e`):
+**Hotspot Positions** (`src/components/ButtonMapping.jsx` and `Home.jsx` - updated in latest commits):
 ```javascript
 {
   'Left Stick': { left: 459, top: 371 },
@@ -114,9 +137,12 @@
   'Button X': { left: 740, top: 257 },
   'Button A': { left: 818, top: 340 },
   'Right Stick': { left: 706, top: 371 },
+  'Left Trigger': { left: 473, top: 122 },
+  'Right Trigger': { left: 697, top: 122 },
   'Button Share': { left: 502, top: 272 },
+  'Menu Button': { left: 711, top: 159 },
   'View Button': { left: 451, top: 159 },
-  // REMOVED: Left Trigger, Right Trigger, Menu Button
+  'Profile Button': { left: 664, top: 273 },
 }
 ```
 
@@ -169,18 +195,20 @@ All hotspots, leader lines, and control points move together with this offset.
 
 ### 📋 Next Steps / TODO
 
-1. **RIGHT-HAND SIDE UPDATES (NEXT TASK):**
-   - Update right-hand side tooltip positions
-   - Update right-hand side hotspot positions
-   - Update right-hand side leader line control points
-   - Use Edit Mode to adjust and export positions
-   - Update code defaults in `ButtonMapping.jsx`
+1. **BACK BUTTONS IMPLEMENTATION (NEXT TASK):**
+   - Add back button hotspots (4 paddles: P1, P2, P3, P4)
+   - Add back button tooltips and leader lines
+   - Update viewMode logic to show/hide front vs back buttons
+   - Create or update ghost-controller-back.png image
+   - Wire up BinaryToggle to switch between front/back views
+   - Test all interactions on back view
 
 2. **Potential Future Improvements:**
    - Add preset configurations for different games
    - Export/import hotspot positions as JSON
    - Visual grid/snap-to-grid for precise positioning
    - Lock individual hotspots to prevent accidental moves
+   - Animation transitions when switching front/back views
 
 ### 🐛 Known Issues
 
@@ -271,34 +299,41 @@ Status-Design-Exploration/
 
 ## 📝 For Next Context / Session Continuity
 
-**Last verified working:** 2026-07-21
-**Latest commit:** `daf6d7e` - "Add comprehensive edit mode features and View button"
+**Last verified working:** 2026-07-21 (Session 2)
+**Latest commit:** `76a9569` - "Adjust BinaryToggle positioning to center and set bottom spacing"
 
 **Current State:**
-- ✅ All 13 hotspots positioned correctly and editable
-- ✅ All 14 tooltips positioned and editable (including new View button)
-- ✅ All 14 leader lines with editable control points
+- ✅ All 18 hotspots positioned correctly (including Menu, Profile, View buttons)
+- ✅ All 16 tooltips positioned and editable (includes Menu, Profile, View buttons)
+- ✅ All 16 leader lines with editable control points
+- ✅ BinaryToggle component for Front/Back switching
+- ✅ DeviceStatusWidget hover area fixed
 - ✅ Undo/Redo fully functional (Cmd+Z / Cmd+Shift+Z)
 - ✅ Shift key aligns control points horizontally with adjacent points
-- ✅ Left-side tooltips, hotspots, and leader lines UPDATED ✅
-- ⏳ Right-side needs updates (NEXT TASK)
+- ✅ Front view fully implemented and positioned
+- ⏳ Back view needs implementation (NEXT TASK)
 
 **Quick Start for New Context:**
 1. Run `npm run dev` to start dev server (http://localhost:5173)
-2. All left-side positions are already correct in code defaults
-3. Right-side positions need to be updated next
+2. All front view positions are correct in code defaults
+3. Back view needs to be implemented next
 4. localStorage will override defaults if user has made edits
 5. To reset to defaults: visit http://localhost:5173/clear-storage.html
 6. Edit mode available on Button Remapping page with full undo/redo
 
 **What's Saved Where:**
-- **Code defaults** = Initial positions for fresh clones/users (updated in commit `daf6d7e`)
+- **Code defaults** = Initial positions for fresh clones/users (updated in latest commits)
 - **localStorage** = User's custom edits (takes precedence over defaults)
 - **Git commits** = Code defaults are version controlled
 - To update defaults: edit positions in Edit Mode, export to console, update code, then commit to git
 
 **Next Session Goal:**
-Update right-hand side tooltip positions, hotspot positions, and leader line control points using Edit Mode.
+Implement back button view with 4 paddles (P1-P4), tooltips, and leader lines. Wire up BinaryToggle to switch controller image and show/hide appropriate buttons.
+
+**Figma MCP Connected:**
+- Successfully authenticated with Figma MCP
+- Can pull designs directly from Figma URLs
+- Used for BinaryToggle component creation
 
 **Repository:** https://github.com/ywang30-prog/Gamescom
-**Latest Commit:** https://github.com/ywang30-prog/Gamescom/commit/daf6d7e
+**Latest Commit:** https://github.com/ywang30-prog/Gamescom/commit/76a9569
