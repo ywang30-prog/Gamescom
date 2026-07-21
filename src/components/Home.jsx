@@ -51,11 +51,7 @@ export default function Home() {
   // Hotspot editing mode
   const [isEditMode, setIsEditMode] = useState(false);
   const [hotspotPositions, setHotspotPositions] = useState(() => {
-    const saved = localStorage.getItem('hotspotPositions');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    return {
+    const defaults = {
       'Left Stick': { left: 459, top: 371 },
       'Left Bumper': { left: 361, top: 125 },
       'D Pad Up': { left: 351, top: 184 },
@@ -74,14 +70,40 @@ export default function Home() {
       'View Button': { left: 451, top: 159 },
       'Profile Button': { left: 664, top: 273 },
     };
+
+    const saved = localStorage.getItem('hotspotPositions');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Check if it's the new format with front/back views
+      if (parsed.front) {
+        // Use the front view positions
+        return { ...defaults, ...parsed.front };
+      }
+      // Old flat format
+      return { ...defaults, ...parsed };
+    }
+    return defaults;
   });
   const [draggingHotspot, setDraggingHotspot] = useState(null);
 
   // Save positions to localStorage when exiting edit mode
   const handleToggleEditMode = () => {
     if (isEditMode) {
-      // Exiting edit mode - save positions
-      localStorage.setItem('hotspotPositions', JSON.stringify(hotspotPositions));
+      // Exiting edit mode - save positions in the front/back structure for compatibility
+      const saved = localStorage.getItem('hotspotPositions');
+      let structure = { front: {}, back: {} };
+
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.front || parsed.back) {
+          structure = parsed;
+        }
+      }
+
+      // Update the front view with current positions
+      structure.front = hotspotPositions;
+
+      localStorage.setItem('hotspotPositions', JSON.stringify(structure));
       console.log('✅ Hotspot positions saved!');
     }
     setIsEditMode(!isEditMode);
