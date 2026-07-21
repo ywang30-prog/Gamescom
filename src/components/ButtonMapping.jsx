@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { ArrowLeft, ChevronRight, ChevronDown, Search } from 'lucide-react';
 import PresetModal from './PresetModal';
 import ImportProfileModal from './ImportProfileModal';
@@ -140,23 +140,23 @@ export default function ButtonMapping() {
   // Load hotspot positions from localStorage (same as Home page)
   const [hotspotPositions, setHotspotPositions] = useState(() => {
     const defaults = {
-      'Left Stick': { left: 459, top: 379 },
-      'Left Bumper': { left: 361, top: 133 },
-      'D Pad Up': { left: 351, top: 192 },
-      'D Pad Left': { left: 351, top: 337 },
-      'D Pad Down': { left: 278, top: 265 },
-      'D Pad Right': { left: 423, top: 265 },
-      'Right Bumper': { left: 818, top: 185 },
-      'Button Y': { left: 821, top: 133 },
-      'Button B': { left: 892, top: 265 },
-      'Button X': { left: 740, top: 265 },
-      'Button A': { left: 818, top: 348 },
-      'Right Stick': { left: 706, top: 379 },
-      'Left Trigger': { left: 473, top: 130 },
-      'Right Trigger': { left: 697, top: 130 },
-      'Menu Button': { left: 450, top: 167 },
-      'View Button': { left: 711, top: 167 },
-      'Button Share': { left: 320, top: 167 },
+      'Left Stick': { left: 459, top: 371 },
+      'Left Bumper': { left: 361, top: 125 },
+      'D Pad Up': { left: 351, top: 184 },
+      'D Pad Left': { left: 351, top: 329 },
+      'D Pad Down': { left: 278, top: 257 },
+      'D Pad Right': { left: 423, top: 257 },
+      'Right Bumper': { left: 818, top: 177 },
+      'Button Y': { left: 821, top: 125 },
+      'Button B': { left: 892, top: 257 },
+      'Button X': { left: 740, top: 257 },
+      'Button A': { left: 818, top: 340 },
+      'Right Stick': { left: 706, top: 371 },
+      'Left Trigger': { left: 473, top: 122 },
+      'Right Trigger': { left: 697, top: 122 },
+      'Menu Button': { left: 711, top: 159 },
+      'View Button': { left: 451, top: 159 },
+      'Button Share': { left: 502, top: 272 },
     };
     const saved = localStorage.getItem('hotspotPositions');
     if (saved) {
@@ -188,7 +188,8 @@ export default function ButtonMapping() {
       rightStick: 'Right Stick',
       leftTrigger: 'Left Trigger',
       rightTrigger: 'Right Trigger',
-      buttonShare: 'Share'
+      buttonShare: 'Share',
+      viewButton: 'View'
     },
     'FPS config': {
       leftStick: 'Bunny Hop',
@@ -205,7 +206,8 @@ export default function ButtonMapping() {
       rightStick: 'Record',
       leftTrigger: 'Left Trigger',
       rightTrigger: 'Right Trigger',
-      buttonShare: 'Share'
+      buttonShare: 'Share',
+      viewButton: 'View'
     },
     'Racing config': {
       leftStick: 'Left Stick',
@@ -222,7 +224,8 @@ export default function ButtonMapping() {
       rightStick: 'Right Stick',
       leftTrigger: 'Left Trigger',
       rightTrigger: 'Right Trigger',
-      buttonShare: 'Share'
+      buttonShare: 'Share',
+      viewButton: 'View'
     }
   };
 
@@ -423,21 +426,27 @@ export default function ButtonMapping() {
   // Edit mode state for leader lines and tooltips
   const [isEditMode, setIsEditMode] = useState(false);
   const [controllerYOffset, setControllerYOffset] = useState(8);
+
+  // Undo/Redo state
+  const [editHistory, setEditHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const saveHistoryTimeoutRef = useRef(null);
   const [tooltipPositions, setTooltipPositions] = useState(() => {
     const defaults = {
-      leftStick: { left: 27, top: 660 },
-      leftBumper: { left: 27, top: 95 },
-      dPadUp: { left: 27, top: 186 },
-      dPadLeft: { left: 27, top: 282 },
-      dPadDown: { left: 27, top: 378 },
-      dPadRight: { left: 27, top: 473 },
+      leftStick: { left: 27, top: 661 },
+      leftBumper: { left: 27, top: 36 },
+      dPadUp: { left: 27, top: 212 },
+      dPadLeft: { left: 27, top: 304 },
+      dPadDown: { left: 27, top: 392 },
+      dPadRight: { left: 27, top: 481 },
       rightBumper: { left: 1144, top: 33 },
       buttonY: { left: 1143, top: 120 },
       buttonB: { left: 1139, top: 226 },
       buttonX: { left: 1152, top: 332 },
       buttonA: { left: 1150, top: 731 },
       rightStick: { left: 1159, top: 567 },
-      buttonShare: { left: 27, top: 567 },
+      buttonShare: { left: 27, top: 569 },
+      viewButton: { left: -82, top: 124 },
     };
     const saved = localStorage.getItem('buttonMappingTooltipPositions');
     if (saved) {
@@ -451,34 +460,34 @@ export default function ButtonMapping() {
     // Default leader line paths - store as arrays of {x, y} points
     const defaults = {
       leftStick: [
-        { x: 81.7, y: 141.7 },
-        { x: 168.6, y: 142.2 },
+        { x: 80.3, y: 143.5 },
+        { x: 152.4, y: 143.5 },
         { x: 330.6, y: -27.8 }
       ],
       leftBumper: [
-        { x: 267.7, y: 124.5 },
-        { x: 152.2, y: 115.4 },
-        { x: 83.3, y: 115.4 }
+        { x: 270.6, y: 122.2 },
+        { x: 151.7, y: 80.8 },
+        { x: 79.5, y: 80.8 }
       ],
       dPadUp: [
-        { x: 264.6, y: 134 },
-        { x: 154.8, y: 143.1 },
-        { x: 83.1, y: 143.1 }
+        { x: 262.7, y: 136.8 },
+        { x: 153.3, y: 157.3 },
+        { x: 81.1, y: 157.3 }
       ],
       dPadLeft: [
-        { x: 220.2, y: 192.4 },
-        { x: 156.6, y: 212.5 },
-        { x: 82.7, y: 212.5 }
+        { x: 220.7, y: 193.3 },
+        { x: 153.8, y: 223.9 },
+        { x: 79.9, y: 223.9 }
       ],
       dPadDown: [
         { x: 263.7, y: 220.2 },
-        { x: 158.1, y: 256.3 },
-        { x: 82.6, y: 256.3 }
+        { x: 153.7, y: 264.1 },
+        { x: 79.2, y: 264.1 }
       ],
       dPadRight: [
-        { x: 314.3, y: 206.1 },
-        { x: 158.6, y: 328.7 },
-        { x: 83.6, y: 328.7 }
+        { x: 313.3, y: 202.9 },
+        { x: 152.9, y: 332.4 },
+        { x: 79.8, y: 332.4 }
       ],
       rightBumper: [
         { x: 556, y: 1 },
@@ -512,9 +521,14 @@ export default function ButtonMapping() {
         { x: 337, y: 142.6 }
       ],
       buttonShare: [
-        { x: 353.5, y: 202.6 },
-        { x: 164.8, y: 378.6 },
-        { x: 82.7, y: 378.6 }
+        { x: 351.1, y: 201.7 },
+        { x: 152.8, y: 378.6 },
+        { x: 79.8, y: 378.6 }
+      ],
+      viewButton: [
+        { x: -41.2, y: 2.2 },
+        { x: 33.8, y: 2.2 },
+        { x: 201.6, y: 15.1 }
       ]
     };
     const saved = localStorage.getItem('buttonMappingLeaderLinePositions');
@@ -524,12 +538,79 @@ export default function ButtonMapping() {
     return defaults;
   });
 
+  const saveToHistory = useCallback(() => {
+    const newState = {
+      tooltipPositions: JSON.parse(JSON.stringify(tooltipPositions)),
+      leaderLinePositions: JSON.parse(JSON.stringify(leaderLinePositions)),
+      hotspotPositions: JSON.parse(JSON.stringify(hotspotPositions))
+    };
+
+    // Remove any states after current index (when undoing then making new change)
+    setEditHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newState);
+
+      // Limit history to 50 states
+      if (newHistory.length > 50) {
+        newHistory.shift();
+        return newHistory;
+      }
+      return newHistory;
+    });
+
+    setHistoryIndex(prev => Math.min(prev + 1, 49));
+  }, [tooltipPositions, leaderLinePositions, hotspotPositions, historyIndex]);
+
+  const debouncedSaveToHistory = useCallback(() => {
+    if (saveHistoryTimeoutRef.current) {
+      clearTimeout(saveHistoryTimeoutRef.current);
+    }
+    saveHistoryTimeoutRef.current = setTimeout(() => {
+      saveToHistory();
+    }, 500); // Save to history 500ms after user stops dragging
+  }, [saveToHistory]);
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      const state = editHistory[newIndex];
+      setTooltipPositions(state.tooltipPositions);
+      setLeaderLinePositions(state.leaderLinePositions);
+      setHotspotPositions(state.hotspotPositions);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < editHistory.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      const state = editHistory[newIndex];
+      setTooltipPositions(state.tooltipPositions);
+      setLeaderLinePositions(state.leaderLinePositions);
+      setHotspotPositions(state.hotspotPositions);
+    }
+  };
+
   const handleToggleEditMode = () => {
     if (isEditMode) {
       // Exiting edit mode - save positions
       localStorage.setItem('buttonMappingTooltipPositions', JSON.stringify(tooltipPositions));
       localStorage.setItem('buttonMappingLeaderLinePositions', JSON.stringify(leaderLinePositions));
-      console.log('✅ Tooltip and leader line positions saved!');
+      localStorage.setItem('hotspotPositions', JSON.stringify(hotspotPositions));
+      console.log('✅ Hotspot, tooltip, and leader line positions saved!');
+      // Clear history when exiting edit mode
+      setEditHistory([]);
+      setHistoryIndex(-1);
+    } else {
+      // Entering edit mode - save initial state
+      const initialState = {
+        tooltipPositions: JSON.parse(JSON.stringify(tooltipPositions)),
+        leaderLinePositions: JSON.parse(JSON.stringify(leaderLinePositions)),
+        hotspotPositions: JSON.parse(JSON.stringify(hotspotPositions))
+      };
+      setEditHistory([initialState]);
+      setHistoryIndex(0);
     }
     setIsEditMode(!isEditMode);
   };
@@ -840,6 +921,35 @@ export default function ButtonMapping() {
     window.addEventListener('unsavedChangesUpdated', handleUnsavedChangesUpdate);
     return () => window.removeEventListener('unsavedChangesUpdated', handleUnsavedChangesUpdate);
   }, []); // No dependencies - listener registered once
+
+  // Keyboard shortcuts for undo/redo in edit mode
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isEditMode) return;
+
+      // Cmd+Z or Ctrl+Z for undo
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+
+      // Cmd+Shift+Z or Ctrl+Shift+Z for redo
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'z') {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEditMode, historyIndex, editHistory]);
+
+  // Track position changes and save to history (debounced)
+  useEffect(() => {
+    if (isEditMode && historyIndex >= 0) {
+      debouncedSaveToHistory();
+    }
+  }, [tooltipPositions, leaderLinePositions, hotspotPositions, isEditMode]);
 
   // Close reset button when clicking outside
   useEffect(() => {
@@ -1219,6 +1329,34 @@ export default function ButtonMapping() {
         <div className="flex-1 flex flex-col">
           {/* Edit Mode Toggle */}
           <div className="flex justify-end gap-2 items-center mb-2">
+            {isEditMode && (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleUndo}
+                  disabled={historyIndex <= 0}
+                  className={`px-3 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
+                    historyIndex > 0
+                      ? 'bg-[#242424] text-white hover:bg-[#333]'
+                      : 'bg-[#1a1a1a] text-[#666] cursor-not-allowed'
+                  }`}
+                  title="Undo (Cmd+Z)"
+                >
+                  ↶ Undo
+                </button>
+                <button
+                  onClick={handleRedo}
+                  disabled={historyIndex >= editHistory.length - 1}
+                  className={`px-3 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
+                    historyIndex < editHistory.length - 1
+                      ? 'bg-[#242424] text-white hover:bg-[#333]'
+                      : 'bg-[#1a1a1a] text-[#666] cursor-not-allowed'
+                  }`}
+                  title="Redo (Cmd+Shift+Z)"
+                >
+                  ↷ Redo
+                </button>
+              </div>
+            )}
             <button
               onClick={handleToggleEditMode}
               className={`px-4 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
@@ -1274,6 +1412,18 @@ export default function ButtonMapping() {
                 >
                   Copy Leader Line Positions
                 </button>
+                <button
+                  onClick={() => {
+                    console.log('=== HOTSPOT POSITIONS ===');
+                    Object.entries(hotspotPositions).forEach(([name, pos]) => {
+                      console.log(`'${name}': { left: ${pos.left}, top: ${pos.top} },`);
+                    });
+                    console.log('========================');
+                  }}
+                  className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
+                >
+                  Copy Hotspot Positions
+                </button>
               </>
             )}
           </div>
@@ -1304,6 +1454,13 @@ export default function ButtonMapping() {
               tooltipId="leftStick"
               onHoverChange={setHoveredTooltipId}
               hoveredTooltipId={hoveredTooltipId}
+              isEditMode={isEditMode}
+              onPositionChange={(newPos) => {
+                setHotspotPositions(prev => ({
+                  ...prev,
+                  'Left Stick': { left: newPos.left, top: newPos.top - controllerYOffset }
+                }));
+              }}
             />
 
             {/* LB - Left Bumper */}
@@ -1316,6 +1473,13 @@ export default function ButtonMapping() {
                 tooltipId="leftBumper"
                 onHoverChange={setHoveredTooltipId}
                 hoveredTooltipId={hoveredTooltipId}
+                isEditMode={isEditMode}
+                onPositionChange={(newPos) => {
+                  setHotspotPositions(prev => ({
+                    ...prev,
+                    'Left Bumper': { left: newPos.left, top: newPos.top - controllerYOffset }
+                  }));
+                }}
               />
             )}
 
@@ -1329,6 +1493,13 @@ export default function ButtonMapping() {
               tooltipId="dPadUp"
               onHoverChange={setHoveredTooltipId}
               hoveredTooltipId={hoveredTooltipId}
+              isEditMode={isEditMode}
+              onPositionChange={(newPos) => {
+                setHotspotPositions(prev => ({
+                  ...prev,
+                  'D Pad Up': { left: newPos.left, top: newPos.top - controllerYOffset }
+                }));
+              }}
             />
 
             {/* LD3 - D Pad Down */}
@@ -1341,6 +1512,13 @@ export default function ButtonMapping() {
                 tooltipId="dPadDown"
                 onHoverChange={setHoveredTooltipId}
                 hoveredTooltipId={hoveredTooltipId}
+                isEditMode={isEditMode}
+                onPositionChange={(newPos) => {
+                  setHotspotPositions(prev => ({
+                    ...prev,
+                    'D Pad Left': { left: newPos.left, top: newPos.top - controllerYOffset }
+                  }));
+                }}
               />
             )}
 
@@ -1356,9 +1534,9 @@ export default function ButtonMapping() {
               hoveredTooltipId={hoveredTooltipId}
               isEditMode={isEditMode}
               onPositionChange={(newPos) => {
-                setTooltipPositions(prev => ({
+                setHotspotPositions(prev => ({
                   ...prev,
-                  dPadDown: newPos
+                  'D Pad Down': { left: newPos.left, top: newPos.top - controllerYOffset }
                 }));
               }}
             />
@@ -1373,13 +1551,13 @@ export default function ButtonMapping() {
                 tooltipId="dPadRight"
                 onHoverChange={setHoveredTooltipId}
                 hoveredTooltipId={hoveredTooltipId}
-              isEditMode={isEditMode}
-              onPositionChange={(newPos) => {
-                setTooltipPositions(prev => ({
-                  ...prev,
-                  dPadRight: newPos
-                }));
-              }}
+                isEditMode={isEditMode}
+                onPositionChange={(newPos) => {
+                  setHotspotPositions(prev => ({
+                    ...prev,
+                    'D Pad Right': { left: newPos.left, top: newPos.top - controllerYOffset }
+                  }));
+                }}
               />
             )}
 
@@ -1393,13 +1571,13 @@ export default function ButtonMapping() {
                 tooltipId="rightBumper"
                 onHoverChange={setHoveredTooltipId}
                 hoveredTooltipId={hoveredTooltipId}
-              isEditMode={isEditMode}
-              onPositionChange={(newPos) => {
-                setTooltipPositions(prev => ({
-                  ...prev,
-                  rightBumper: newPos
-                }));
-              }}
+                isEditMode={isEditMode}
+                onPositionChange={(newPos) => {
+                  setHotspotPositions(prev => ({
+                    ...prev,
+                    'Right Bumper': { left: newPos.left, top: newPos.top - controllerYOffset }
+                  }));
+                }}
               />
             )}
 
@@ -1414,9 +1592,9 @@ export default function ButtonMapping() {
               hoveredTooltipId={hoveredTooltipId}
               isEditMode={isEditMode}
               onPositionChange={(newPos) => {
-                setTooltipPositions(prev => ({
+                setHotspotPositions(prev => ({
                   ...prev,
-                  buttonY: newPos
+                  'Button Y': { left: newPos.left, top: newPos.top - controllerYOffset }
                 }));
               }}
             />
@@ -1431,13 +1609,13 @@ export default function ButtonMapping() {
                 tooltipId="buttonB"
                 onHoverChange={setHoveredTooltipId}
                 hoveredTooltipId={hoveredTooltipId}
-              isEditMode={isEditMode}
-              onPositionChange={(newPos) => {
-                setTooltipPositions(prev => ({
-                  ...prev,
-                  buttonB: newPos
-                }));
-              }}
+                isEditMode={isEditMode}
+                onPositionChange={(newPos) => {
+                  setHotspotPositions(prev => ({
+                    ...prev,
+                    'Button B': { left: newPos.left, top: newPos.top - controllerYOffset }
+                  }));
+                }}
               />
             )}
 
@@ -1451,13 +1629,13 @@ export default function ButtonMapping() {
                 tooltipId="buttonX"
                 onHoverChange={setHoveredTooltipId}
                 hoveredTooltipId={hoveredTooltipId}
-              isEditMode={isEditMode}
-              onPositionChange={(newPos) => {
-                setTooltipPositions(prev => ({
-                  ...prev,
-                  buttonX: newPos
-                }));
-              }}
+                isEditMode={isEditMode}
+                onPositionChange={(newPos) => {
+                  setHotspotPositions(prev => ({
+                    ...prev,
+                    'Button X': { left: newPos.left, top: newPos.top - controllerYOffset }
+                  }));
+                }}
               />
             )}
 
@@ -1474,9 +1652,9 @@ export default function ButtonMapping() {
               hoveredTooltipId={hoveredTooltipId}
               isEditMode={isEditMode}
               onPositionChange={(newPos) => {
-                setTooltipPositions(prev => ({
+                setHotspotPositions(prev => ({
                   ...prev,
-                  buttonA: newPos
+                  'Button A': { left: newPos.left, top: newPos.top - controllerYOffset }
                 }));
               }}
             />
@@ -1493,9 +1671,9 @@ export default function ButtonMapping() {
               hoveredTooltipId={hoveredTooltipId}
               isEditMode={isEditMode}
               onPositionChange={(newPos) => {
-                setTooltipPositions(prev => ({
+                setHotspotPositions(prev => ({
                   ...prev,
-                  rightStick: newPos
+                  'Right Stick': { left: newPos.left, top: newPos.top - controllerYOffset }
                 }));
               }}
             />
@@ -1510,41 +1688,16 @@ export default function ButtonMapping() {
                 tooltipId="buttonShare"
                 onHoverChange={setHoveredTooltipId}
                 hoveredTooltipId={hoveredTooltipId}
+                isEditMode={isEditMode}
+                onPositionChange={(newPos) => {
+                  setHotspotPositions(prev => ({
+                    ...prev,
+                    'Button Share': { left: newPos.left, top: newPos.top - controllerYOffset }
+                  }));
+                }}
               />
             )}
 
-            {/* Left Trigger */}
-            <HotspotMarker
-              name="Left Trigger"
-              style={{ left: `${hotspotPositions['Left Trigger'].left}px`, top: `${hotspotPositions['Left Trigger'].top + controllerYOffset}px` }}
-              isSelected={false}
-              isHovered={hoveredTooltipId === 'leftTrigger'}
-              tooltipId="leftTrigger"
-              onHoverChange={setHoveredTooltipId}
-              hoveredTooltipId={hoveredTooltipId}
-            />
-
-            {/* Right Trigger */}
-            <HotspotMarker
-              name="Right Trigger"
-              style={{ left: `${hotspotPositions['Right Trigger'].left}px`, top: `${hotspotPositions['Right Trigger'].top + controllerYOffset}px` }}
-              isSelected={false}
-              isHovered={hoveredTooltipId === 'rightTrigger'}
-              tooltipId="rightTrigger"
-              onHoverChange={setHoveredTooltipId}
-              hoveredTooltipId={hoveredTooltipId}
-            />
-
-            {/* Menu Button */}
-            <HotspotMarker
-              name="Menu Button"
-              style={{ left: `${hotspotPositions['Menu Button'].left}px`, top: `${hotspotPositions['Menu Button'].top + controllerYOffset}px` }}
-              isSelected={false}
-              isHovered={hoveredTooltipId === 'menuButton'}
-              tooltipId="menuButton"
-              onHoverChange={setHoveredTooltipId}
-              hoveredTooltipId={hoveredTooltipId}
-            />
 
             {/* View Button */}
             <HotspotMarker
@@ -1555,6 +1708,13 @@ export default function ButtonMapping() {
               tooltipId="viewButton"
               onHoverChange={setHoveredTooltipId}
               hoveredTooltipId={hoveredTooltipId}
+              isEditMode={isEditMode}
+              onPositionChange={(newPos) => {
+                setHotspotPositions(prev => ({
+                  ...prev,
+                  'View Button': { left: newPos.left, top: newPos.top - controllerYOffset }
+                }));
+              }}
             />
 
             {/* All Leader Lines in one SVG layer */}
@@ -1676,6 +1836,16 @@ export default function ButtonMapping() {
                   transform="scale(0.8085) translateY(-40px) translateX(-60px)"
                 />
               )}
+
+              {/* View Button */}
+              {viewMode !== 'back' && (
+                <LeaderLinePath
+                  points={leaderLinePositions.viewButton}
+                  lineId="viewButton"
+                  hoveredTooltipId={hoveredTooltipId}
+                  transform="scale(0.8085) translateY(73px) translateX(60px)"
+                />
+              )}
             </svg>
 
             {/* All Control Points in one top layer */}
@@ -1745,6 +1915,11 @@ export default function ButtonMapping() {
                   id: 'buttonShare',
                   points: leaderLinePositions.buttonShare,
                   transform: 'scale(0.8085) translateY(-40px) translateX(-60px)'
+                }] : []),
+                ...(viewMode !== 'back' ? [{
+                  id: 'viewButton',
+                  points: leaderLinePositions.viewButton,
+                  transform: 'scale(0.8085) translateY(73px) translateX(60px)'
                 }] : [])
               ]}
               isEditMode={isEditMode}
@@ -2181,6 +2356,41 @@ export default function ButtonMapping() {
                 />
               </>
             )}
+
+            {/* Tooltip 12 - View Button */}
+            {viewMode !== 'back' && (
+              <>
+                {showResetButton === 'viewButton' && (
+                  <ResetButton
+                    position={tooltipPositions.viewButton}
+                    align="left"
+                    onClick={() => handleResetTooltip('viewButton')}
+                  />
+                )}
+                <HotspotTooltip
+                  key={`viewButton-${viewMode}`}
+                  label="Button"
+                  value={tooltipAssignments.viewButton || 'View'}
+                  position={tooltipPositions.viewButton}
+                  isActive={activeTooltip === 'viewButton'}
+                  isModified={tooltipAssignments.viewButton !== defaultTooltipAssignments.viewButton}
+                  align="left"
+                  isHoveredByDrag={hoveredTooltipIndex === 13}
+                  tooltipRef={(el) => tooltipRefs.current[13] = el}
+                  onClick={() => handleTooltipClick('viewButton', 'Button')}
+                  tooltipId="viewButton"
+                  onHoverChange={setHoveredTooltipId}
+                  hoveredTooltipId={hoveredTooltipId}
+                  isEditMode={isEditMode}
+                  onPositionChange={(newPos) => {
+                    setTooltipPositions(prev => ({
+                      ...prev,
+                      viewButton: newPos
+                    }));
+                  }}
+                />
+              </>
+            )}
           </div>
 
           {/* Reset to Default Button - moved from top */}
@@ -2573,18 +2783,24 @@ function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate, controllerYO
       const x = mouseX - draggingLine.offsetX;
       let y = mouseY - draggingLine.offsetY;
 
-      // If Shift is held, lock Y to the adjacent point's Y position (horizontal constraint)
+      // If Shift is held, align Y with the closest adjacent point to create horizontal line
       if (e.shiftKey && line.points.length >= 2) {
-        // Find the adjacent point: prefer next point, or previous if this is the last point
-        let adjacentPointIndex;
-        if (draggingLine.pointIndex < line.points.length - 1) {
-          // Not the last point, use next point
-          adjacentPointIndex = draggingLine.pointIndex + 1;
+        // For a point with neighbors on both sides, choose the closest one
+        // For first/last points, use the only neighbor
+        if (draggingLine.pointIndex === 0) {
+          // First point - align with next point
+          y = line.points[1].y;
+        } else if (draggingLine.pointIndex === line.points.length - 1) {
+          // Last point - align with previous point
+          y = line.points[line.points.length - 2].y;
         } else {
-          // Last point, use previous point
-          adjacentPointIndex = draggingLine.pointIndex - 1;
+          // Middle point - align with the closest adjacent point
+          const prevPoint = line.points[draggingLine.pointIndex - 1];
+          const nextPoint = line.points[draggingLine.pointIndex + 1];
+          const distToPrev = Math.abs(y - prevPoint.y);
+          const distToNext = Math.abs(y - nextPoint.y);
+          y = distToPrev < distToNext ? prevPoint.y : nextPoint.y;
         }
-        y = line.points[adjacentPointIndex].y;
       }
 
       onLineUpdate(draggingLine.lineId, draggingLine.pointIndex, {
@@ -2616,7 +2832,7 @@ function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate, controllerYO
       viewBox="0 0 567.5 351.5"
       fill="none"
       style={{
-        pointerEvents: 'auto',
+        pointerEvents: 'none',
         zIndex: 100,
         overflow: 'visible',
         transform: `translateY(${controllerYOffset}px)`
@@ -2627,14 +2843,14 @@ function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate, controllerYO
           {line.points.map((point, index) => {
             const isDragging = draggingLine?.lineId === line.id && draggingLine?.pointIndex === index;
             return (
-              <g key={`${line.id}-${index}`}>
+              <g key={`${line.id}-${index}`} style={{ pointerEvents: 'auto' }}>
                 {/* Larger invisible hit area */}
                 <circle
                   cx={point.x}
                   cy={point.y}
                   r="20"
                   fill="transparent"
-                  style={{ cursor: 'move' }}
+                  style={{ cursor: 'move', pointerEvents: 'auto' }}
                   onMouseDown={(e) => handleMouseDown(e, line.id, index, point)}
                 />
                 {/* Visible control point */}
@@ -2660,33 +2876,183 @@ function LeaderLineControlPoints({ lines, isEditMode, onLineUpdate, controllerYO
 }
 
 // Hotspot marker component
-function HotspotMarker({ name, style, isSelected, isHovered, tooltipId, onHoverChange }) {
+function HotspotMarker({ name, style, isSelected, isHovered, tooltipId, onHoverChange, isEditMode, onPositionChange }) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [showEditTooltip, setShowEditTooltip] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState({ left: parseInt(style.left), top: parseInt(style.top) });
+
+  useEffect(() => {
+    setCurrentPosition({ left: parseInt(style.left), top: parseInt(style.top) });
+  }, [style.left, style.top]);
+
+  const handleClick = (e) => {
+    if (isEditMode) {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsPinned(!isPinned);
+      setShowEditTooltip(true);
+    }
+  };
+
+  const handleMouseDown = (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') {
+      return;
+    }
+    if (isEditMode && onPositionChange) {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - currentPosition.left,
+        y: e.clientY - currentPosition.top
+      });
+    }
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (isDragging && isEditMode && onPositionChange) {
+        const newLeft = e.clientX - dragStart.x;
+        const newTop = e.clientY - dragStart.y;
+        const newPos = {
+          left: Math.round(newLeft),
+          top: Math.round(newTop)
+        };
+        setCurrentPosition(newPos);
+        onPositionChange(newPos);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragStart, isEditMode, onPositionChange]);
+
   return (
-    <button
-      className={`
-        backdrop-blur-[4px] border border-solid
-        absolute overflow-hidden rounded-[40px] w-[24px] h-[24px]
-        transition-all duration-150 ease-in-out cursor-pointer outline-none
-        focus-visible:ring-2 focus-visible:ring-primary-default focus-visible:ring-offset-1 focus-visible:ring-offset-black
-        ${
-          isSelected
-            ? 'bg-[rgba(0,182,250,0.25)] border-primary-default'
-            : 'bg-[rgba(43,48,59,0.2)] border-stroke-neutral-default'
-        }
-      `}
-      style={style}
-      title={name}
-      aria-label={name}
-      onMouseEnter={() => onHoverChange && onHoverChange(tooltipId)}
-      onMouseLeave={() => onHoverChange && onHoverChange(null)}
+    <div
+      className="absolute"
+      style={{
+        left: `${currentPosition.left}px`,
+        top: `${currentPosition.top}px`,
+        zIndex: isPinned ? 1000 : 10
+      }}
+      onMouseEnter={() => !isPinned && isEditMode && setShowEditTooltip(true)}
+      onMouseLeave={() => !isPinned && isEditMode && setShowEditTooltip(false)}
     >
-      <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[40px] transition-all duration-200 ease-in ${
-        isSelected
-          ? 'w-[12px] h-[12px] bg-primary-default'
-          : isHovered
-          ? 'w-[10px] h-[10px] bg-white'
-          : 'w-[8px] h-[8px] bg-white'
-      }`} />
-    </button>
+      <div
+        className={`
+          backdrop-blur-[4px] border border-solid
+          overflow-hidden rounded-[40px] w-[24px] h-[24px]
+          transition-all duration-150 ease-in-out outline-none
+          focus-visible:ring-2 focus-visible:ring-primary-default focus-visible:ring-offset-1 focus-visible:ring-offset-black
+          ${isDragging ? 'ring-2 ring-primary-default' : ''}
+          ${showEditTooltip && isEditMode && !isPinned ? 'ring-2 ring-yellow-400' : ''}
+          ${isPinned ? 'ring-2 ring-green-500' : ''}
+          ${
+            isSelected
+              ? 'bg-[rgba(0,182,250,0.25)] border-primary-default'
+              : 'bg-[rgba(43,48,59,0.2)] border-stroke-neutral-default'
+          }
+        `}
+        style={{
+          cursor: isEditMode ? 'move' : 'pointer',
+          pointerEvents: 'auto'
+        }}
+        title={name}
+        aria-label={name}
+        onClick={handleClick}
+        onMouseDown={handleMouseDown}
+        onMouseEnter={() => !isEditMode && onHoverChange && onHoverChange(tooltipId)}
+        onMouseLeave={() => !isEditMode && onHoverChange && onHoverChange(null)}
+      >
+        <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[40px] transition-all duration-200 ease-in ${
+          isSelected
+            ? 'w-[12px] h-[12px] bg-primary-default'
+            : isHovered
+            ? 'w-[10px] h-[10px] bg-white'
+            : 'w-[8px] h-[8px] bg-white'
+        }`} />
+      </div>
+      {isEditMode && (showEditTooltip || isPinned) && (
+        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white px-3 py-2 rounded-lg shadow-xl flex gap-2 items-center border-2 border-blue-500" style={{ zIndex: 1001, pointerEvents: 'auto' }}>
+          {isPinned && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsPinned(false);
+                setShowEditTooltip(false);
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-red-600 cursor-pointer"
+              style={{ pointerEvents: 'auto' }}
+            >
+              ×
+            </button>
+          )}
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] text-gray-600 font-bold uppercase">X</span>
+            <input
+              type="text"
+              value={currentPosition.left}
+              onChange={(e) => {
+                const val = parseInt(e.target.value) || 0;
+                const newPos = { left: val, top: currentPosition.top };
+                setCurrentPosition(newPos);
+                onPositionChange && onPositionChange(newPos);
+              }}
+              className="w-14 h-7 text-center rounded border-2 border-gray-300 focus:border-blue-500 outline-none"
+              onClick={(e) => e.stopPropagation()}
+              onFocus={(e) => e.target.select()}
+              style={{
+                fontSize: '14px',
+                fontWeight: '700',
+                color: '#000000',
+                backgroundColor: '#ffffff',
+                fontFamily: 'monospace'
+              }}
+            />
+          </div>
+          <span className="text-gray-400 text-lg font-bold">/</span>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] text-gray-600 font-bold uppercase">Y</span>
+            <input
+              type="text"
+              value={currentPosition.top}
+              onChange={(e) => {
+                const val = parseInt(e.target.value) || 0;
+                const newPos = { left: currentPosition.left, top: val };
+                setCurrentPosition(newPos);
+                onPositionChange && onPositionChange(newPos);
+              }}
+              className="w-14 h-7 text-center rounded border-2 border-gray-300 focus:border-blue-500 outline-none"
+              onClick={(e) => e.stopPropagation()}
+              onFocus={(e) => e.target.select()}
+              style={{
+                fontSize: '14px',
+                fontWeight: '700',
+                color: '#000000',
+                backgroundColor: '#ffffff',
+                fontFamily: 'monospace'
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
