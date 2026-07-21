@@ -2563,16 +2563,16 @@ export default function ButtonMapping() {
               RESET ALL TO DEFAULT
             </span>
           </button>
+          </div>
 
           {/* View Mode Toggle - Front/Back buttons */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
+          <div className="absolute left-1/2 -translate-x-1/2 z-20" style={{ bottom: '64px' }}>
             <BinaryToggle
               leftLabel="FRONT"
               rightLabel="BACK"
               value={viewMode === 'front' ? 'left' : 'right'}
               onChange={(value) => setViewMode(value === 'left' ? 'front' : 'back')}
             />
-          </div>
           </div>
         </div>
       </div>
