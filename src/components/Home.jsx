@@ -21,6 +21,9 @@ const imgVector4 = "/figmaAssets/input-test-icon.svg";
 const imgVector5 = "/figmaAssets/general-settings-icon.svg";
 const imgGhostController = "/ghost-controller-white.png";
 
+// Feature flags
+const ENABLE_EDIT_HOTSPOTS = false; // Set to true to enable Edit Hotspots feature
+
 export default function Home() {
   const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState('Actions');
@@ -374,7 +377,7 @@ export default function Home() {
         {/* Device section */}
         <div className="flex-1 flex flex-col">
           {/* Edit Mode Toggle */}
-          {true && (
+          {ENABLE_EDIT_HOTSPOTS && (
             <div className="flex justify-end gap-2 items-center">
               <button
                 onClick={handleToggleEditMode}
