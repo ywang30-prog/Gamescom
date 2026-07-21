@@ -310,7 +310,33 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-black w-full h-screen flex flex-col" style={{ minWidth: '1600px' }} data-name="Home" data-node-id="175:3182">
+    <div className="bg-black w-full h-screen flex flex-col" data-name="Home" data-node-id="175:3182">
+      <style>{`
+        /* Scale controller based on available width */
+        .controller-container-home {
+          width: 1188px;
+          height: 771px;
+          transform: translateY(-36px);
+        }
+
+        @media (max-width: 1672px) {
+          .controller-container-home {
+            transform: translateY(-36px) scale(0.8);
+          }
+        }
+
+        @media (max-width: 1472px) {
+          .controller-container-home {
+            transform: translateY(-36px) scale(0.7);
+          }
+        }
+
+        @media (max-width: 1372px) {
+          .controller-container-home {
+            transform: translateY(-36px) scale(0.6);
+          }
+        }
+      `}</style>
       {/* Navigation */}
       <nav className="flex items-center justify-between gap-4 px-8 py-2 border-b border-solid border-[#333]">
         <div className="inline-flex items-center gap-4" data-name="Tab: Main Navigation">
@@ -435,8 +461,8 @@ export default function Home() {
           <DeviceStatusWidget />
 
           {/* Device image with hotspots */}
-          <div className="flex flex-col items-center justify-center" style={{ height: 'calc(100vh - 48px - 64px - 32px - 16px)' }}>
-            <div className="relative w-[1188px] h-[771px]" style={{ transform: 'translateY(-36px)' }}>
+          <div className="flex flex-col items-center justify-center overflow-hidden" style={{ height: 'calc(100vh - 48px - 64px - 32px - 16px)' }}>
+            <div className="relative controller-container-home">
               <img
                 alt="Ghost Controller"
                 className="absolute inset-0 w-full h-full object-contain"

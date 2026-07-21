@@ -1118,7 +1118,7 @@ export default function ButtonMapping() {
   const defaultTooltipAssignments = getDefaultTooltipAssignments(presetConfig);
 
   return (
-    <div className="bg-black flex flex-col h-screen w-full" style={{ minWidth: '1600px' }}>
+    <div className="bg-black flex flex-col h-screen w-full">
       <style>{`
         .custom-scrollbar {
           overflow: overlay;
@@ -1139,6 +1139,30 @@ export default function ButtonMapping() {
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #333333;
+        }
+
+        /* Scale controller based on available width */
+        .controller-container {
+          width: 1188px;
+          height: 771px;
+        }
+
+        @media (max-width: 1672px) {
+          .controller-container {
+            transform: scale(0.8);
+          }
+        }
+
+        @media (max-width: 1472px) {
+          .controller-container {
+            transform: scale(0.7);
+          }
+        }
+
+        @media (max-width: 1372px) {
+          .controller-container {
+            transform: scale(0.6);
+          }
         }
       `}</style>
       {/* Navigation */}
@@ -1578,8 +1602,8 @@ export default function ButtonMapping() {
           <DeviceStatusWidget />
 
           {/* Controller visualization centered below */}
-          <div className="flex flex-col items-center justify-center" style={{ height: 'calc(100vh - 48px - 64px - 32px - 16px - 48px)', marginTop: '16px' }}>
-          <div className="relative w-[1188px] h-[771px]" ref={controllerRef}>
+          <div className="flex flex-col items-center justify-center overflow-hidden" style={{ height: 'calc(100vh - 48px - 64px - 32px - 16px - 48px)', marginTop: '16px' }}>
+          <div className="relative controller-container" ref={controllerRef}>
             {/* Controller with leader lines and dots */}
             <img
               src={viewMode === 'back' ? "/ghost-controller-back-white.png" : "/ghost-controller-white.png"}
