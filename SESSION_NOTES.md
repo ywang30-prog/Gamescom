@@ -6,15 +6,15 @@
 - **Dev Server**: http://localhost:5173/
 - **Start Dev Server**: `npm run dev` (runs in background)
 
-## Current Status (Last Updated: 2026-07-20)
+## Current Status (Last Updated: 2026-07-21)
 
 ### ✅ Completed Features
 
-1. **Hotspot Positions - FIXED AND COMMITTED**
-   - All 16 hotspot positions are now correct in the code defaults
+1. **Hotspot Positions - UPDATED**
+   - All 13 visible hotspot positions updated and committed
    - Positions match the Ghost controller layout perfectly
    - Works on both Ghost Home and Button Remapping pages
-   - Committed to git, pushed to GitHub
+   - Committed to git, pushed to GitHub (commit: `daf6d7e`)
 
 2. **Edit Mode - Ghost Home Page**
    - Toggle button visible at top of page
@@ -23,27 +23,44 @@
    - "Copy Positions to Console" button for exporting
    - Saves to localStorage on "Save & Exit Edit Mode"
 
-3. **Edit Mode - Button Remapping Page** 
+3. **Edit Mode - Button Remapping Page ✅ FULLY UPDATED**
    - "Edit Layout" button at top of controller view
+   - **Hotspots are now draggable** (same as tooltips)
    - Drag tooltips to reposition
-   - Click tooltip to pin and edit X/Y coordinates
+   - Click tooltip/hotspot to pin and edit X/Y coordinates
    - Tooltip positions saved separately from hotspots
-   - "Copy Tooltip Positions" and "Copy Leader Line Positions" buttons for exporting
+   - "Copy Tooltip Positions", "Copy Leader Line Positions", and "Copy Hotspot Positions" buttons
    - Visual indicators: yellow ring (hover), green ring (pinned), blue ring (dragging)
    - Live Y offset editor with slider and number input (default: 8px)
    - Clean hover states without animated borders (TracingAnimationLayer removed)
 
-4. **Leader Line Editing - Button Remapping Page ✅ NEW**
-   - SVG leader lines are now fully editable in edit mode
+4. **Leader Line Editing - Button Remapping Page ✅ ENHANCED**
+   - SVG leader lines are fully editable in edit mode
    - Each line has draggable control points (orange circles)
    - Control points turn blue when dragging
+   - **Hold Shift** to align control point with adjacent point's Y position (creates horizontal segments)
    - Click and drag any control point to reshape the line
    - Line paths stored as arrays of {x, y} coordinates
-   - All 12 leader lines support editing (leftStick, leftBumper, dPadUp, dPadLeft, dPadDown, dPadRight, rightBumper, buttonY, buttonB, buttonX, buttonA, rightStick)
+   - All 13 leader lines support editing (includes new viewButton)
    - Positions saved to localStorage on "Save & Exit Edit Mode"
-   - Separate export button for leader line coordinates
 
-5. **Shared Hotspot Positions**
+5. **Undo/Redo Functionality ✅ NEW**
+   - **Cmd+Z** (or Ctrl+Z) to undo last change
+   - **Cmd+Shift+Z** (or Ctrl+Shift+Z) to redo
+   - Visual undo/redo buttons in edit mode UI
+   - 50-state history limit
+   - Debounced saves (500ms after dragging stops)
+   - Tracks all hotspot, tooltip, and leader line positions
+   - History auto-clears when exiting edit mode
+
+6. **View Button ✅ NEW**
+   - Added View button tooltip on right side
+   - Tooltip label: "Button" / "View"
+   - Leader line with 3 editable control points
+   - Fully integrated into edit mode
+   - Included in all preset configurations
+
+7. **Shared Hotspot Positions**
    - Both pages load from same localStorage key: `hotspotPositions`
    - Code defaults in both files are identical and correct
    - Clearing localStorage will revert to correct defaults
@@ -52,7 +69,7 @@
 
 **Components:**
 - `src/components/Home.jsx` - Ghost Home page with hotspot editor
-- `src/components/ButtonMapping.jsx` - Button Remapping page with tooltip editor
+- `src/components/ButtonMapping.jsx` - Button Remapping page with tooltip/hotspot/leader line editor
 - `src/components/HotspotDetailCard.jsx` - Hotspot detail popup
 - `src/components/ProfileSelector.jsx` - Profile switching
 - `src/components/DeviceStatusWidget.jsx` - Battery/connection status
@@ -60,9 +77,29 @@
 **Utilities:**
 - `public/clear-storage.html` - Utility page to clear localStorage
 
-### 🎯 Default Hotspot Positions (in code defaults)
+### 🎯 Current Default Positions (in code defaults)
 
-**Ghost Home Page** (`src/components/Home.jsx` - lines 56-72):
+**Tooltip Positions** (`src/components/ButtonMapping.jsx` - updated in commit `daf6d7e`):
+```javascript
+{
+  leftStick: { left: 27, top: 661 },
+  leftBumper: { left: 27, top: 36 },
+  dPadUp: { left: 27, top: 212 },
+  dPadLeft: { left: 27, top: 304 },
+  dPadDown: { left: 27, top: 392 },
+  dPadRight: { left: 27, top: 481 },
+  rightBumper: { left: 1144, top: 33 },
+  buttonY: { left: 1143, top: 120 },
+  buttonB: { left: 1139, top: 226 },
+  buttonX: { left: 1152, top: 332 },
+  buttonA: { left: 1150, top: 731 },
+  rightStick: { left: 1159, top: 567 },
+  buttonShare: { left: 27, top: 569 },
+  viewButton: { left: -82, top: 124 },
+}
+```
+
+**Hotspot Positions** (`src/components/ButtonMapping.jsx` - updated in commit `daf6d7e`):
 ```javascript
 {
   'Left Stick': { left: 459, top: 371 },
@@ -77,37 +114,17 @@
   'Button X': { left: 740, top: 257 },
   'Button A': { left: 818, top: 340 },
   'Right Stick': { left: 706, top: 371 },
-  'Left Trigger': { left: 473, top: 122 },
-  'Right Trigger': { left: 697, top: 122 },
-  'Menu Button': { left: 450, top: 159 },
-  'View Button': { left: 711, top: 159 },
+  'Button Share': { left: 502, top: 272 },
+  'View Button': { left: 451, top: 159 },
+  // REMOVED: Left Trigger, Right Trigger, Menu Button
 }
 ```
 
-**Button Remapping Page** (`src/components/ButtonMapping.jsx` - lines 145-161):
-Same positions BUT with +8px Y offset applied:
-```javascript
-{
-  'Left Stick': { left: 459, top: 379 },      // +8px
-  'Left Bumper': { left: 361, top: 133 },     // +8px
-  'D Pad Up': { left: 351, top: 192 },        // +8px
-  'D Pad Left': { left: 351, top: 337 },      // +8px
-  'D Pad Down': { left: 278, top: 265 },      // +8px
-  'D Pad Right': { left: 423, top: 265 },     // +8px
-  'Right Bumper': { left: 818, top: 185 },    // +8px
-  'Button Y': { left: 821, top: 133 },        // +8px
-  'Button B': { left: 892, top: 265 },        // +8px
-  'Button X': { left: 740, top: 265 },        // +8px
-  'Button A': { left: 818, top: 348 },        // +8px
-  'Right Stick': { left: 706, top: 379 },     // +8px
-  'Left Trigger': { left: 473, top: 130 },    // +8px
-  'Right Trigger': { left: 697, top: 130 },   // +8px
-  'Menu Button': { left: 450, top: 167 },     // +8px
-  'View Button': { left: 711, top: 167 },     // +8px
-}
-```
+**Leader Line Positions** (updated in commit `daf6d7e`):
+- All left-side leader lines have horizontally aligned segments (using Shift key)
+- View button leader line added: `[{ x: -41.2, y: 2.2 }, { x: 33.8, y: 2.2 }, { x: 201.6, y: 15.1 }]`
 
-**Controller Y Offset:** Default is 8px on Button Remapping page to match Ghost Home positioning.
+**Controller Y Offset:** Default is 8px on Button Remapping page.
 All hotspots, leader lines, and control points move together with this offset.
 
 ### 💾 localStorage Keys (User Edits Persist Here)
@@ -124,7 +141,7 @@ All hotspots, leader lines, and control points move together with this offset.
 - `tooltipAssignments_{profile}_{presetConfig}` - Tooltip assignments
 
 **Important:** All edit mode changes are saved to localStorage automatically. When you:
-1. Edit hotspot positions on Ghost Home → Saved to `hotspotPositions`
+1. Edit hotspot positions → Saved to `hotspotPositions`
 2. Edit tooltip positions in edit mode → Saved to `buttonMappingTooltipPositions`
 3. Edit leader line control points → Saved to `buttonMappingLeaderLinePositions`
 4. Adjust controller Y offset → Applied immediately via transform
@@ -144,17 +161,24 @@ All hotspots, leader lines, and control points move together with this offset.
    ```
    Server will run on http://localhost:5173/
 
-3. **Verify hotspots are correct:**
+3. **Verify everything is correct:**
    - Open http://localhost:5173/
-   - Hotspots should be positioned correctly on controller
+   - Go to Button Remapping page
+   - Hotspots, tooltips, and leader lines should be positioned correctly
    - If not, go to http://localhost:5173/clear-storage.html and clear localStorage
 
 ### 📋 Next Steps / TODO
 
-1. **Potential Improvements:**
+1. **RIGHT-HAND SIDE UPDATES (NEXT TASK):**
+   - Update right-hand side tooltip positions
+   - Update right-hand side hotspot positions
+   - Update right-hand side leader line control points
+   - Use Edit Mode to adjust and export positions
+   - Update code defaults in `ButtonMapping.jsx`
+
+2. **Potential Future Improvements:**
    - Add preset configurations for different games
    - Export/import hotspot positions as JSON
-   - Add undo/redo for position changes
    - Visual grid/snap-to-grid for precise positioning
    - Lock individual hotspots to prevent accidental moves
 
@@ -164,16 +188,26 @@ All hotspots, leader lines, and control points move together with this offset.
 
 ### 🔧 Development Tips
 
+**Edit Mode Usage:**
+1. Click "Edit Layout" on Button Remapping page
+2. **Drag** any hotspot, tooltip, or leader line control point
+3. **Click** to pin and show coordinate input fields
+4. **Hold Shift** while dragging control points to align horizontally with adjacent points
+5. **Cmd+Z** to undo, **Cmd+Shift+Z** to redo
+6. Click export buttons to copy positions to console
+7. Click "Save & Exit Edit Mode" to save all changes
+
 **To clear localStorage if positions get messed up:**
 - Visit: http://localhost:5173/clear-storage.html
 - Or console: `localStorage.clear()`
 - Or console: `localStorage.removeItem('hotspotPositions')`
 
 **To export current positions:**
-1. Enter edit mode (Ghost Home or Button Remapping page)
-2. Click "Copy Tooltip Positions" or "Copy Leader Line Positions"
+1. Enter edit mode (Button Remapping page)
+2. Click "Copy Tooltip Positions", "Copy Leader Line Positions", or "Copy Hotspot Positions"
 3. Open DevTools (F12) → Console tab
 4. Copy the logged positions
+5. Update code defaults in `ButtonMapping.jsx`
 
 **Important localStorage Concept:**
 - localStorage is browser-specific, NOT saved in git
@@ -181,13 +215,19 @@ All hotspots, leader lines, and control points move together with this offset.
 - Always update code defaults when you have correct positions
 - This way, fresh clones of the repo will have correct positions
 
+**Shift Key for Horizontal Alignment:**
+- Hold Shift while dragging a leader line control point
+- It aligns with the closest adjacent point's Y position
+- Creates perfectly horizontal line segments
+- Works for all control points on all leader lines
+
 ### 📊 Project Structure
 
 ```
 Status-Design-Exploration/
 ├── src/
 │   ├── components/
-│   │   ├── ButtonMapping.jsx   (Main button remapping UI + tooltip editor)
+│   │   ├── ButtonMapping.jsx   (Main button remapping UI + full editor)
 │   │   ├── Home.jsx            (Ghost home page + hotspot editor)
 │   │   ├── HotspotDetailCard.jsx
 │   │   └── ...
@@ -206,32 +246,59 @@ Status-Design-Exploration/
 - Hotspot size: 24px × 24px
 - Coordinate system: top-left origin (0,0)
 
+### 🎨 Visible Elements (Current State)
+
+**Hotspots (13 visible):**
+- ✅ Left Stick
+- ✅ Left Bumper
+- ✅ D Pad Up/Left/Down/Right
+- ✅ Right Bumper
+- ✅ Button Y/B/X/A
+- ✅ Right Stick
+- ✅ Button Share
+- ✅ View Button
+- ❌ Left Trigger (removed)
+- ❌ Right Trigger (removed)
+- ❌ Menu Button (removed)
+
+**Tooltips (14 total):**
+- All 13 hotspots + View Button tooltip
+
+**Leader Lines (14 total):**
+- All 13 hotspots + View Button leader line
+
 ---
 
 ## 📝 For Next Context / Session Continuity
 
-**Last verified working:** 2026-07-20
+**Last verified working:** 2026-07-21
+**Latest commit:** `daf6d7e` - "Add comprehensive edit mode features and View button"
 
 **Current State:**
-- ✅ All 16 hotspots positioned correctly on both pages
-- ✅ Leader line editing fully functional with draggable control points
-- ✅ Tooltip editing working with pin/drag/coordinate inputs
-- ✅ Live Y offset editor available (default: 8px on Button Remapping)
-- ✅ All positions saved to localStorage and code defaults
-- ✅ TracingAnimationLayer removed (no more weird tooltip animations)
-- ✅ Latest commit: f1aa0c0 "Remove TracingAnimationLayer to fix weird tooltip animation"
+- ✅ All 13 hotspots positioned correctly and editable
+- ✅ All 14 tooltips positioned and editable (including new View button)
+- ✅ All 14 leader lines with editable control points
+- ✅ Undo/Redo fully functional (Cmd+Z / Cmd+Shift+Z)
+- ✅ Shift key aligns control points horizontally with adjacent points
+- ✅ Left-side tooltips, hotspots, and leader lines UPDATED ✅
+- ⏳ Right-side needs updates (NEXT TASK)
 
 **Quick Start for New Context:**
 1. Run `npm run dev` to start dev server (http://localhost:5173)
-2. All hotspot positions are already correct in code defaults
-3. localStorage will override defaults if user has made edits
-4. To reset to defaults: visit http://localhost:5173/clear-storage.html
-5. Edit mode available on both Ghost Home and Button Remapping pages
+2. All left-side positions are already correct in code defaults
+3. Right-side positions need to be updated next
+4. localStorage will override defaults if user has made edits
+5. To reset to defaults: visit http://localhost:5173/clear-storage.html
+6. Edit mode available on Button Remapping page with full undo/redo
 
 **What's Saved Where:**
-- **Code defaults** = Initial positions for fresh clones/users
+- **Code defaults** = Initial positions for fresh clones/users (updated in commit `daf6d7e`)
 - **localStorage** = User's custom edits (takes precedence over defaults)
 - **Git commits** = Code defaults are version controlled
-- To update defaults: edit the code, then commit to git
+- To update defaults: edit positions in Edit Mode, export to console, update code, then commit to git
+
+**Next Session Goal:**
+Update right-hand side tooltip positions, hotspot positions, and leader line control points using Edit Mode.
 
 **Repository:** https://github.com/ywang30-prog/Gamescom
+**Latest Commit:** https://github.com/ywang30-prog/Gamescom/commit/daf6d7e
