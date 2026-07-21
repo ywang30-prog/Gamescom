@@ -310,7 +310,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-black w-full h-screen flex flex-col" data-name="Home" data-node-id="175:3182">
+    <div className="bg-black w-full h-screen flex flex-col" style={{ minWidth: '1600px' }} data-name="Home" data-node-id="175:3182">
       {/* Navigation */}
       <nav className="flex items-center justify-between gap-4 px-8 py-2 border-b border-solid border-[#333]">
         <div className="inline-flex items-center gap-4" data-name="Tab: Main Navigation">

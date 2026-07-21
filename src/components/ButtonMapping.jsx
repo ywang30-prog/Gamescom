@@ -1118,7 +1118,7 @@ export default function ButtonMapping() {
   const defaultTooltipAssignments = getDefaultTooltipAssignments(presetConfig);
 
   return (
-    <div className="bg-black flex flex-col h-screen w-full">
+    <div className="bg-black flex flex-col h-screen w-full" style={{ minWidth: '1600px' }}>
       <style>{`
         .custom-scrollbar {
           overflow: overlay;
