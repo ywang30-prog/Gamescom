@@ -161,14 +161,14 @@ export default function ButtonMapping() {
       'Profile Button': { left: 664, top: 273 },
     };
     const defaultsBack = {
-      'Left Stick': { left: 459, top: 371 },
-      'Left Trigger': { left: 361, top: 125 },
-      'D Pad Up': { left: 351, top: 184 },
-      'D Pad Down': { left: 278, top: 257 },
-      'Right Trigger': { left: 812, top: 125 },
-      'Button Y': { left: 818, top: 180 },
-      'Button A': { left: 818, top: 340 },
-      'Right Stick': { left: 706, top: 371 },
+      'Left Stick': { left: 382, top: 439 },      // RP - Right Paddle 2 (bottom left)
+      'Left Trigger': { left: 361, top: 125 },    // Not visible in back view
+      'D Pad Up': { left: 470, top: 126 },        // RT - Right Trigger (top left)
+      'D Pad Down': { left: 368, top: 174 },      // SR - Shoulder Right (left middle)
+      'Right Trigger': { left: 812, top: 125 },   // Not visible in back view
+      'Button Y': { left: 690, top: 126 },        // LT - Left Trigger (top right)
+      'Button A': { left: 798, top: 174 },        // SL - Shoulder Left (right middle)
+      'Right Stick': { left: 782, top: 439 },     // LP - Left Paddle 2 (bottom right)
     };
     const defaults = {
       front: defaultsFront,
@@ -669,7 +669,7 @@ export default function ButtonMapping() {
   }, [viewMode]);
 
   const setCurrentHotspotPositions = useCallback((updater) => {
-    setCurrentHotspotPositions(prev => ({
+    setHotspotPositions(prev => ({
       ...prev,
       [viewMode]: typeof updater === 'function' ? updater(prev[viewMode]) : updater
     }));
@@ -990,12 +990,16 @@ export default function ButtonMapping() {
       3: 'buttonY',
       4: 'leftBumper',
       5: 'rightBumper',
+      8: 'viewButton',        // View/Back button
+      9: 'menuButton',        // Menu/Start button
       10: 'leftStick',
       11: 'rightStick',
       12: 'dPadUp',
       13: 'dPadDown',
       14: 'dPadLeft',
       15: 'dPadRight',
+      16: 'profileButton',    // Xbox/Profile button
+      17: 'buttonShare',      // Share button (if present)
     };
 
     const pollGamepad = () => {
@@ -1665,8 +1669,8 @@ export default function ButtonMapping() {
               name={viewMode === 'back' ? 'SR' : 'LD4'}
               style={{ left: `${currentHotspotPositions['D Pad Down'].left}px`, top: `${currentHotspotPositions['D Pad Down'].top + controllerYOffset}px` }}
               isSelected={false}
-              isHovered={hoveredTooltipId === 'dPadLeft'}
-              tooltipId="dPadLeft"
+              isHovered={hoveredTooltipId === (viewMode === 'back' ? 'dPadDown' : 'dPadLeft')}
+              tooltipId={viewMode === 'back' ? 'dPadDown' : 'dPadLeft'}
               onHoverChange={setHoveredTooltipId}
               hoveredTooltipId={hoveredTooltipId}
               isEditMode={isEditMode}
@@ -2283,14 +2287,14 @@ export default function ButtonMapping() {
             )}
             <HotspotTooltip
               key={`dPadDown-${viewMode}`}
-              label={viewMode === 'back' ? 'Paddle' : 'D Pad D'}
-              value={viewMode === 'back' ? 'Right Paddle 1' : tooltipAssignments.dPadDown}
+              label={viewMode === 'back' ? 'Button' : 'D Pad D'}
+              value={viewMode === 'back' ? 'Shoulder Right' : tooltipAssignments.dPadDown}
               position={currentTooltipPositions.dPadDown}
               isActive={activeTooltip === 'dPadDown'}
               isModified={tooltipAssignments.dPadDown !== defaultTooltipAssignments.dPadDown}
               isHoveredByDrag={hoveredTooltipIndex === 4}
               tooltipRef={(el) => tooltipRefs.current[4] = el}
-              onClick={() => handleTooltipClick('dPadDown', viewMode === 'back' ? 'Paddle' : 'D Pad D')}
+              onClick={() => handleTooltipClick('dPadDown', viewMode === 'back' ? 'Button' : 'D Pad D')}
               tooltipId="dPadDown"
               onHoverChange={setHoveredTooltipId}
               hoveredTooltipId={hoveredTooltipId}
@@ -2479,15 +2483,15 @@ export default function ButtonMapping() {
             )}
             <HotspotTooltip
               key={`buttonA-${viewMode}`}
-              label={viewMode === 'back' ? 'Paddle' : 'Button'}
-              value={viewMode === 'back' ? 'Left Paddle 1' : tooltipAssignments.buttonA}
+              label={viewMode === 'back' ? 'Button' : 'Button'}
+              value={viewMode === 'back' ? 'Shoulder Left' : tooltipAssignments.buttonA}
               position={currentTooltipPositions.buttonA}
               isActive={activeTooltip === 'buttonA'}
               isModified={tooltipAssignments.buttonA !== defaultTooltipAssignments.buttonA}
               align="left"
               isHoveredByDrag={hoveredTooltipIndex === 10}
               tooltipRef={(el) => tooltipRefs.current[10] = el}
-              onClick={() => handleTooltipClick('buttonA', viewMode === 'back' ? 'Paddle' : 'Button')}
+              onClick={() => handleTooltipClick('buttonA', viewMode === 'back' ? 'Button' : 'Button')}
               tooltipId="buttonA"
               onHoverChange={setHoveredTooltipId}
               hoveredTooltipId={hoveredTooltipId}
@@ -2675,11 +2679,20 @@ export default function ButtonMapping() {
           {/* Reset to Default Button - moved from top */}
           <button
             onClick={handleResetAllTooltips}
-            className="bg-[#242424] rounded-lg shadow-[4px_4px_10px_0px_rgba(0,0,0,0.4)] px-4 py-2 hover:bg-[#2e2e2e] transition-colors relative"
-            style={{ bottom: '715px' }}
+            disabled={JSON.stringify(tooltipAssignments) === JSON.stringify(defaultTooltipAssignments)}
+            className={`flex items-center justify-center h-8 rounded-[40px] px-4 transition-all relative ${
+              JSON.stringify(tooltipAssignments) === JSON.stringify(defaultTooltipAssignments)
+                ? 'bg-[#242424] cursor-not-allowed'
+                : 'bg-[#2e2e2e] border-2 border-[#4d4d4d] hover:border-[#666] cursor-pointer'
+            }`}
+            style={{ bottom: '715px', width: '159px' }}
           >
-            <span className="font-logitech text-xs font-bold tracking-[0.36px] uppercase text-[#e6e6e6] whitespace-nowrap">
-              RESET ALL TO DEFAULT
+            <span className={`font-logitech text-[11px] font-bold tracking-[0.275px] uppercase leading-[11px] whitespace-nowrap ${
+              JSON.stringify(tooltipAssignments) === JSON.stringify(defaultTooltipAssignments)
+                ? 'text-[#666666]'
+                : 'text-[#e6e6e6]'
+            }`}>
+              RESET TO DEFAULT
             </span>
           </button>
 
