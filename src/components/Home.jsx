@@ -414,7 +414,7 @@ export default function Home() {
 
           {/* Device image with hotspots */}
           <div className="flex flex-col items-center justify-center" style={{ height: 'calc(100vh - 48px - 64px - 32px - 16px)' }}>
-            <div className="relative w-[1188px] h-[771px]">
+            <div className="relative w-[1188px] h-[771px]" style={{ transform: 'translateY(-36px)' }}>
               <img
                 alt="Ghost Controller"
                 className="absolute inset-0 w-full h-full object-contain"
