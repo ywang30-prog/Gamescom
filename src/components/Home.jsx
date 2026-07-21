@@ -512,6 +512,12 @@ function HotspotMarker({ name, position, onClick, isSelected, isHovered: isHover
   const [isPinned, setIsPinned] = useState(false);
   const isHovered = isHoveredProp || isLocalHovered;
 
+  // Safety check: if position is undefined, don't render
+  if (!position || position.left === undefined || position.top === undefined) {
+    console.warn(`HotspotMarker "${name}" has invalid position:`, position);
+    return null;
+  }
+
   const handleClick = (e) => {
     if (isEditMode) {
       e.stopPropagation();
