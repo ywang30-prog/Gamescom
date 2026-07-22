@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import Button from './Button';
+import DeviceStatusWidget from './DeviceStatusWidget';
 
 export default function ReflexRange() {
   const navigate = useNavigate();
@@ -934,13 +935,16 @@ export default function ReflexRange() {
             </div>
           </div>
 
-          {/* Exit Button */}
-          <button
-            onClick={() => setGameState('menu')}
-            className="absolute top-6 right-6 z-10 text-[#8e8e8f] hover:text-white transition-colors p-1"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          {/* Status Widget and Exit Button - Top Right */}
+          <div className="absolute top-6 right-6 z-10 flex items-start gap-4">
+            <DeviceStatusWidget />
+            <button
+              onClick={() => setGameState('menu')}
+              className="text-[#8e8e8f] hover:text-white transition-colors p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
           {/* Game Canvas - Full Screen */}
           <canvas

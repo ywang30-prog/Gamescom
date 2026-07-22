@@ -6,6 +6,7 @@ import PresetModal from './PresetModal';
 import ImportProfileModal from './ImportProfileModal';
 import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
+import DeviceStatusWidget from './DeviceStatusWidget';
 
 // Image assets
 const imgBatteryIcon = "/figmaAssets/battery-icon.svg";
@@ -865,24 +866,8 @@ export default function TriggerDeadzone() {
 
         {/* Center - Controller Visualization */}
         <div className="flex-1 flex flex-col gap-4">
-          {/* Header aligned with preset selector */}
-          <div className="flex items-center justify-end w-full h-[71px] shrink-0">
-            <div className="flex gap-4 items-center">
-              <h1 className="font-logitech font-bold leading-[28px] text-white text-2xl text-right tracking-[-0.96px] whitespace-nowrap">
-                Ghost
-              </h1>
-              <div className="bg-[#082b0d] rounded flex gap-1 h-8 items-center overflow-hidden pl-1 pr-3 py-1.5">
-                <div className="relative shrink-0 w-6 h-6">
-                  <div className="absolute inset-[12.5%_31.25%]">
-                    <img alt="Battery" className="absolute block max-w-none w-full h-full" src={imgBatteryIcon} />
-                  </div>
-                </div>
-                <div className="flex h-6 items-center">
-                  <p className="font-logitech font-bold text-[12px] text-[#2dba3e] leading-[1.3] whitespace-nowrap">50%</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Status Widget */}
+          <DeviceStatusWidget />
 
           {/* Controller visualization centered below */}
           <div className="flex-1 flex flex-col items-center justify-center gap-4" style={{ overflow: 'visible' }}>
