@@ -1534,7 +1534,7 @@ export default function Mapping() {
           <div className="relative w-[1188px] h-[771px]">
             {/* Controller Image */}
             <img
-              src="/ghost-controller-white.png"
+              src="/ghost-controller-sticks.png"
               alt="Ghost Controller"
               className="absolute inset-0 w-full h-full object-contain"
               style={{ pointerEvents: 'none' }}
