@@ -1569,7 +1569,20 @@ export default function Mapping() {
           </div>
 
           {/* Edit Mode Toggle */}
-          <div className="flex justify-end mb-2">
+          <div className="flex justify-end gap-2 mb-2">
+            {isEditMode && (
+              <button
+                onClick={() => {
+                  const coords = activeStick === 'left' ? leftStickPosition : rightStickPosition;
+                  const message = `${activeStick.toUpperCase()} STICK COORDINATES:\nleft: ${coords.left}\ntop: ${coords.top}`;
+                  console.log(message);
+                  alert(message);
+                }}
+                className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
+              >
+                Show Current Coordinates
+              </button>
+            )}
             <button
               onClick={() => {
                 if (isEditMode) {
