@@ -1740,18 +1740,56 @@ export default function Mapping() {
                   strokeOpacity="0.3"
                 />
 
-                {/* Line connecting white dot to blue dot */}
-                {(activeStickWithDeadzone.magnitude > 0) && (
-                  <line
-                    x1={dotPosition.x}
-                    y1={dotPosition.y}
-                    x2={blueDotPosition.x}
-                    y2={blueDotPosition.y}
-                    stroke="#00b6fa"
-                    strokeWidth="1"
-                    strokeOpacity="0.5"
-                  />
-                )}
+                {/* Axis line and trajectory visualization - only when stick is pushed */}
+                {(activeStickWithDeadzone.magnitude > 0) && (() => {
+                  const centerX = 64.9883;
+                  const centerY = 64.9883;
+
+                  // Calculate distances from center for both dots
+                  const whiteDistX = dotPosition.x - centerX;
+                  const whiteDistY = dotPosition.y - centerY;
+                  const whiteDist = Math.sqrt(whiteDistX * whiteDistX + whiteDistY * whiteDistY);
+
+                  const blueDistX = blueDotPosition.x - centerX;
+                  const blueDistY = blueDotPosition.y - centerY;
+                  const blueDist = Math.sqrt(blueDistX * blueDistX + blueDistY * blueDistY);
+
+                  // Determine which dot is furthest
+                  const furthestPoint = blueDist >= whiteDist ? blueDotPosition : dotPosition;
+
+                  // Calculate blue dot magnitude as percentage (game-registered input)
+                  const blueMagnitude = Math.sqrt(activeStickCurveAdjusted.x * activeStickCurveAdjusted.x + activeStickCurveAdjusted.y * activeStickCurveAdjusted.y);
+                  const percentageValue = Math.round(blueMagnitude * 100);
+
+                  return (
+                    <>
+                      {/* Axis line from center to furthest dot */}
+                      <line
+                        x1={centerX}
+                        y1={centerY}
+                        x2={furthestPoint.x}
+                        y2={furthestPoint.y}
+                        stroke="#00b6fa"
+                        strokeWidth="4"
+                        strokeOpacity="0.8"
+                        strokeLinecap="round"
+                      />
+
+                      {/* Percentage text at the end of axis */}
+                      <text
+                        x={furthestPoint.x}
+                        y={furthestPoint.y - 8}
+                        fill="#e6e6e6"
+                        fontSize="10"
+                        fontFamily="Brown_Logitech_Pan:Regular"
+                        textAnchor="middle"
+                        dominantBaseline="auto"
+                      >
+                        {percentageValue}
+                      </text>
+                    </>
+                  );
+                })()}
 
                 {/* Center dot (white) - moves with left stick input */}
                 <circle
