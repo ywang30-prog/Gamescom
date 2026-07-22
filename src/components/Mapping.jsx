@@ -1606,7 +1606,7 @@ export default function Mapping() {
           {/* Controller visualization centered below */}
           <div className="flex-1 flex flex-col items-center justify-center">
 
-          <div className="relative w-[1188px] h-[771px]">
+          <div className="relative w-[1188px] h-[771px]" style={{ transform: 'translateX(-50px)' }}>
             {/* Controller Image - changes based on active stick */}
             <img
               src={activeStick === 'left' ? '/ghost-controller-left-stick.png' : '/ghost-controller-right-stick.png'}
