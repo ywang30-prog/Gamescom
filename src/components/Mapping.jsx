@@ -56,7 +56,7 @@ export default function Mapping() {
   });
   const [rightStickPosition, setRightStickPosition] = useState(() => {
     const saved = localStorage.getItem('rightStickDeadzonePosition');
-    return saved ? JSON.parse(saved) : { left: 479, top: 238 };
+    return saved ? JSON.parse(saved) : { left: 743, top: 322 };
   });
   const [isDraggingOverlay, setIsDraggingOverlay] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -1568,41 +1568,6 @@ export default function Mapping() {
             </div>
           </div>
 
-          {/* Edit Mode Toggle */}
-          <div className="flex justify-end gap-2 mb-2">
-            {isEditMode && (
-              <button
-                onClick={() => {
-                  const coords = activeStick === 'left' ? leftStickPosition : rightStickPosition;
-                  const message = `${activeStick.toUpperCase()} STICK COORDINATES:\nleft: ${coords.left}\ntop: ${coords.top}`;
-                  console.log(message);
-                  alert(message);
-                }}
-                className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-[#242424] text-white hover:bg-[#333] transition-colors"
-              >
-                Show Current Coordinates
-              </button>
-            )}
-            <button
-              onClick={() => {
-                if (isEditMode) {
-                  // Save positions when exiting edit mode
-                  localStorage.setItem('leftStickDeadzonePosition', JSON.stringify(leftStickPosition));
-                  localStorage.setItem('rightStickDeadzonePosition', JSON.stringify(rightStickPosition));
-                  console.log('✅ Deadzone positions saved!', { left: leftStickPosition, right: rightStickPosition });
-                }
-                setIsEditMode(!isEditMode);
-              }}
-              className={`px-4 py-2 rounded-lg font-logitech font-bold text-sm transition-colors ${
-                isEditMode
-                  ? 'bg-primary-default text-black'
-                  : 'bg-[#242424] text-white hover:bg-[#333]'
-              }`}
-            >
-              {isEditMode ? 'Save & Exit Edit Mode' : 'Edit Deadzone Position'}
-            </button>
-          </div>
-
           {/* Controller visualization centered below */}
           <div className="flex-1 flex flex-col items-center justify-center">
 
@@ -1624,39 +1589,7 @@ export default function Mapping() {
                 width: '117px',
                 height: '117px',
                 transform: 'translate(-50%, -50%)',
-                overflow: 'visible',
-                cursor: isEditMode ? 'move' : 'default',
-                border: isEditMode ? '2px dashed #00B6FA' : 'none',
-                borderRadius: isEditMode ? '50%' : '0',
-                zIndex: isEditMode ? 50 : 'auto'
-              }}
-              onMouseDown={(e) => {
-                if (isEditMode) {
-                  e.preventDefault();
-                  setIsDraggingOverlay(true);
-                  const currentPos = activeStick === 'left' ? leftStickPosition : rightStickPosition;
-                  setDragStart({
-                    x: e.clientX - currentPos.left,
-                    y: e.clientY - currentPos.top
-                  });
-                }
-              }}
-              onMouseMove={(e) => {
-                if (isDraggingOverlay && isEditMode) {
-                  const newLeft = e.clientX - dragStart.x;
-                  const newTop = e.clientY - dragStart.y;
-                  if (activeStick === 'left') {
-                    setLeftStickPosition({ left: Math.round(newLeft), top: Math.round(newTop) });
-                  } else {
-                    setRightStickPosition({ left: Math.round(newLeft), top: Math.round(newTop) });
-                  }
-                }
-              }}
-              onMouseUp={() => setIsDraggingOverlay(false)}
-              onMouseLeave={() => {
-                if (isDraggingOverlay) {
-                  setIsDraggingOverlay(false);
-                }
+                overflow: 'visible'
               }}
             >
               <svg
