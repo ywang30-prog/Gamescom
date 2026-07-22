@@ -1532,10 +1532,10 @@ export default function Mapping() {
           <div className="flex-1 flex flex-col items-center justify-center">
 
           <div className="relative w-[1188px] h-[771px]">
-            {/* Controller Image */}
+            {/* Controller Image - changes based on active stick */}
             <img
-              src="/ghost-controller-sticks.png"
-              alt="Ghost Controller"
+              src={activeStick === 'left' ? '/ghost-controller-left-stick.png' : '/ghost-controller-right-stick.png'}
+              alt={`Ghost Controller - ${activeStick === 'left' ? 'Left' : 'Right'} Stick Focus`}
               className="absolute inset-0 w-full h-full object-contain"
               style={{ pointerEvents: 'none' }}
             />
