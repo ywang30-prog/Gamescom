@@ -52,7 +52,7 @@ export default function Mapping() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [leftStickPosition, setLeftStickPosition] = useState(() => {
     const saved = localStorage.getItem('leftStickDeadzonePosition');
-    return saved ? JSON.parse(saved) : { left: 279, top: 238 };
+    return saved ? JSON.parse(saved) : { left: 445, top: 323 };
   });
   const [rightStickPosition, setRightStickPosition] = useState(() => {
     const saved = localStorage.getItem('rightStickDeadzonePosition');
