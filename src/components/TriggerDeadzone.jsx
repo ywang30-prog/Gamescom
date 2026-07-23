@@ -9,6 +9,7 @@ import ProfileSelector from './ProfileSelector';
 import DeviceStatusWidget from './DeviceStatusWidget';
 import BinaryToggle from './BinaryToggle';
 import Toggle from './Toggle';
+import MouseClickIndicator from './MouseClickIndicator';
 
 // Image assets
 const imgBatteryIcon = "/figmaAssets/battery-icon.svg";
@@ -432,7 +433,12 @@ export default function TriggerDeadzone() {
 
   useEffect(() => {
     localStorage.setItem('switchToMouseClick', JSON.stringify(switchToMouseClick));
-  }, [switchToMouseClick]);
+
+    // Force applyToBothTriggers ON when mouse click mode is enabled
+    if (switchToMouseClick && !applyToBothTriggers) {
+      setApplyToBothTriggers(true);
+    }
+  }, [switchToMouseClick, applyToBothTriggers]);
 
   // Generate smooth curve that passes exactly through all control points
   const getCurvePath = () => {
@@ -837,7 +843,7 @@ export default function TriggerDeadzone() {
             </div>
 
             {/* Start and End Inputs */}
-            <div className="flex gap-4 mb-6">
+            <div className={`flex gap-4 mb-6 ${switchToMouseClick ? 'opacity-45 pointer-events-none' : ''}`}>
               <div className="flex-1 flex flex-col gap-[15px]">
                 <label className="font-logitech font-bold text-[14px] text-white tracking-[-0.42px] leading-[1.3]">
                   Deadzone start
@@ -848,6 +854,7 @@ export default function TriggerDeadzone() {
                     min="0"
                     max="100"
                     value={activeStartValue}
+                    disabled={switchToMouseClick}
                     onChange={(e) => {
                       const value = Math.min(100, Math.max(0, Number(e.target.value) || 0));
                       if (activeTrigger === 'left') {
@@ -875,6 +882,7 @@ export default function TriggerDeadzone() {
                     min="0"
                     max="100"
                     value={activeEndValue}
+                    disabled={switchToMouseClick}
                     onChange={(e) => {
                       const value = Math.min(100, Math.max(0, Number(e.target.value) || 0));
                       if (activeTrigger === 'left') {
@@ -895,7 +903,7 @@ export default function TriggerDeadzone() {
             </div>
 
             {/* Horizontal Range Slider */}
-            <div className="mb-8 select-none">
+            <div className={`mb-8 select-none ${switchToMouseClick ? 'opacity-45 pointer-events-none' : ''}`}>
               <div className="w-full relative">
                 {/* Horizontal Range Slider */}
                 <div
@@ -953,12 +961,12 @@ export default function TriggerDeadzone() {
             </div>
 
             {/* Toggle switches */}
-            <div className="flex flex-col gap-[16px] mb-6">
+            <div className={`flex flex-col gap-[16px] mb-6 ${switchToMouseClick ? 'opacity-45' : ''}`}>
               {/* Apply to both triggers toggle */}
-              <div className="flex gap-[12px] items-center">
+              <div className={`flex gap-[12px] items-center ${switchToMouseClick ? 'pointer-events-none' : ''}`}>
                 <Toggle
                   enabled={applyToBothTriggers}
-                  onChange={setApplyToBothTriggers}
+                  onChange={switchToMouseClick ? undefined : setApplyToBothTriggers}
                 />
                 <span className="font-logitech text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
                   Apply to both triggers
@@ -966,10 +974,10 @@ export default function TriggerDeadzone() {
               </div>
 
               {/* Advanced trigger control toggle */}
-              <div className="flex gap-[12px] items-center">
+              <div className={`flex gap-[12px] items-center ${switchToMouseClick ? 'pointer-events-none' : ''}`}>
                 <Toggle
                   enabled={showAdvancedTriggerControl}
-                  onChange={setShowAdvancedTriggerControl}
+                  onChange={switchToMouseClick ? undefined : setShowAdvancedTriggerControl}
                 />
                 <div className="flex gap-2 items-center">
                   <span className="font-logitech text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
@@ -988,7 +996,7 @@ export default function TriggerDeadzone() {
             {showAdvancedTriggerControl && (
               <>
                 {/* Bottom section with different background */}
-                <div className="bg-[#1a1a1a] rounded-b-2xl px-4 py-4 -mx-4 flex flex-col gap-6">
+                <div className={`bg-[#1a1a1a] rounded-b-2xl px-4 py-4 -mx-4 flex flex-col gap-6 ${switchToMouseClick ? 'opacity-45' : ''}`}>
                   {/* Curated Presets Header */}
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center justify-between pl-0 pr-2 py-2 rounded-lg">
@@ -999,7 +1007,7 @@ export default function TriggerDeadzone() {
                   </div>
 
                   {/* Trigger Preset Selector */}
-                  <div className="relative" ref={presetDropdownRef}>
+                  <div className={`relative ${switchToMouseClick ? 'pointer-events-none' : ''}`} ref={presetDropdownRef}>
                     {/* Collapsed Dropdown Button */}
                     <div
                       className="bg-[#242424] h-[72px] p-2 flex items-center justify-between cursor-pointer rounded-lg relative overflow-hidden group"
@@ -1110,7 +1118,7 @@ export default function TriggerDeadzone() {
                       }
                     `}
                   </style>
-                  <div className="border border-[#4d4d4d] rounded overflow-hidden relative h-[194px]">
+                  <div className={`border border-[#4d4d4d] rounded overflow-hidden relative h-[194px] ${switchToMouseClick ? 'pointer-events-none' : ''}`}>
                     {/* Grid - 18x10 grid */}
                     <div className="grid grid-cols-[repeat(18,1fr)] grid-rows-[repeat(10,1fr)] h-[200px] w-full">
                       {[...Array(180)].map((_, i) => (
@@ -1230,26 +1238,50 @@ export default function TriggerDeadzone() {
                 }}
               />
 
-              {/* Trigger Range Arc Indicator */}
-              <div
-                className="absolute w-[300px] h-[150px] select-none"
-                style={{
-                  left: activeTrigger === 'right'
-                    ? `calc(15% + ${rightArcLeftOffset}px)`
-                    : `calc(15% + ${arcLeftOffset}px)`,
-                  top: activeTrigger === 'right'
-                    ? `calc(52% + ${rightArcTopOffset}px)`
-                    : `calc(52% + ${arcTopOffset}px)`,
-                  transform: activeTrigger === 'right' ? 'scaleX(-1)' : 'none',
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  MozUserSelect: 'none',
-                  msUserSelect: 'none',
-                  overflow: 'visible',
-                  pointerEvents: 'none',
-                  zIndex: 1
-                }}
-              >
+              {/* Trigger Range Indicator - Arc or Binary */}
+              {switchToMouseClick ? (
+                /* Binary ON/OFF Indicator for Mouse Click Mode */
+                <div
+                  className="absolute select-none"
+                  style={{
+                    left: activeTrigger === 'right'
+                      ? `calc(15% + ${rightArcLeftOffset + 140}px)`
+                      : `calc(15% + ${arcLeftOffset + 140}px)`,
+                    top: activeTrigger === 'right'
+                      ? `calc(52% + ${rightArcTopOffset + 25}px)`
+                      : `calc(52% + ${arcTopOffset + 25}px)`,
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none',
+                    overflow: 'visible',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                  }}
+                >
+                  <MouseClickIndicator isActive={registeredTriggerValue > 0} />
+                </div>
+              ) : (
+                /* Arc Indicator for Analog Mode */
+                <div
+                  className="absolute w-[300px] h-[150px] select-none"
+                  style={{
+                    left: activeTrigger === 'right'
+                      ? `calc(15% + ${rightArcLeftOffset}px)`
+                      : `calc(15% + ${arcLeftOffset}px)`,
+                    top: activeTrigger === 'right'
+                      ? `calc(52% + ${rightArcTopOffset}px)`
+                      : `calc(52% + ${arcTopOffset}px)`,
+                    transform: activeTrigger === 'right' ? 'scaleX(-1)' : 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none',
+                    overflow: 'visible',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                  }}
+                >
                 <style>{`
                   @keyframes pulse-ring {
                     0% {
@@ -1364,7 +1396,8 @@ export default function TriggerDeadzone() {
                     );
                   })}
                 </svg>
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Binary Toggle - positioned below controller */}
