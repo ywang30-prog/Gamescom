@@ -58,14 +58,14 @@ export default function TriggerDeadzone() {
   const arcLeftOffset = -20;
   const arcTopOffset = -200;
 
-  // Right trigger position (finalized)
+  // Right trigger position (finalized - Y compensated for editor removal)
   const rightTriggerX = -80;
-  const rightTriggerY = -65;
+  const rightTriggerY = -25; // Moved up 20px more from -5px
   const rightTriggerScale = 1.8;
 
-  // Right trigger arc position (finalized)
+  // Right trigger arc position (finalized - also compensated for editor removal)
   const rightArcLeftOffset = 273;
-  const rightArcTopOffset = -253;
+  const rightArcTopOffset = -193; // Moved up 20px more from -173px
   const [isDraggingStart, setIsDraggingStart] = useState(false);
   const [isDraggingEnd, setIsDraggingEnd] = useState(false);
   const [isHoveringStart, setIsHoveringStart] = useState(false);
