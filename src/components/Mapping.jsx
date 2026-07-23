@@ -1055,7 +1055,10 @@ export default function Mapping() {
             <div className="mb-6 pb-4 border-b border-[#2e2e2e]">
               <div className="flex items-center gap-4">
                 {/* Back button */}
-                <button className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-[#2e2e2e] shrink-0">
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-[#2e2e2e] shrink-0 hover:bg-[#2e2e2e] transition-colors cursor-pointer"
+                >
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
                     <path d="M14 7L9 12L14 17" stroke="#e6e6e6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
@@ -1232,9 +1235,9 @@ export default function Mapping() {
             </div>
 
             {/* Toggle switches */}
-            <div className="flex flex-col gap-[10px] mb-6">
+            <div className="flex flex-col gap-[16px] mb-6">
               {/* Apply to both sticks toggle */}
-              <div className="flex gap-3 items-center">
+              <div className="flex gap-[12px] items-center">
                 <Toggle
                   enabled={applyToBothSticks}
                   onChange={setApplyToBothSticks}
@@ -1245,7 +1248,7 @@ export default function Mapping() {
               </div>
 
               {/* Advanced stick control toggle */}
-              <div className="flex gap-3 items-center">
+              <div className="flex gap-[12px] items-center">
                 <Toggle
                   enabled={showAdvancedControls}
                   onChange={setShowAdvancedControls}
