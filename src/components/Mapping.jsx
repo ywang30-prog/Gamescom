@@ -6,6 +6,8 @@ import ImportProfileModal from './ImportProfileModal';
 import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
 import DeviceStatusWidget from './DeviceStatusWidget';
+import BinaryToggle from './BinaryToggle';
+import Toggle from './Toggle';
 
 // Image assets
 const imgBatteryIcon = "/figmaAssets/battery-icon.svg";
@@ -89,6 +91,16 @@ export default function Mapping() {
   const [hasLocalChanges, setHasLocalChanges] = useState(false);
   const [savedSettings, setSavedSettings] = useState(null);
   const isInitialized = useRef(false);
+
+  // New toggle states
+  const [applyToBothSticks, setApplyToBothSticks] = useState(() => {
+    const saved = localStorage.getItem('applyToBothSticks');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+  const [showAdvancedControls, setShowAdvancedControls] = useState(() => {
+    const saved = localStorage.getItem('showAdvancedControls');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
 
   // Padding to keep curve within container bounds
   const padding = 10;
@@ -777,6 +789,38 @@ export default function Mapping() {
     localStorage.setItem(`rightStickControlPoints_${currentPreset}`, JSON.stringify(rightControlPoints));
   }, [rightControlPoints, currentPreset]);
 
+  // Persist toggle states
+  useEffect(() => {
+    localStorage.setItem('applyToBothSticks', JSON.stringify(applyToBothSticks));
+  }, [applyToBothSticks]);
+
+  useEffect(() => {
+    localStorage.setItem('showAdvancedControls', JSON.stringify(showAdvancedControls));
+  }, [showAdvancedControls]);
+
+  // Apply to both sticks logic - sync settings when individual settings change
+  useEffect(() => {
+    if (applyToBothSticks && isInitialized.current && activeStick === 'left') {
+      // Sync left settings to right when left stick is active
+      setRightInnerDeadzone(leftDeadzone);
+      setRightOuterDeadzone(rightDeadzone);
+      setRightCurveAdjustment(curveAdjustment);
+      setRightSensitivity(sensitivity);
+      setRightControlPoints([...controlPoints]);
+    }
+  }, [applyToBothSticks, leftDeadzone, rightDeadzone, curveAdjustment, sensitivity, controlPoints, activeStick]);
+
+  useEffect(() => {
+    if (applyToBothSticks && isInitialized.current && activeStick === 'right') {
+      // Sync right settings to left when right stick is active
+      setLeftDeadzone(rightInnerDeadzone);
+      setRightDeadzone(rightOuterDeadzone);
+      setCurveAdjustment(rightCurveAdjustment);
+      setSensitivity(rightSensitivity);
+      setControlPoints([...rightControlPoints]);
+    }
+  }, [applyToBothSticks, rightInnerDeadzone, rightOuterDeadzone, rightCurveAdjustment, rightSensitivity, rightControlPoints, activeStick]);
+
   // Update control points when sensitivity changes (after initialization)
   useEffect(() => {
     if (isInitialized.current) {
@@ -1007,41 +1051,10 @@ export default function Mapping() {
 
           {/* Controls Panel */}
           <div className="bg-[#1a1a1a] rounded-xl flex-1 p-6 overflow-y-auto">
-            <div className="mb-6">
-              <h2 className="font-logitech font-bold text-[#e6e6e6] text-[20px] tracking-[-0.42px] leading-[1.3]">
+            <div className="mb-6 pb-4 border-b border-[#2e2e2e]">
+              <h2 className="font-logitech font-bold text-[#e6e6e6] text-[16px] tracking-[-0.48px] leading-[1.28]">
                 Sticks
               </h2>
-              <p className="font-logitech text-[13px] text-[#8e8e8f] mt-2 leading-[1.3]">
-                Adjust stick deadzone and curve sensitivity
-              </p>
-            </div>
-
-            {/* Stick Selector Tab */}
-            <div className="border border-[#2e2e2e] flex gap-1 items-center p-1 rounded-lg mb-6">
-              <button
-                onClick={() => setActiveStick('left')}
-                className={`flex-1 h-8 flex items-center justify-center px-4 rounded transition-colors ${
-                  activeStick === 'left'
-                    ? 'bg-[#042f44] text-[#00b6fa] font-bold'
-                    : 'text-[#a7a7a8] hover:bg-[#2e2e2e]'
-                }`}
-              >
-                <span className="font-logitech text-[14px] tracking-[-0.42px] leading-[1.3]">
-                  Left
-                </span>
-              </button>
-              <button
-                onClick={() => setActiveStick('right')}
-                className={`flex-1 h-8 flex items-center justify-center px-4 rounded transition-colors ${
-                  activeStick === 'right'
-                    ? 'bg-[#042f44] text-[#00b6fa] font-bold'
-                    : 'text-[#a7a7a8] hover:bg-[#2e2e2e]'
-                }`}
-              >
-                <span className="font-logitech text-[14px] tracking-[-0.42px] leading-[1.3]">
-                  Right
-                </span>
-              </button>
             </div>
 
             {/* Inner Deadzone */}
@@ -1194,32 +1207,53 @@ export default function Mapping() {
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="h-px bg-stroke-neutral-disabled w-full mb-6" />
+            {/* Toggle switches */}
+            <div className="flex flex-col gap-[10px] mb-6">
+              {/* Apply to both sticks toggle */}
+              <div className="flex gap-3 items-center">
+                <Toggle
+                  enabled={applyToBothSticks}
+                  onChange={setApplyToBothSticks}
+                />
+                <span className="font-logitech text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                  Apply to both sticks
+                </span>
+              </div>
 
-            {/* Sensitivity Accordion */}
-            <div className="mb-6">
-              <button
-                onClick={() => setIsSensitivityExpanded(!isSensitivityExpanded)}
-                className="flex items-center justify-between mb-[15px] w-full"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-[14px] text-white font-bold font-logitech tracking-[-0.42px] leading-[1.3]">Sensitivity</span>
+              {/* Advanced stick control toggle */}
+              <div className="flex gap-3 items-center">
+                <Toggle
+                  enabled={showAdvancedControls}
+                  onChange={setShowAdvancedControls}
+                />
+                <div className="flex gap-2 items-center">
+                  <span className="font-logitech text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                    Advanced stick control
+                  </span>
                   <div className="relative w-6 h-6">
                     <div className="absolute inset-[8.33%]">
                       <img src="/info-icon.svg" alt="" className="absolute block inset-0 w-full h-full" />
                     </div>
                   </div>
                 </div>
-                <div className={`relative w-6 h-6 transition-transform duration-200 ${isSensitivityExpanded ? 'rotate-0' : 'rotate-180'}`}>
-                  <div className="absolute inset-[37.5%_29.17%]">
-                    <img src="/figmaAssets/chevron-up-small-correct.svg" alt="" className="absolute block max-w-none w-full h-full" />
-                  </div>
-                </div>
-              </button>
+              </div>
+            </div>
 
-              {isSensitivityExpanded && (
+            {/* Advanced Controls - only show when toggle is ON */}
+            {showAdvancedControls && (
               <>
+                {/* Divider */}
+                <div className="h-px bg-stroke-neutral-disabled w-full mb-6" />
+
+                {/* Curated Presets Header */}
+                <div className="mb-4">
+                  <span className="font-logitech font-bold text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                    Curated Presets
+                  </span>
+                </div>
+
+                {/* Sensitivity Preset Selector */}
+                <div className="mb-6">
               <div className="relative" ref={sensitivityDropdownRef}>
               {/* Collapsed Dropdown Button */}
               <div
@@ -1542,9 +1576,9 @@ export default function Mapping() {
                 })}
               </svg>
             </div>
-            </>
+                </div>
+              </>
             )}
-            </div>
           </div>
         </div>
 
@@ -1819,6 +1853,17 @@ export default function Mapping() {
                 )}
               </svg>
             </div>
+          </div>
+
+          {/* Stick Selector Toggle - positioned below controller */}
+          <div className="flex justify-center mt-8">
+            <BinaryToggle
+              leftLabel="Left"
+              rightLabel="Right"
+              value={activeStick}
+              onChange={(value) => setActiveStick(value)}
+              className="w-auto"
+            />
           </div>
           </div>
         </div>
