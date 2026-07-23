@@ -48,6 +48,15 @@ export default function TriggerDeadzone() {
     const saved = localStorage.getItem(`activeTrigger_${currentProfile}`);
     return saved || 'left';
   });
+
+  // Position values for left trigger (finalized)
+  const leftTriggerX = 78;
+  const leftTriggerY = -30;
+  const leftTriggerScale = 1.8;
+
+  // Arc position for left trigger (finalized)
+  const arcLeftOffset = -20;
+  const arcTopOffset = -200;
   const [isDraggingStart, setIsDraggingStart] = useState(false);
   const [isDraggingEnd, setIsDraggingEnd] = useState(false);
   const [isHoveringStart, setIsHoveringStart] = useState(false);
@@ -873,12 +882,14 @@ export default function TriggerDeadzone() {
           <div className="flex-1 flex flex-col items-center justify-center gap-4" style={{ overflow: 'visible' }}>
             <div className="w-full max-w-[800px] relative" style={{ overflow: 'visible' }}>
               <img
-                src="/controller-triggers.png"
-                alt="Ghost Controller"
+                src={activeTrigger === 'left' ? '/ghost-controller-left-trigger.png' : '/controller-triggers.png'}
+                alt={`Ghost Controller - ${activeTrigger === 'left' ? 'Left' : 'Right'} Trigger`}
                 className="w-full h-auto"
                 style={{
                   transform: activeTrigger === 'right'
                     ? 'scale(0.9) translateX(30px) translateY(-36px) scaleX(-1)'
+                    : activeTrigger === 'left'
+                    ? `scale(${leftTriggerScale}) translateX(${leftTriggerX}px) translateY(${leftTriggerY}px)`
                     : 'scale(0.9) translateX(30px) translateY(-36px)'
                 }}
               />
@@ -887,8 +898,8 @@ export default function TriggerDeadzone() {
               <div
                 className="absolute w-[300px] h-[150px] select-none"
                 style={{
-                  left: activeTrigger === 'right' ? 'calc(15% + 332px)' : 'calc(15% - 20px)',
-                  top: 'calc(52% - 90px)',
+                  left: activeTrigger === 'right' ? 'calc(15% + 332px)' : `calc(15% + ${arcLeftOffset}px)`,
+                  top: `calc(52% + ${arcTopOffset}px)`,
                   transform: activeTrigger === 'right' ? 'scaleX(-1)' : 'none',
                   userSelect: 'none',
                   WebkitUserSelect: 'none',
