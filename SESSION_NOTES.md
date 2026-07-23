@@ -6,9 +6,41 @@
 - **Dev Server**: http://localhost:5173/
 - **Start Dev Server**: `npm run dev` (runs in background)
 
-## Current Status (Last Updated: 2026-07-21 - Session 2)
+## Current Status (Last Updated: 2026-07-23 - Session 3 - Sticks Page Refactor)
 
 ### ✅ Completed Features
+
+#### SESSION 3 (2026-07-23) - Sticks Page Refactor
+
+1. **Axis Trajectory Visualization** (Commit 4ddc700)
+   - Visual axis line from center to furthest dot (blue or white)
+   - Shows game-registered input percentage at end of axis
+   - 4px thick line, only visible when stick is pushed
+   - Line extends to whichever dot is furthest from center
+
+2. **DeviceStatusWidget Added to All Pages** (Commit dc792de)
+   - Added to Sticks page (Mapping.jsx)
+   - Added to Triggers page (TriggerDeadzone.jsx)
+   - Added to Aim Training page (ReflexRange.jsx)
+   - Replaced hardcoded battery/Ghost header sections
+   - Consistent polling rate monitoring across all configuration pages
+
+3. **Sticks Page UI Refactor** (Commit 5c97ea0)
+   - **Removed:** Left/Right tab toggle from side panel
+   - **Added BinaryToggle at bottom of controller** (matches Button Remapping UX)
+   - **"Apply to both sticks" toggle:**
+     - Global state - OFF on either page turns OFF for both
+     - When ON: Changes to either stick apply to both
+     - Real-time sync based on active stick
+     - Persists to localStorage
+   - **"Advanced stick control" toggle:**
+     - When ON: Shows Curated Presets, sensitivity dropdown, curve adjustment, curve graph
+     - When OFF: Hides all advanced controls
+     - Persists to localStorage
+   - **Simplified side panel:** Removed description, added border to header
+   - Sensitivity section now always expanded when Advanced toggle is ON (no accordion)
+
+#### SESSION 1 & 2 (2026-07-21)
 
 1. **Hotspot Positions - UPDATED**
    - All 13 visible hotspot positions updated and committed
@@ -297,17 +329,24 @@ Status-Design-Exploration/
 
 ---
 
-## 📝 For Next Context / Session Continuity
+## 📝 Session 3 Summary - Sticks Page Refactor
 
-**Last verified working:** 2026-07-21 (Session 2)
-**Latest commit:** `76a9569` - "Adjust BinaryToggle positioning to center and set bottom spacing"
+**Last verified working:** 2026-07-23 (Session 3)
+**Latest commits:** 
+- `4ddc700` - Axis trajectory visualization
+- `dc792de` - DeviceStatusWidget added to pages  
+- `5c97ea0` - Sticks page UI refactor
 
 **Current State:**
 - ✅ All 18 hotspots positioned correctly (including Menu, Profile, View buttons)
 - ✅ All 16 tooltips positioned and editable (includes Menu, Profile, View buttons)
 - ✅ All 16 leader lines with editable control points
-- ✅ BinaryToggle component for Front/Back switching
-- ✅ DeviceStatusWidget hover area fixed
+- ✅ BinaryToggle component for Front/Back switching (Button Remapping)
+- ✅ **BinaryToggle added to Sticks page** (Left/Right stick selection)
+- ✅ DeviceStatusWidget on all config pages (Button Remapping, Sticks, Triggers, Aim Training)
+- ✅ Axis trajectory on Sticks page with percentage display
+- ✅ "Apply to both sticks" global toggle
+- ✅ "Advanced stick control" toggle for sensitivity controls
 - ✅ Undo/Redo fully functional (Cmd+Z / Cmd+Shift+Z)
 - ✅ Shift key aligns control points horizontally with adjacent points
 - ✅ Front view fully implemented and positioned
@@ -327,13 +366,50 @@ Status-Design-Exploration/
 - **Git commits** = Code defaults are version controlled
 - To update defaults: edit positions in Edit Mode, export to console, update code, then commit to git
 
-**Next Session Goal:**
-Implement back button view with 4 paddles (P1-P4), tooltips, and leader lines. Wire up BinaryToggle to switch controller image and show/hide appropriate buttons.
+**Next Session Goals:**
+
+1. **Sticks Page Refinements (if needed):**
+   - Match Figma styling exactly (sliders, labels, numeric inputs)
+   - Improve Curated Presets dropdown visual hierarchy
+   - Fine-tune curve graph styling
+   - Test toggle behaviors thoroughly
+
+2. **Back Button View Implementation:**
+   - Add back button hotspots (4 paddles: P1, P2, P3, P4)
+   - Add back button tooltips and leader lines
+   - Wire up BinaryToggle to switch controller image and show/hide appropriate buttons
+
+**Key State Variables for Sticks Page:**
+```javascript
+// Toggle states (persist to localStorage)
+const [applyToBothSticks, setApplyToBothSticks] = useState(false);
+const [showAdvancedControls, setShowAdvancedControls] = useState(false);
+
+// Stick selection
+const [activeStick, setActiveStick] = useState('left');
+
+// Left stick settings
+const [leftDeadzone, setLeftDeadzone] = useState(18);
+const [rightDeadzone, setRightDeadzone] = useState(5); // outer deadzone for left
+const [curveAdjustment, setCurveAdjustment] = useState(0);
+const [sensitivity, setSensitivity] = useState('Linear');
+
+// Right stick settings (independent)
+const [rightInnerDeadzone, setRightInnerDeadzone] = useState(18);
+const [rightOuterDeadzone, setRightOuterDeadzone] = useState(5);
+const [rightCurveAdjustment, setRightCurveAdjustment] = useState(0);
+const [rightSensitivity, setRightSensitivity] = useState('Linear');
+```
+
+**Figma References for Sticks Page:**
+- Main side panel: https://www.figma.com/design/gDE9NANyfk8RWIt7XF05ew/Ghost?node-id=743-16716
+- Binary toggle: https://www.figma.com/design/gDE9NANyfk8RWIt7XF05ew/Ghost?node-id=977-8196
+- Advanced controls ON: https://www.figma.com/design/gDE9NANyfk8RWIt7XF05ew/Ghost?node-id=746-11678
 
 **Figma MCP Connected:**
 - Successfully authenticated with Figma MCP
 - Can pull designs directly from Figma URLs
-- Used for BinaryToggle component creation
+- Used for BinaryToggle component and Sticks page refactor
 
 **Repository:** https://github.com/ywang30-prog/Gamescom
-**Latest Commit:** https://github.com/ywang30-prog/Gamescom/commit/76a9569
+**Latest Commit:** https://github.com/ywang30-prog/Gamescom/commit/5c97ea0
