@@ -1,5 +1,29 @@
 # Gamescom Project - Session Notes
 
+## Session 2026-07-23 (Evening): Mouse Click Trigger Mode
+
+### Implemented Features
+1. **MouseClickIndicator Component** (`src/components/MouseClickIndicator.jsx`)
+   - Vertical binary ON/OFF toggle switch
+   - OFF state: Gray bar (20px height), white thumb at top
+   - ON state: Blue bar (136px height), white thumb moves down
+   - Simple vertical bar that changes color and extends downward
+
+2. **Mouse Click Trigger Integration**
+   - When "Switch to mouse click trigger" is ON:
+     - Binary indicator replaces arc/ticks visualization
+     - Deadzone controls disabled (opacity-45, pointer-events-none)
+     - "Apply to both triggers" forced ON and disabled
+     - Advanced trigger controls disabled (presets and curve)
+   - Trigger operates in binary mode (any input = ON)
+
+3. **Binary Toggle Positioning (Finalized)**
+   - **Left Trigger**: X offset 4px, Y offset -4px
+   - **Right Trigger**: X offset 272px, Y offset -4px
+   - Coordinates saved in `MOUSE_CLICK_TRIGGER_COORDS.md`
+
+---
+
 ## Project Location
 - **Local**: `~/Desktop/Ghost-Project-Space/Status-Design-Exploration`
 - **GitHub**: https://github.com/ywang30-prog/Gamescom

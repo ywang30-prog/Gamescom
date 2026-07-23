@@ -138,6 +138,12 @@ export default function TriggerDeadzone() {
     return saved !== null ? JSON.parse(saved) : false;
   });
 
+  // Binary toggle indicator position (for mouse click mode) - finalized
+  const binaryToggleLeftOffset = 4;  // Left trigger X offset
+  const binaryToggleTopOffset = -4;    // Left trigger Y offset
+  const rightBinaryToggleLeftOffset = 272;  // Right trigger X offset
+  const rightBinaryToggleTopOffset = -4;    // Right trigger Y offset
+
   // Padding for curve control points
   const padding = 10;
 
@@ -1245,11 +1251,11 @@ export default function TriggerDeadzone() {
                   className="absolute select-none"
                   style={{
                     left: activeTrigger === 'right'
-                      ? `calc(15% + ${rightArcLeftOffset + 140}px)`
-                      : `calc(15% + ${arcLeftOffset + 140}px)`,
+                      ? `calc(15% + ${rightArcLeftOffset + rightBinaryToggleLeftOffset}px)`
+                      : `calc(15% + ${arcLeftOffset + binaryToggleLeftOffset}px)`,
                     top: activeTrigger === 'right'
-                      ? `calc(52% + ${rightArcTopOffset + 25}px)`
-                      : `calc(52% + ${arcTopOffset + 25}px)`,
+                      ? `calc(52% + ${rightArcTopOffset + rightBinaryToggleTopOffset}px)`
+                      : `calc(52% + ${arcTopOffset + binaryToggleTopOffset}px)`,
                     userSelect: 'none',
                     WebkitUserSelect: 'none',
                     MozUserSelect: 'none',
