@@ -18,17 +18,19 @@ export default function Toggle({ enabled = false, onChange, className = '' }) {
   return (
     <button
       onClick={handleToggle}
-      className={`relative w-[48px] h-[24px] rounded-[29px] transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-primary-default focus-visible:ring-offset-2 focus-visible:ring-offset-background-950 ${
-        isEnabled
-          ? 'bg-primary-default border-0'
-          : 'bg-[#1a1a1a] border border-stroke-neutral-default'
+      className={`relative w-[48px] h-[24px] rounded-[29px] transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[#00b8fc] shrink-0 ${
+        isEnabled ? 'bg-[#00b8fc]' : 'bg-[#1a1a1a]'
       } ${className}`}
       role="switch"
       aria-checked={isEnabled}
+      style={{
+        border: isEnabled ? 'none' : '0.5px solid rgba(255, 255, 255, 0.1)'
+      }}
     >
+      {/* Toggle knob - smaller with spacing */}
       <div
-        className={`absolute w-[20px] h-[20px] bg-white rounded-full transition-all duration-200 ${
-          isEnabled ? 'top-[2px] left-[26px]' : 'top-[1px] left-[1px]'
+        className={`absolute top-1/2 -translate-y-1/2 w-[12px] h-[12px] bg-white rounded-full transition-all duration-200 ${
+          isEnabled ? 'left-[32px]' : 'left-[4px]'
         }`}
       />
     </button>

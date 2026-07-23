@@ -7,6 +7,8 @@ import ImportProfileModal from './ImportProfileModal';
 import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
 import DeviceStatusWidget from './DeviceStatusWidget';
+import BinaryToggle from './BinaryToggle';
+import Toggle from './Toggle';
 
 // Image assets
 const imgBatteryIcon = "/figmaAssets/battery-icon.svg";
@@ -120,6 +122,78 @@ export default function TriggerDeadzone() {
   // Track if THIS page specifically has changes (local)
   const [hasLocalChanges, setHasLocalChanges] = useState(false);
   const [savedSettings, setSavedSettings] = useState(null);
+
+  // New toggle states
+  const [applyToBothTriggers, setApplyToBothTriggers] = useState(() => {
+    const saved = localStorage.getItem('applyToBothTriggers');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+  const [showAdvancedTriggerControl, setShowAdvancedTriggerControl] = useState(() => {
+    const saved = localStorage.getItem('showAdvancedTriggerControl');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+  const [switchToMouseClick, setSwitchToMouseClick] = useState(() => {
+    const saved = localStorage.getItem('switchToMouseClick');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+
+  // Padding for curve control points
+  const padding = 10;
+
+  // Helper function to get base control points for each trigger preset type
+  const getPresetControlPoints = (presetType) => {
+    const presets = {
+      'Linear': [
+        { x: padding, y: 190 },
+        { x: 93, y: 155 },
+        { x: 186, y: 120 },
+        { x: 279, y: 85 },
+        { x: 372 - padding, y: padding }
+      ],
+      'Aggressive': [
+        { x: padding, y: 190 },
+        { x: 93, y: 82 },
+        { x: 186, y: 46 },
+        { x: 279, y: 28 },
+        { x: 372 - padding, y: padding }
+      ],
+      'Exponential': [
+        { x: padding, y: 190 },
+        { x: 93, y: 165 },
+        { x: 186, y: 120 },
+        { x: 279, y: 75 },
+        { x: 372 - padding, y: padding }
+      ]
+    };
+
+    return presets[presetType] || presets['Linear'];
+  };
+
+  // Curve control points for triggers
+  const [leftTriggerControlPoints, setLeftTriggerControlPoints] = useState(() => {
+    const saved = localStorage.getItem(`leftTriggerControlPoints_${currentProfile}`);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return getPresetControlPoints('Linear');
+  });
+
+  const [rightTriggerControlPoints, setRightTriggerControlPoints] = useState(() => {
+    const saved = localStorage.getItem(`rightTriggerControlPoints_${currentProfile}`);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return getPresetControlPoints('Linear');
+  });
+
+  const [draggingIndex, setDraggingIndex] = useState(null);
+  const [dragPosition, setDragPosition] = useState(null);
+  const svgRef = useRef(null);
+  const isDraggingRef = useRef(false);
+
+  // Active control points based on which trigger is selected
+  const activeTriggerControlPoints = activeTrigger === 'left' ? leftTriggerControlPoints : rightTriggerControlPoints;
+  const setActiveTriggerControlPoints = activeTrigger === 'left' ? setLeftTriggerControlPoints : setRightTriggerControlPoints;
 
   // Profile management handlers
   const handlePresetClick = () => {
@@ -346,6 +420,156 @@ export default function TriggerDeadzone() {
   useEffect(() => {
     localStorage.setItem(`activeTrigger_${currentPreset}`, activeTrigger);
   }, [activeTrigger, currentPreset]);
+
+  // Persist toggle states
+  useEffect(() => {
+    localStorage.setItem('applyToBothTriggers', JSON.stringify(applyToBothTriggers));
+  }, [applyToBothTriggers]);
+
+  useEffect(() => {
+    localStorage.setItem('showAdvancedTriggerControl', JSON.stringify(showAdvancedTriggerControl));
+  }, [showAdvancedTriggerControl]);
+
+  useEffect(() => {
+    localStorage.setItem('switchToMouseClick', JSON.stringify(switchToMouseClick));
+  }, [switchToMouseClick]);
+
+  // Generate smooth curve that passes exactly through all control points
+  const getCurvePath = () => {
+    const points = activeTriggerControlPoints.map((point, i) =>
+      (draggingIndex === i && dragPosition) ? dragPosition : point
+    );
+
+    if (points.length < 2) return '';
+
+    // Calculate slope at start to extend line to left edge
+    const startSlope = (points[1].y - points[0].y) / (points[1].x - points[0].x);
+    const startY = points[0].y - startSlope * points[0].x;
+
+    // Calculate slope at end to extend line to right edge
+    const endPoint = points[points.length - 1];
+    const secondLastPoint = points[points.length - 2];
+    const endSlope = (endPoint.y - secondLastPoint.y) / (endPoint.x - secondLastPoint.x);
+    const endY = endPoint.y + endSlope * (372 - endPoint.x);
+
+    let path = `M 0 ${startY}`;
+    path += ` L ${points[0].x} ${points[0].y}`;
+
+    for (let i = 1; i < points.length; i++) {
+      path += ` L ${points[i].x} ${points[i].y}`;
+    }
+
+    path += ` L 372 ${endY}`;
+    return path;
+  };
+
+  // Mouse handlers for dragging control points
+  const handleMouseDown = (index) => (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDraggingIndex(index);
+    isDraggingRef.current = true;
+    setDragPosition(activeTriggerControlPoints[index]);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDraggingRef.current || draggingIndex === null || !svgRef.current) return;
+
+    e.preventDefault();
+
+    const svg = svgRef.current;
+    const rect = svg.getBoundingClientRect();
+
+    const x = ((e.clientX - rect.left) / rect.width) * 372;
+    const y = ((e.clientY - rect.top) / rect.height) * 200;
+
+    const clampedX = Math.max(padding, Math.min(372 - padding, x));
+    const clampedY = Math.max(padding, Math.min(200 - padding, y));
+
+    let newPosition;
+    if (draggingIndex === 0) {
+      newPosition = { x: padding, y: clampedY };
+    } else if (draggingIndex === activeTriggerControlPoints.length - 1) {
+      newPosition = { x: 372 - padding, y: clampedY };
+    } else {
+      newPosition = { x: clampedX, y: clampedY };
+    }
+
+    setDragPosition(newPosition);
+    setActiveTriggerControlPoints(prev => {
+      const newPoints = [...prev];
+      newPoints[draggingIndex] = newPosition;
+      return newPoints;
+    });
+  };
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+    setDraggingIndex(null);
+    setDragPosition(null);
+  };
+
+  // Update control points when preset changes
+  useEffect(() => {
+    if (activeTrigger === 'left') {
+      const newPoints = getPresetControlPoints(leftTriggerPreset);
+      setLeftTriggerControlPoints(newPoints);
+    } else {
+      const newPoints = getPresetControlPoints(rightTriggerPreset);
+      setRightTriggerControlPoints(newPoints);
+    }
+  }, [leftTriggerPreset, rightTriggerPreset, activeTrigger]);
+
+  // Persist control points
+  useEffect(() => {
+    localStorage.setItem(`leftTriggerControlPoints_${currentPreset}`, JSON.stringify(leftTriggerControlPoints));
+  }, [leftTriggerControlPoints, currentPreset]);
+
+  useEffect(() => {
+    localStorage.setItem(`rightTriggerControlPoints_${currentPreset}`, JSON.stringify(rightTriggerControlPoints));
+  }, [rightTriggerControlPoints, currentPreset]);
+
+  // Handle dragging
+  useEffect(() => {
+    if (draggingIndex !== null) {
+      window.addEventListener('mousemove', handleMouseMove, { passive: false });
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [draggingIndex, activeTriggerControlPoints.length]);
+
+  // Apply to both triggers logic - sync settings when toggled ON
+  const isInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!isInitialized.current) {
+      isInitialized.current = true;
+      return;
+    }
+
+    if (applyToBothTriggers && activeTrigger === 'left') {
+      // Sync left settings to right when left trigger is active
+      setRightStartValue(leftStartValue);
+      setRightEndValue(leftEndValue);
+      setRightTriggerMode(leftTriggerMode);
+      setRightTriggerPreset(leftTriggerPreset);
+    }
+  }, [applyToBothTriggers, leftStartValue, leftEndValue, leftTriggerMode, leftTriggerPreset, activeTrigger]);
+
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    if (applyToBothTriggers && activeTrigger === 'right') {
+      // Sync right settings to left when right trigger is active
+      setLeftStartValue(rightStartValue);
+      setLeftEndValue(rightEndValue);
+      setLeftTriggerMode(rightTriggerMode);
+      setLeftTriggerPreset(rightTriggerPreset);
+    }
+  }, [applyToBothTriggers, rightStartValue, rightEndValue, rightTriggerMode, rightTriggerPreset, activeTrigger]);
 
   // Global sync: listen for profile changes from other pages/tabs
   useEffect(() => {
@@ -574,36 +798,42 @@ export default function TriggerDeadzone() {
           </div>
 
           {/* Trigger Controls Panel */}
-          <div className="bg-[#1a1a1a] rounded-xl flex-1 p-6 overflow-y-auto">
-            <h2 className="font-logitech font-bold text-[#e6e6e6] text-[20px] tracking-[-0.42px] leading-[1.3]">
-              Triggers
-            </h2>
-            <p className="font-logitech text-[13px] text-[#8e8e8f] mt-2 leading-[1.3]">
-              Customize trigger deadzones and response
-            </p>
+          <div className="bg-[#1a1a1a] rounded-t-2xl flex-1 pt-4 px-4 overflow-y-auto">
+            {/* Header with back button */}
+            <div className="mb-6 pb-4 border-b border-[#2e2e2e]">
+              <div className="flex items-center gap-4">
+                {/* Back button */}
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-[#2e2e2e] shrink-0 hover:bg-[#2e2e2e] transition-colors cursor-pointer"
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                    <path d="M14 7L9 12L14 17" stroke="#e6e6e6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                {/* Title */}
+                <h2 className="font-logitech font-bold text-[#e6e6e6] text-[16px] tracking-[-0.48px] leading-[1.28]">
+                  Triggers
+                </h2>
+              </div>
+            </div>
 
-            {/* Left/Right Segmented Control */}
-            <div className="border border-[#2e2e2e] flex gap-1 items-center p-1 rounded-lg my-6">
-              <button
-                onClick={() => setActiveTrigger('left')}
-                className={`flex-1 h-8 flex items-center justify-center px-4 rounded transition-colors ${
-                  activeTrigger === 'left'
-                    ? 'bg-[#042f44] text-[#00b6fa] font-bold'
-                    : 'text-[#a7a7a8] hover:bg-[#2e2e2e]'
-                }`}
-              >
-                <span className="font-logitech text-[14px] tracking-[-0.42px] leading-[1.3]">Left</span>
-              </button>
-              <button
-                onClick={() => setActiveTrigger('right')}
-                className={`flex-1 h-8 flex items-center justify-center px-4 rounded transition-colors ${
-                  activeTrigger === 'right'
-                    ? 'bg-[#042f44] text-[#00b6fa] font-bold'
-                    : 'text-[#a7a7a8] hover:bg-[#2e2e2e]'
-                }`}
-              >
-                <span className="font-logitech text-[14px] tracking-[-0.42px] leading-[1.3]">Right</span>
-              </button>
+            {/* Switch to mouse click trigger */}
+            <div className="bg-[#242424] flex gap-3 items-center p-2 rounded-lg mb-6 w-full">
+              <Toggle
+                enabled={switchToMouseClick}
+                onChange={setSwitchToMouseClick}
+              />
+              <div className="flex gap-2 h-8 items-center py-0.5 flex-1">
+                <span className="font-logitech text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                  Switch to mouse click trigger
+                </span>
+                <div className="overflow-clip relative shrink-0 w-6 h-6">
+                  <div className="absolute inset-[8.33%]">
+                    <img src="/info-icon.svg" alt="" className="absolute block inset-0 max-w-none w-full h-full" />
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Start and End Inputs */}
@@ -722,163 +952,257 @@ export default function TriggerDeadzone() {
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="h-px bg-stroke-neutral-disabled w-full mb-6" />
+            {/* Toggle switches */}
+            <div className="flex flex-col gap-[16px] mb-6">
+              {/* Apply to both triggers toggle */}
+              <div className="flex gap-[12px] items-center">
+                <Toggle
+                  enabled={applyToBothTriggers}
+                  onChange={setApplyToBothTriggers}
+                />
+                <span className="font-logitech text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                  Apply to both triggers
+                </span>
+              </div>
 
-            {/* Trigger Mode Accordion */}
-            <div className="mb-6">
-              <button
-                onClick={() => setIsTriggerModeExpanded(!isTriggerModeExpanded)}
-                className="flex items-center justify-between mb-[15px] w-full"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-[14px] text-white font-bold font-logitech tracking-[-0.42px] leading-[1.3]">Trigger mode</span>
+              {/* Advanced trigger control toggle */}
+              <div className="flex gap-[12px] items-center">
+                <Toggle
+                  enabled={showAdvancedTriggerControl}
+                  onChange={setShowAdvancedTriggerControl}
+                />
+                <div className="flex gap-2 items-center">
+                  <span className="font-logitech text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                    Advanced trigger control
+                  </span>
                   <div className="relative w-6 h-6">
                     <div className="absolute inset-[8.33%]">
                       <img src="/info-icon.svg" alt="" className="absolute block inset-0 w-full h-full" />
                     </div>
                   </div>
                 </div>
-                <div className={`relative w-6 h-6 transition-transform duration-200 ${isTriggerModeExpanded ? 'rotate-0' : 'rotate-180'}`}>
-                  <div className="absolute inset-[37.5%_29.17%]">
-                    <img src="/figmaAssets/chevron-up-small-correct.svg" alt="" className="absolute block max-w-none w-full h-full" />
-                  </div>
-                </div>
-              </button>
+              </div>
+            </div>
 
-              {isTriggerModeExpanded && (
+            {/* Advanced Controls - only show when toggle is ON */}
+            {showAdvancedTriggerControl && (
               <>
-              <div className="flex border-2 border-[#2e2e2e] rounded-lg p-1 gap-1">
-                <button
-                  onClick={() => {
-                    if (activeTrigger === 'left') {
-                      setLeftTriggerMode('analog');
-                    } else {
-                      setRightTriggerMode('analog');
-                    }
-                  }}
-                  className={`flex-1 h-8 text-[14px] tracking-[-0.42px] rounded transition-colors font-logitech ${
-                    activeTriggerMode === 'analog'
-                      ? 'bg-[#042f44] text-[#00b6fa]'
-                      : 'text-[#a7a7a8] hover:bg-[#2e2e2e]'
-                  }`}
-                >
-                  Analog
-                </button>
-                <button
-                  onClick={() => {
-                    if (activeTrigger === 'left') {
-                      setLeftTriggerMode('digital');
-                    } else {
-                      setRightTriggerMode('digital');
-                    }
-                  }}
-                  className={`flex-1 h-8 text-[14px] tracking-[-0.42px] rounded transition-colors font-logitech ${
-                    activeTriggerMode === 'digital'
-                      ? 'bg-[#042f44] text-[#00b6fa]'
-                      : 'text-[#a7a7a8] hover:bg-[#2e2e2e]'
-                  }`}
-                >
-                  Digital
-                </button>
-              </div>
-
-            {/* Preset Dropdown - Only show for analog mode */}
-            {activeTriggerMode === 'analog' && (
-            <div className="flex flex-col gap-[15px] w-full mt-6" ref={presetDropdownRef}>
-              <div className="flex gap-2 h-6 items-center">
-                <span className="text-[14px] text-[#fbfbfb] font-bold font-logitech tracking-[-0.42px] leading-[1.3]">Preset</span>
-                <div className="relative w-6 h-6">
-                  <div className="absolute inset-[8.33%]">
-                    <img src="/info-icon.svg" alt="" className="absolute block inset-0 w-full h-full" />
-                  </div>
-                </div>
-              </div>
-              <div className="relative">
-                <div className="relative group">
-                  <div
-                    className={`bg-[#2e2e2e] h-[48px] px-2 flex items-center justify-between cursor-pointer relative rounded-lg transition-all overflow-hidden ${
-                      isPresetDropdownOpen
-                        ? 'border border-[#00b6fa]'
-                        : 'border border-transparent'
-                    }`}
-                    onClick={() => setIsPresetDropdownOpen(!isPresetDropdownOpen)}
-                  >
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-[rgba(251,251,251,0.14)] opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                    <div className="flex gap-2 items-center relative z-10">
-                      <div className="relative shrink-0 w-6 h-6">
-                        <img
-                          alt=""
-                          className="absolute block max-w-none w-full h-full"
-                          src={
-                            activeTriggerPreset === 'Linear' ? imgPresetLinear :
-                            activeTriggerPreset === 'Aggressive' ? imgPresetAggressive :
-                            activeTriggerPreset === 'Exponential' ? imgPresetExponential :
-                            imgPresetIcon
-                          }
-                        />
-                      </div>
-                      <span className={`text-[14px] tracking-[-0.42px] leading-[1.3] font-logitech transition-colors ${
-                        isPresetDropdownOpen
-                          ? 'text-[#e6e6e6] font-bold'
-                          : 'text-[#a7a7a8] group-hover:text-[#e6e6e6]'
-                      }`}>{activeTriggerPreset}</span>
+                {/* Bottom section with different background */}
+                <div className="bg-[#1a1a1a] rounded-b-2xl px-4 py-4 -mx-4 flex flex-col gap-6">
+                  {/* Curated Presets Header */}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between pl-0 pr-2 py-2 rounded-lg">
+                      <span className="font-logitech font-bold text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                        Curated Presets
+                      </span>
                     </div>
-                    <ChevronDown className="w-4 h-4 text-[#a7a7a8] shrink-0 transition-transform relative z-10" style={{
-                      transform: isPresetDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'
-                    }} />
                   </div>
-                </div>
 
-                {/* Dropdown List */}
-                {isPresetDropdownOpen && (
-                  <div className="absolute top-[calc(100%+4px)] left-0 right-0 bg-[#2e2e2e] rounded-lg shadow-[4px_4px_10px_0px_rgba(0,0,0,0.4)] z-50 overflow-hidden pb-px">
-                    {[
-                      { name: 'Linear', icon: imgPresetLinear },
-                      { name: 'Aggressive', icon: imgPresetAggressive },
-                      { name: 'Exponential', icon: imgPresetExponential }
-                    ].map((option) => {
-                      const isSelected = activeTriggerPreset === option.name;
-                      return (
-                        <div
-                          key={option.name}
-                          className="h-10 pl-3 pr-2 flex items-center cursor-pointer transition-colors relative overflow-hidden group"
-                          onClick={() => {
-                            if (activeTrigger === 'left') {
-                              setLeftTriggerPreset(option.name);
-                            } else {
-                              setRightTriggerPreset(option.name);
-                            }
-                            setIsPresetDropdownOpen(false);
-                          }}
-                        >
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-[rgba(251,251,251,0.14)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                          <div className="flex gap-2 items-center relative z-10">
-                            <div className="relative shrink-0 w-6 h-6">
-                              <img alt="" className="absolute block max-w-none w-full h-full" src={option.icon} />
-                            </div>
-                            <span className={`text-[14px] tracking-[-0.42px] leading-[1.3] font-logitech ${
-                              isSelected
-                                ? 'text-[#00b6fa] font-bold'
-                                : 'text-[#8e8e8f]'
-                            }`}>
-                              {option.name}
-                            </span>
+                  {/* Trigger Preset Selector */}
+                  <div className="relative" ref={presetDropdownRef}>
+                    {/* Collapsed Dropdown Button */}
+                    <div
+                      className="bg-[#242424] h-[72px] p-2 flex items-center justify-between cursor-pointer rounded-lg relative overflow-hidden group"
+                      onClick={() => setIsPresetDropdownOpen(!isPresetDropdownOpen)}
+                    >
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-[rgba(251,251,251,0.14)] opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                      <div className="flex gap-4 h-14 items-center relative z-10">
+                        {/* Curve Icon */}
+                        <div className="bg-[#1a1a1a] shrink-0 flex items-center justify-center rounded overflow-hidden px-2 py-[7px]" style={{ width: '64px', height: '56px' }}>
+                          <div className="transform scale-y-[-1] rotate-180" style={{ width: '48px', height: '20px' }}>
+                            <img
+                              src={`/figmaAssets/curve-${activeTriggerPreset.toLowerCase()}.svg`}
+                              alt={activeTriggerPreset}
+                              className="w-full h-full block object-contain"
+                            />
                           </div>
                         </div>
-                      );
-                    })}
+
+                        {/* Labels */}
+                        <div className="flex flex-col gap-[6px]">
+                          <p className="font-logitech font-bold text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                            {activeTriggerPreset}
+                          </p>
+                          <p className="font-logitech text-[12px] text-[#a7a7a8] leading-[1.3]">
+                            {activeTriggerPreset === 'Linear' && 'Consistent trigger response'}
+                            {activeTriggerPreset === 'Aggressive' && 'Fast trigger activation'}
+                            {activeTriggerPreset === 'Exponential' && 'Gradual then fast activation'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Chevron */}
+                      <div className="h-14 w-6 flex items-center justify-center relative z-10">
+                        <ChevronDown className="w-4 h-4 text-[#a7a7a8] transition-transform" style={{
+                          transform: isPresetDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                        }} />
+                      </div>
+                    </div>
+
+                    {/* Dropdown List */}
+                    {isPresetDropdownOpen && (
+                      <div className="absolute top-[calc(100%+4px)] left-0 right-0 bg-[#2e2e2e] rounded-lg shadow-[4px_4px_10px_0px_rgba(0,0,0,0.4)] z-50 overflow-hidden p-2 flex flex-col gap-1">
+                        {[
+                          { name: 'Linear', desc: 'Consistent trigger response' },
+                          { name: 'Aggressive', desc: 'Fast trigger activation' },
+                          { name: 'Exponential', desc: 'Gradual then fast activation' }
+                        ].map((option) => {
+                          const isSelected = option.name === activeTriggerPreset;
+                          return (
+                            <div
+                              key={option.name}
+                              className={`bg-[#242424] h-[72px] p-2 flex items-center justify-between cursor-pointer rounded-lg relative overflow-hidden group ${
+                                isSelected ? '' : 'hover:bg-[rgba(251,251,251,0.14)]'
+                              }`}
+                              onClick={() => {
+                                if (activeTrigger === 'left') {
+                                  setLeftTriggerPreset(option.name);
+                                } else {
+                                  setRightTriggerPreset(option.name);
+                                }
+                                setIsPresetDropdownOpen(false);
+                              }}
+                            >
+                              <div className="flex gap-4 h-14 items-center relative z-10">
+                                {/* Curve Icon */}
+                                <div className="bg-[#1a1a1a] shrink-0 flex items-center justify-center rounded overflow-hidden px-2 py-[7px]" style={{ width: '64px', height: '56px' }}>
+                                  <div className="transform scale-y-[-1] rotate-180" style={{ width: '48px', height: '20px' }}>
+                                    <img
+                                      src={`/figmaAssets/curve-${option.name.toLowerCase()}.svg`}
+                                      alt={option.name}
+                                      className="w-full h-full block object-contain"
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Labels */}
+                                <div className="flex flex-col gap-[6px]">
+                                  <p className={`font-logitech text-[14px] tracking-[-0.42px] leading-[1.3] ${
+                                    isSelected ? 'font-bold text-[#00b6fa]' : 'text-[#e6e6e6]'
+                                  }`}>
+                                    {option.name}
+                                  </p>
+                                  <p className="font-logitech text-[12px] text-[#a7a7a8] leading-[1.3]">
+                                    {option.desc}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Chevron - hidden in dropdown */}
+                              <div className="h-14 w-6 opacity-0" />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
+
+                  {/* Curve Graph */}
+                  <style>
+                    {`
+                      .control-point-group:hover circle:first-child {
+                        opacity: 0.15 !important;
+                      }
+                      .control-point-group.dragging circle:first-child {
+                        opacity: 0.25 !important;
+                      }
+                    `}
+                  </style>
+                  <div className="border border-[#4d4d4d] rounded overflow-hidden relative h-[194px]">
+                    {/* Grid - 18x10 grid */}
+                    <div className="grid grid-cols-[repeat(18,1fr)] grid-rows-[repeat(10,1fr)] h-[200px] w-full">
+                      {[...Array(180)].map((_, i) => (
+                        <div key={i} className="border-[0.5px] border-[#4d4d4d]" />
+                      ))}
+                    </div>
+
+                    {/* Curve visualization with interactive control points */}
+                    <svg
+                      ref={svgRef}
+                      className="absolute inset-0"
+                      viewBox="0 0 372 200"
+                      style={{ pointerEvents: 'auto', userSelect: 'none' }}
+                    >
+                      <defs>
+                        <linearGradient id="triggerCurveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="#00b6fa" stopOpacity="0.3" />
+                          <stop offset="100%" stopColor="#00b6fa" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+
+                      {/* Gradient fill under the curve */}
+                      <path
+                        d={`${getCurvePath()} L 372 200 L 0 200 Z`}
+                        fill="url(#triggerCurveGradient)"
+                        style={{ pointerEvents: 'none' }}
+                      />
+
+                      {/* Dimmed base curve */}
+                      <path
+                        d={getCurvePath()}
+                        stroke="#00b6fa"
+                        strokeWidth="2"
+                        fill="none"
+                        opacity="0.35"
+                        style={{ pointerEvents: 'none' }}
+                      />
+
+                      {/* Active trace that fills up with trigger press */}
+                      <path
+                        d={getCurvePath()}
+                        stroke="#00b6fa"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeLinecap="round"
+                        style={{
+                          pointerEvents: 'none',
+                          strokeDasharray: '1000',
+                          strokeDashoffset: 1000 - ((registeredTriggerValue / 100) * 1000)
+                        }}
+                      />
+
+                      {/* Control points */}
+                      {activeTriggerControlPoints.map((point, i) => {
+                        const pos = (draggingIndex === i && dragPosition) ? dragPosition : point;
+                        const isActive = draggingIndex === i;
+                        return (
+                          <g key={i} className={`control-point-group ${isActive ? 'dragging' : ''}`}>
+                            {/* Hover/active glow effect */}
+                            <circle
+                              cx={pos.x}
+                              cy={pos.y}
+                              r="12"
+                              fill="#00b6fa"
+                              style={{
+                                pointerEvents: 'none',
+                                opacity: 0,
+                                transition: 'opacity 0.2s'
+                              }}
+                            />
+                            {/* Main control point */}
+                            <circle
+                              cx={pos.x}
+                              cy={pos.y}
+                              r="3"
+                              fill="white"
+                              stroke="#00b6fa"
+                              strokeWidth="1.5"
+                              style={{
+                                pointerEvents: 'auto',
+                                cursor: 'pointer'
+                              }}
+                              onMouseDown={handleMouseDown(i)}
+                            />
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  </div>
+                </div>
+              </>
             )}
-            </>
-            )}
-            </div>
           </div>
         </div>
 
@@ -888,7 +1212,7 @@ export default function TriggerDeadzone() {
           <DeviceStatusWidget />
 
           {/* Controller visualization centered below */}
-          <div className="flex-1 flex flex-col items-center justify-center gap-4" style={{ overflow: 'visible' }}>
+          <div className="flex-1 flex flex-col items-center justify-center">
             <div className="w-full max-w-[800px] relative" style={{ overflow: 'visible' }}>
               <img
                 src={
@@ -901,7 +1225,8 @@ export default function TriggerDeadzone() {
                 style={{
                   transform: activeTrigger === 'right'
                     ? `scale(${rightTriggerScale}) translateX(${rightTriggerX}px) translateY(${rightTriggerY}px)`
-                    : `scale(${leftTriggerScale}) translateX(${leftTriggerX}px) translateY(${leftTriggerY}px)`
+                    : `scale(${leftTriggerScale}) translateX(${leftTriggerX}px) translateY(${leftTriggerY}px)`,
+                  pointerEvents: 'none'
                 }}
               />
 
@@ -922,6 +1247,7 @@ export default function TriggerDeadzone() {
                   msUserSelect: 'none',
                   overflow: 'visible',
                   pointerEvents: 'none',
+                  zIndex: 1
                 }}
               >
                 <style>{`
@@ -1041,6 +1367,16 @@ export default function TriggerDeadzone() {
               </div>
             </div>
 
+            {/* Binary Toggle - positioned below controller */}
+            <div className="flex justify-center mt-8" style={{ position: 'relative', zIndex: 10 }}>
+              <BinaryToggle
+                leftLabel="Left"
+                rightLabel="Right"
+                value={activeTrigger}
+                onChange={(value) => setActiveTrigger(value)}
+                className="w-auto"
+              />
+            </div>
           </div>
         </div>
       </div>
