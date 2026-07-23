@@ -47,10 +47,7 @@ export default function TriggerDeadzone() {
     // Force default to 'analog'
     return 'analog';
   });
-  const [activeTrigger, setActiveTrigger] = useState(() => {
-    const saved = localStorage.getItem(`activeTrigger_${currentProfile}`);
-    return saved || 'left';
-  });
+  const [activeTrigger, setActiveTrigger] = useState('left');
 
   // Position values for left trigger (finalized)
   const leftTriggerX = 78;
@@ -73,14 +70,8 @@ export default function TriggerDeadzone() {
   const [isDraggingEnd, setIsDraggingEnd] = useState(false);
   const [isHoveringStart, setIsHoveringStart] = useState(false);
   const [isHoveringEnd, setIsHoveringEnd] = useState(false);
-  const [leftTriggerPreset, setLeftTriggerPreset] = useState(() => {
-    const saved = localStorage.getItem(`leftTriggerPreset_${currentProfile}`);
-    return saved || 'Linear';
-  });
-  const [rightTriggerPreset, setRightTriggerPreset] = useState(() => {
-    const saved = localStorage.getItem(`rightTriggerPreset_${currentProfile}`);
-    return saved || 'Linear';
-  });
+  const [leftTriggerPreset, setLeftTriggerPreset] = useState('Linear');
+  const [rightTriggerPreset, setRightTriggerPreset] = useState('Linear');
   const [isPresetDropdownOpen, setIsPresetDropdownOpen] = useState(false);
   const [isTriggerModeExpanded, setIsTriggerModeExpanded] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
@@ -336,6 +327,11 @@ export default function TriggerDeadzone() {
   // Initialize saved settings on mount - captures state after all initial effects
   useEffect(() => {
     if (savedSettings === null) {
+      // Clear any saved toggle values to ensure defaults are always used
+      localStorage.removeItem(`activeTrigger_${currentPreset}`);
+      localStorage.removeItem(`leftTriggerPreset_${currentPreset}`);
+      localStorage.removeItem(`rightTriggerPreset_${currentPreset}`);
+
       const globalFlag = localStorage.getItem('hasUnsavedChanges') === 'true';
 
       // Always initialize with current state
@@ -415,18 +411,6 @@ export default function TriggerDeadzone() {
   useEffect(() => {
     localStorage.setItem(`rightTriggerMode_${currentPreset}`, rightTriggerMode);
   }, [rightTriggerMode, currentPreset]);
-
-  useEffect(() => {
-    localStorage.setItem(`leftTriggerPreset_${currentPreset}`, leftTriggerPreset);
-  }, [leftTriggerPreset, currentPreset]);
-
-  useEffect(() => {
-    localStorage.setItem(`rightTriggerPreset_${currentPreset}`, rightTriggerPreset);
-  }, [rightTriggerPreset, currentPreset]);
-
-  useEffect(() => {
-    localStorage.setItem(`activeTrigger_${currentPreset}`, activeTrigger);
-  }, [activeTrigger, currentPreset]);
 
   // Persist toggle states
   useEffect(() => {

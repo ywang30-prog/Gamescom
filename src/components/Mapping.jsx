@@ -25,10 +25,7 @@ export default function Mapping() {
     return saved !== null ? JSON.parse(saved) : 0;
   });
   const [activeStick, setActiveStick] = useState('left');
-  const [sensitivity, setSensitivity] = useState(() => {
-    const saved = localStorage.getItem(`stickSensitivity_${currentProfile}`);
-    return saved || 'Linear';
-  });
+  const [sensitivity, setSensitivity] = useState('Linear');
   const [sensitivityDropdownOpen, setSensitivityDropdownOpen] = useState(false);
   const [isSensitivityExpanded, setIsSensitivityExpanded] = useState(false);
   const sensitivityDropdownRef = useRef(null);
@@ -46,10 +43,7 @@ export default function Mapping() {
     const saved = localStorage.getItem(`rightStickCurveAdjustment_${currentProfile}`);
     return saved !== null ? JSON.parse(saved) : 0;
   });
-  const [rightSensitivity, setRightSensitivity] = useState(() => {
-    const saved = localStorage.getItem(`rightStickSensitivity_${currentProfile}`);
-    return saved || 'Linear';
-  });
+  const [rightSensitivity, setRightSensitivity] = useState('Linear');
 
   // Edit mode for positioning deadzone overlay
   const [isEditMode, setIsEditMode] = useState(false);
@@ -700,8 +694,10 @@ export default function Mapping() {
   useEffect(() => {
     if (!isInitialized.current) {
       // Initialize on next tick to ensure controlPoints are set
-      // Clear any saved activeStick values to ensure 'left' is always the default
+      // Clear any saved toggle values to ensure defaults are always used
       localStorage.removeItem(`activeStick_${currentPreset}`);
+      localStorage.removeItem(`stickSensitivity_${currentPreset}`);
+      localStorage.removeItem(`rightStickSensitivity_${currentPreset}`);
 
       const timer = setTimeout(() => {
         const globalFlag = localStorage.getItem('hasUnsavedChanges') === 'true';
@@ -764,10 +760,6 @@ export default function Mapping() {
     localStorage.setItem(`stickCurveAdjustment_${currentPreset}`, JSON.stringify(curveAdjustment));
   }, [curveAdjustment, currentPreset]);
 
-  useEffect(() => {
-    localStorage.setItem(`stickSensitivity_${currentPreset}`, sensitivity);
-  }, [sensitivity, currentPreset]);
-
   // Persist right stick settings to localStorage
   useEffect(() => {
     localStorage.setItem(`rightStickInnerDeadzone_${currentPreset}`, JSON.stringify(rightInnerDeadzone));
@@ -780,10 +772,6 @@ export default function Mapping() {
   useEffect(() => {
     localStorage.setItem(`rightStickCurveAdjustment_${currentPreset}`, JSON.stringify(rightCurveAdjustment));
   }, [rightCurveAdjustment, currentPreset]);
-
-  useEffect(() => {
-    localStorage.setItem(`rightStickSensitivity_${currentPreset}`, rightSensitivity);
-  }, [rightSensitivity, currentPreset]);
 
   useEffect(() => {
     localStorage.setItem(`rightStickControlPoints_${currentPreset}`, JSON.stringify(rightControlPoints));
