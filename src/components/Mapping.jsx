@@ -1050,24 +1050,41 @@ export default function Mapping() {
           </div>
 
           {/* Controls Panel */}
-          <div className="bg-[#1a1a1a] rounded-xl flex-1 p-6 overflow-y-auto">
+          <div className="bg-[#1a1a1a] rounded-t-2xl flex-1 pt-4 px-4 overflow-y-auto">
+            {/* Header with back button */}
             <div className="mb-6 pb-4 border-b border-[#2e2e2e]">
-              <h2 className="font-logitech font-bold text-[#e6e6e6] text-[16px] tracking-[-0.48px] leading-[1.28]">
-                Sticks
-              </h2>
+              <div className="flex items-center gap-4">
+                {/* Back button */}
+                <button className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-[#2e2e2e] shrink-0">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                    <path d="M14 7L9 12L14 17" stroke="#e6e6e6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                {/* Title */}
+                <h2 className="font-logitech font-bold text-[#e6e6e6] text-[16px] tracking-[-0.48px] leading-[1.28]">
+                  Sticks
+                </h2>
+              </div>
             </div>
 
             {/* Inner Deadzone */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-[14px] text-white font-bold tracking-[-0.42px] font-logitech">
+              <div className="flex items-center gap-2 mb-2 h-6">
+                <span className="text-[14px] text-[#e6e6e6] font-bold tracking-[-0.42px] font-logitech leading-[1.3]">
                   Inner Deadzone
                 </span>
+                {/* Info icon */}
+                <div className="w-6 h-6 shrink-0 flex items-center justify-center">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="#a7a7a8" strokeWidth="1.5"/>
+                    <path d="M12 16V12M12 8H12.01" stroke="#a7a7a8" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
               </div>
 
-              <div className="flex items-end gap-4 mb-2">
-                <div className="flex-1">
-                  <div className="relative h-[22px] mb-2">
+              <div className="flex items-center gap-4 h-10">
+                <div className="flex-1 flex flex-col">
+                  <div className="relative h-[22px]">
                     <input
                       type="range"
                       min="0"
@@ -1106,43 +1123,50 @@ export default function Mapping() {
                       <div className="absolute inset-[8px] w-4 h-4 bg-white rounded-full shadow-lg pointer-events-none" />
                     </div>
                   </div>
-                  <div className="flex justify-between font-logitech text-[12px] text-[#a7a7a8]">
+                  <div className="flex justify-between font-logitech text-[10px] text-[#a7a7a8] leading-[1.16]">
                     <span>0</span>
+                    <span>50</span>
                     <span>100</span>
                   </div>
                 </div>
-                <div className="bg-[#2e2e2e] rounded-lg h-10 w-[74px] flex items-center justify-center px-4">
+                {/* Number input with border */}
+                <div className="border border-[#2e2e2e] rounded-lg h-10 min-w-[60px] max-w-[82px] flex items-center justify-center px-3 shrink-0">
                   <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={activeStick === 'left' ? leftDeadzone : rightInnerDeadzone}
+                    type="text"
+                    value={`${activeStick === 'left' ? leftDeadzone : rightInnerDeadzone}%`}
                     onChange={(e) => {
-                      const value = Math.min(100, Math.max(0, Number(e.target.value) || 0));
+                      const numValue = parseInt(e.target.value.replace('%', '')) || 0;
+                      const value = Math.min(100, Math.max(0, numValue));
                       if (activeStick === 'left') {
                         setLeftDeadzone(value);
                       } else {
                         setRightInnerDeadzone(value);
                       }
                     }}
-                    className={`bg-transparent font-logitech text-[14px] tracking-[-0.42px] w-full text-center outline-none transition-colors ${isDraggingDeadzone ? 'text-[#ececec]' : 'text-[#a7a7a8]'}`}
+                    className="bg-transparent font-logitech text-[14px] tracking-[-0.42px] leading-[1.3] w-full text-center outline-none text-[#a7a7a8]"
                   />
-                  <span className={`font-logitech text-[14px] transition-colors ${isDraggingDeadzone ? 'text-[#ececec]' : 'text-[#a7a7a8]'}`}>%</span>
                 </div>
               </div>
             </div>
 
             {/* Outer Deadzone */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-[14px] text-white font-bold tracking-[-0.42px] font-logitech">
+              <div className="flex items-center gap-2 mb-2 h-6">
+                <span className="text-[14px] text-[#e6e6e6] font-bold tracking-[-0.42px] font-logitech leading-[1.3]">
                   Outer Deadzone
                 </span>
+                {/* Info icon */}
+                <div className="w-6 h-6 shrink-0 flex items-center justify-center">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="#a7a7a8" strokeWidth="1.5"/>
+                    <path d="M12 16V12M12 8H12.01" stroke="#a7a7a8" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
               </div>
 
-              <div className="flex items-end gap-4 mb-2">
-                <div className="flex-1">
-                  <div className="relative h-[22px] mb-2">
+              <div className="flex items-center gap-4 h-10">
+                <div className="flex-1 flex flex-col">
+                  <div className="relative h-[22px]">
                     <input
                       type="range"
                       min="0"
@@ -1181,28 +1205,28 @@ export default function Mapping() {
                       <div className="absolute inset-[8px] w-4 h-4 bg-white rounded-full shadow-lg pointer-events-none" />
                     </div>
                   </div>
-                  <div className="flex justify-between font-logitech text-[12px] text-[#a7a7a8]">
+                  <div className="flex justify-between font-logitech text-[10px] text-[#a7a7a8] leading-[1.16]">
                     <span>0</span>
+                    <span>50</span>
                     <span>100</span>
                   </div>
                 </div>
-                <div className="bg-[#2e2e2e] rounded-lg h-10 w-[74px] flex items-center justify-center px-4">
+                {/* Number input with border */}
+                <div className="border border-[#2e2e2e] rounded-lg h-10 min-w-[60px] max-w-[82px] flex items-center justify-center px-3 shrink-0">
                   <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={activeOuterDeadzone}
+                    type="text"
+                    value={`${activeOuterDeadzone}%`}
                     onChange={(e) => {
-                      const value = Math.min(100, Math.max(0, Number(e.target.value) || 0));
+                      const numValue = parseInt(e.target.value.replace('%', '')) || 0;
+                      const value = Math.min(100, Math.max(0, numValue));
                       if (activeStick === 'left') {
                         setRightDeadzone(value);
                       } else {
                         setRightOuterDeadzone(value);
                       }
                     }}
-                    className={`bg-transparent font-logitech text-[14px] tracking-[-0.42px] w-full text-center outline-none transition-colors ${isDraggingDeadzone2 ? 'text-[#ececec]' : 'text-[#a7a7a8]'}`}
+                    className="bg-transparent font-logitech text-[14px] tracking-[-0.42px] leading-[1.3] w-full text-center outline-none text-[#a7a7a8]"
                   />
-                  <span className={`font-logitech text-[14px] transition-colors ${isDraggingDeadzone2 ? 'text-[#ececec]' : 'text-[#a7a7a8]'}`}>%</span>
                 </div>
               </div>
             </div>
@@ -1242,19 +1266,19 @@ export default function Mapping() {
             {/* Advanced Controls - only show when toggle is ON */}
             {showAdvancedControls && (
               <>
-                {/* Divider */}
-                <div className="h-px bg-stroke-neutral-disabled w-full mb-6" />
+                {/* Bottom section with different background */}
+                <div className="bg-[#1a1a1a] rounded-b-2xl px-4 py-4 -mx-4 flex flex-col gap-6">
+                  {/* Curated Presets Header */}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between pl-0 pr-2 py-2 rounded-lg">
+                      <span className="font-logitech font-bold text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                        Curated Presets
+                      </span>
+                    </div>
+                  </div>
 
-                {/* Curated Presets Header */}
-                <div className="mb-4">
-                  <span className="font-logitech font-bold text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
-                    Curated Presets
-                  </span>
-                </div>
-
-                {/* Sensitivity Preset Selector */}
-                <div className="mb-6">
-              <div className="relative" ref={sensitivityDropdownRef}>
+                  {/* Sensitivity Preset Selector */}
+                  <div className="relative" ref={sensitivityDropdownRef}>
               {/* Collapsed Dropdown Button */}
               <div
                 className="bg-[#242424] h-[72px] p-2 flex items-center justify-between cursor-pointer rounded-lg relative overflow-hidden group"
@@ -1354,104 +1378,9 @@ export default function Mapping() {
                   })}
                 </div>
               )}
-              </div>
-
-            {/* Curve Adjustment */}
-            <div className="mb-6 mt-6">
-              <div className="flex h-6 items-center mb-[15px]">
-                <p className="font-logitech font-bold text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3] overflow-hidden text-ellipsis whitespace-nowrap">
-                  Curve Adjustment
-                </p>
-              </div>
-              <div className="flex gap-4 h-10 items-center">
-                <div className="flex-1 flex flex-col items-start min-h-0 min-w-0">
-                  <div className="h-[22px] relative rounded-[2px] w-full">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={activeCurveAdjustment}
-                      onChange={(e) => activeStick === 'left' ? setCurveAdjustment(Number(e.target.value)) : setRightCurveAdjustment(Number(e.target.value))}
-                      onMouseDown={() => setIsDraggingCurve(true)}
-                      onMouseUp={() => setIsDraggingCurve(false)}
-                      onTouchStart={() => setIsDraggingCurve(true)}
-                      onTouchEnd={() => setIsDraggingCurve(false)}
-                      onMouseEnter={() => setIsHoveringCurve(true)}
-                      onMouseLeave={() => setIsHoveringCurve(false)}
-                      className="absolute inset-0 w-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="absolute inset-[2px] pointer-events-none">
-                      {/* Slider Rail */}
-                      <div className="absolute h-[18px] left-0 right-0 top-1/2 -translate-y-1/2">
-                        <div className="absolute h-[4px] left-0 right-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                          <div className="w-[4px] h-full bg-[#2e2e2e] rounded-full" style={{ width: '100%', height: '4px' }} />
-                        </div>
-                      </div>
-
-                      {/* Tick marks */}
-                      <div className="absolute inset-[7px_12px]">
-                        {[1.11, 13.33, 25.56, 37.78, 50, 62.22, 74.44, 86.67, 98.89].map((position, i) => {
-                          return (
-                            <div
-                              key={i}
-                              className="absolute top-1/2 -translate-y-1/2"
-                              style={{ left: `${position}%` }}
-                            >
-                              <div
-                                className="bg-[#5a5a5a] rounded-full -translate-x-1/2"
-                                style={{ width: '2px', height: '2px' }}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Slider Track (filled portion) */}
-                      <div className="absolute top-0 bottom-0 left-0" style={{ right: `${100 - activeCurveAdjustment}%` }}>
-                        <div className="absolute h-[4px] left-0 right-[1px] top-1/2 -translate-y-1/2">
-                          <div className="h-full bg-[#00b6fa] rounded-full" />
-                        </div>
-                        {/* Slider Thumb */}
-                        <div className={`slider-thumb-container absolute right-[-16px] top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none ${isHoveringCurve ? 'hovering' : ''} ${isDraggingCurve ? 'dragging' : ''}`}>
-                          {/* Glow effect */}
-                          <div
-                            className="slider-glow absolute inset-0 w-8 h-8 bg-[#00b6fa] rounded-full pointer-events-none"
-                            style={{
-                              opacity: 0,
-                              transition: 'opacity 0.2s'
-                            }}
-                          />
-                          {/* Main thumb */}
-                          <div className="absolute inset-[8px] w-4 h-4 bg-white rounded-full shadow-[1px_1px_10px_rgba(0,0,0,0.4)] pointer-events-none" />
-                        </div>
-                      </div>
-                    </div>
                   </div>
-                </div>
-                <div className="flex flex-col items-start rounded-lg w-[74px]">
-                  <div className="bg-[#2e2e2e] flex h-10 items-center justify-center px-4 rounded-lg w-full gap-0">
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={activeCurveAdjustment}
-                      onChange={(e) => {
-                        const value = Math.min(100, Math.max(0, Number(e.target.value) || 0));
-                        if (activeStick === 'left') {
-                          setCurveAdjustment(value);
-                        } else {
-                          setRightCurveAdjustment(value);
-                        }
-                      }}
-                      className={`bg-transparent font-logitech text-[14px] tracking-[-0.42px] leading-[1.3] w-[42px] text-center outline-none transition-colors ${isDraggingCurve ? 'text-[#ececec]' : 'text-[#8e8e8f]'}`}
-                    />
-                    <span className={`font-logitech text-[14px] transition-colors ${isDraggingCurve ? 'text-[#ececec]' : 'text-[#8e8e8f]'}`}>%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Curve Editor Grid */}
+                  {/* Curve Editor Grid */}
             <style>
               {`
                 .control-point-group:hover circle:first-child {
@@ -1486,21 +1415,21 @@ export default function Mapping() {
                 }
               `}
             </style>
-            <div className="border border-[#4d4d4d] rounded relative h-[200px] overflow-hidden">
-              {/* Grid */}
-              <div className="grid grid-cols-[repeat(18,1fr)] grid-rows-[repeat(10,1fr)] h-full w-full">
-                {[...Array(180)].map((_, i) => (
-                  <div key={i} className="border-[1px] border-[rgba(255,255,255,0.1)]" />
-                ))}
-              </div>
+                  <div className="border border-[#4d4d4d] rounded overflow-hidden relative h-[194px]">
+                    {/* Grid - 18x10 grid */}
+                    <div className="grid grid-cols-[repeat(18,1fr)] grid-rows-[repeat(10,1fr)] h-[200px] w-full">
+                      {[...Array(180)].map((_, i) => (
+                        <div key={i} className="border-[0.5px] border-[#4d4d4d]" />
+                      ))}
+                    </div>
 
-              {/* Curve visualization - dynamic based on control points */}
-              <svg
-                ref={svgRef}
-                className="absolute inset-0"
-                viewBox="0 0 372 200"
-                style={{ pointerEvents: 'auto', userSelect: 'none' }}
-              >
+                    {/* Curve visualization - dynamic based on control points */}
+                    <svg
+                      ref={svgRef}
+                      className="absolute inset-0"
+                      viewBox="0 0 372 200"
+                      style={{ pointerEvents: 'auto', userSelect: 'none' }}
+                    >
                 <defs>
                   <linearGradient id="curveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stopColor="#00b6fa" stopOpacity="0.3" />
@@ -1572,10 +1501,10 @@ export default function Mapping() {
                         onMouseDown={handleMouseDown(i)}
                       />
                     </g>
-                  );
-                })}
-              </svg>
-            </div>
+                      );
+                    })}
+                    </svg>
+                  </div>
                 </div>
               </>
             )}
