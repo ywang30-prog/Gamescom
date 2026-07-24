@@ -1,17 +1,44 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronRight as LucideChevronRight } from 'lucide-react';
 import ProfileSelector from './ProfileSelector';
 import PresetModal from './PresetModal';
 import ImportProfileModal from './ImportProfileModal';
 import SaveNotification from './SaveNotification';
 
-// Icon assets
-const imgInfoIcon = "/figmaAssets/info-icon-general.svg";
-const imgChevronDown = "/figmaAssets/chevron-down-general.svg";
-const imgBattery = "/figmaAssets/battery-general.svg";
-const imgHeart = "/figmaAssets/heart-general.svg";
-const imgChevronRight = "/figmaAssets/chevron-right-general.svg";
+// Icon Components
+const InfoIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fillRule="evenodd" clipRule="evenodd" d="M12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#A7A7A8"/>
+    <path d="M12 11C12.5523 11 13 11.4477 13 12V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V12C11 11.4477 11.4477 11 12 11Z" fill="#A7A7A8"/>
+    <path d="M13 8.5C13 9.05228 12.5523 9.5 12 9.5C11.4477 9.5 11 9.05228 11 8.5C11 7.94772 11.4477 7.5 12 7.5C12.5523 7.5 13 7.94772 13 8.5Z" fill="#A7A7A8"/>
+  </svg>
+);
+
+const ChevronDownIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.293 10.2929C17.6835 9.90237 18.3165 9.90237 18.707 10.2929C19.0975 10.6834 19.0975 11.3166 18.707 11.7071L13.707 16.7071C13.5194 16.8946 13.2651 17 13 17C12.7349 17 12.4806 16.8946 12.293 16.7071L7.29297 11.7071C6.90244 11.3166 6.90244 10.6834 7.29297 10.2929C7.68349 9.90237 8.3165 9.90237 8.70703 10.2929L13 14.5858L17.293 10.2929Z" fill="#A7A7A8"/>
+  </svg>
+);
+
+const BatteryIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13.5 3H16.5C17.052 3 17.5 3.44772 17.5 4C17.5 4.55228 17.052 5 16.5 5H13.5C12.948 5 12.5 4.55228 12.5 4C12.5 3.44772 12.948 3 13.5 3Z" fill="#248456"/>
+    <path fillRule="evenodd" clipRule="evenodd" d="M11.786 6H18.214C18.924 6 19.5 6.5166 19.5 7.1538V19.8462C19.5 20.4834 18.924 21 18.214 21H11.786C11.076 21 10.5 20.4834 10.5 19.8462V7.1538C10.5 6.5166 11.076 6 11.786 6Z" fill="#248456"/>
+  </svg>
+);
+
+const HeartIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14.0108 2.82513C13.7502 2.56354 13.4407 2.35603 13.1001 2.21445C12.7595 2.07287 12.3945 2 12.0258 2C11.6571 2 11.2921 2.07287 10.9515 2.21445C10.6109 2.35603 10.3014 2.56354 10.0408 2.82513L9.49986 3.36777L8.95896 2.82513C8.43249 2.29699 7.71846 2.00027 6.97392 2.00027C6.22939 2.00027 5.51536 2.29699 4.98889 2.82513C4.46243 3.35328 4.16667 4.0696 4.16667 4.81652C4.16667 5.56344 4.46243 6.27976 4.98889 6.80791L9.49986 11.3333L14.0108 6.80791C14.2716 6.54644 14.4784 6.23599 14.6196 5.89431C14.7607 5.55262 14.8333 5.18638 14.8333 4.81652C14.8333 4.44666 14.7607 4.08043 14.6196 3.73874C14.4784 3.39705 14.2716 3.0866 14.0108 2.82513Z" fill="#00B8FC"/>
+  </svg>
+);
+
+const ChevronRightIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10.293 7.70696C9.90244 7.31643 9.90244 6.68342 10.293 6.29289C10.6835 5.90237 11.3165 5.90237 11.707 6.29289L15.707 10.2929C16.0975 10.6834 16.0975 11.3166 15.707 11.7071L11.707 15.7071C11.3165 16.0976 10.6835 16.0976 10.293 15.7071C9.90244 15.3166 9.90244 14.6834 10.293 14.2929L13.5858 11L10.293 7.70696Z" fill="#00B8FC"/>
+  </svg>
+);
 
 export default function GeneralSettings() {
   const navigate = useNavigate();
@@ -101,7 +128,7 @@ export default function GeneralSettings() {
               <div className="h-px rounded-[1px] shrink-0 w-10" />
             </button>
             <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4 w-[5px]">
-              <ChevronRight className="w-4 h-4 text-[#a7a7a8]" />
+              <LucideChevronRight className="w-4 h-4 text-[#a7a7a8]" />
               <div className="h-px rounded-[1px] shrink-0 w-10" />
             </div>
             <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4">
@@ -115,7 +142,7 @@ export default function GeneralSettings() {
       </nav>
 
       {/* Main Content */}
-      <div className="flex-1 flex px-8 pb-8 gap-4 pt-4" style={{ overflow: 'visible' }}>
+      <div className="flex-1 flex px-8 pb-8 gap-[102px] pt-4" style={{ overflow: 'visible' }}>
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Preset Selector */}
@@ -208,113 +235,133 @@ export default function GeneralSettings() {
           </h1>
 
           {/* Settings Content - EXACT spacing: 32px gap */}
-          <div className="flex flex-col gap-8">
-            {/* Firmware Version */}
-            <div className="flex items-start justify-between w-[245px]">
-              <div className="flex flex-col gap-2">
-                <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px]">
+          <div className="flex flex-col gap-8 items-start w-full">
+            {/* Firmware Version - 1507:7717 */}
+            <div className="flex flex-wrap gap-y-1 items-start justify-between w-[245px]">
+              <div className="flex flex-col gap-2 shrink-0">
+                <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
                   Firmware Version
                 </p>
-                <div className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px]">
-                  <p className="m-0">Name: 1.2.123</p>
-                  <p className="m-0">Update available</p>
+                <div className="text-sm text-[#a7a7a8] leading-[1.3]">
+                  <p className="mb-0 leading-[1.3]">Name: 1.2.123</p>
+                  <p className="leading-[1.3]">Update available</p>
                 </div>
               </div>
-              <button className="h-[24px] px-3 py-1.5 text-xs font-bold bg-[#00b8fc] text-[#1a1a1a] rounded-lg hover:bg-[#00a8ec] transition-colors uppercase tracking-[0.36px] leading-[1.16] flex items-center justify-center">
-                Update
+              <button className="h-8 min-w-[96px] px-4 text-xs font-bold bg-[#00b8fc] text-[#1a1a1a] rounded-2xl hover:bg-[#00a8ec] transition-colors uppercase tracking-[0.36px] leading-[1.16] flex items-center justify-center shrink-0">
+                UPDATE
               </button>
             </div>
 
-            {/* Device Name - 16px gap between input and button */}
-            <div className="flex flex-col gap-4">
+            {/* Device Name - 1507:7722 - 16px gap between field and button */}
+            <div className="flex flex-col gap-4 items-start w-full">
               <div className="flex flex-col gap-2 w-[245px]">
-                <div className="flex items-center gap-2 h-6">
-                  <label className="text-sm font-bold text-[#e6e6e6] leading-[1.3] tracking-[-0.42px]">
+                <div className="flex gap-2 h-6 items-center w-full">
+                  <label className="text-sm font-bold text-[#e6e6e6] leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis whitespace-nowrap shrink-0">
                     Device name
                   </label>
-                  <img src={imgInfoIcon} alt="" className="w-6 h-6 opacity-40" />
+                  <div className="shrink-0 w-6 h-6">
+                    <InfoIcon />
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  value={deviceName}
-                  onChange={(e) => setDeviceName(e.target.value)}
-                  className="h-10 px-2 bg-transparent border border-[#2e2e2e] rounded-lg text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] focus:outline-none focus:ring-2 focus:ring-[#00b8fc]"
-                  placeholder="Ghost Controller"
-                />
+                <div className="h-10 px-2 bg-transparent border border-[#2e2e2e] border-solid rounded-lg flex items-center w-full">
+                  <input
+                    type="text"
+                    value={deviceName}
+                    onChange={(e) => setDeviceName(e.target.value)}
+                    className="bg-transparent text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] focus:outline-none w-full h-[21px] overflow-hidden text-ellipsis"
+                    placeholder="Ghost Controller"
+                  />
+                </div>
               </div>
               <button
                 disabled
-                className="h-[24px] px-3 py-1.5 text-xs font-bold bg-[#1f1f1f] text-[#4d4d4d] rounded-lg cursor-not-allowed uppercase tracking-[0.36px] leading-[1.16] flex items-center justify-center w-fit"
+                className="h-8 w-[78px] text-xs font-bold bg-[#242424] text-[#4d4d4d] rounded-2xl cursor-not-allowed uppercase tracking-[0.36px] leading-[1.16] flex items-center justify-center shrink-0"
               >
-                Save
+                SAVE
               </button>
             </div>
 
-            {/* Language Dropdown */}
-            <div className="flex flex-col gap-2 w-[245px]">
-              <div className="flex items-center gap-2 h-6">
-                <label className="text-sm font-bold text-[#e6e6e6] leading-[1.3] tracking-[-0.42px]">
+            {/* Language Dropdown - 1507:7725 */}
+            <div className="flex flex-col gap-2 items-start rounded-lg w-[245px]">
+              <div className="flex gap-2 h-6 items-center w-full">
+                <label className="text-sm font-bold text-[#e6e6e6] leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis whitespace-nowrap shrink-0">
                   Language
                 </label>
-                <img src={imgInfoIcon} alt="" className="w-6 h-6 opacity-40" />
+                <div className="shrink-0 w-6 h-6">
+                  <InfoIcon />
+                </div>
               </div>
-              <button
-                onClick={() => setIsLanguageOpen(!isLanguageOpen)}
-                className="w-full h-12 px-2 bg-[#242424] rounded-lg flex items-center justify-between hover:bg-[#2d2d2d] transition-colors"
-              >
-                <span className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px]">
-                  {selectedLanguage}
-                </span>
-                <img src={imgChevronDown} alt="" className="w-6 h-6 opacity-40" />
-              </button>
-            </div>
-
-            {/* Battery Level */}
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px]">
-                Battery level
-              </p>
-              <div className="flex items-center gap-0">
-                <p className="text-sm font-bold text-[#248456] leading-[1.3] tracking-[-0.42px] w-[29px]">90%</p>
-                <img src={imgBattery} alt="" className="w-6 h-6" style={{filter: 'brightness(0) saturate(100%) invert(48%) sepia(45%) saturate(462%) hue-rotate(102deg) brightness(91%) contrast(89%)'}} />
-              </div>
-              <p className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px]">
-                Approximately 72 hours
-              </p>
-            </div>
-
-            {/* Usage */}
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px]">
-                Usage
-              </p>
-              <p className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px]">
-                187 Hours Played
-              </p>
-              <div className="flex items-center gap-0">
-                <img src={imgHeart} alt="" className="w-4 h-4" style={{filter: 'brightness(0) saturate(100%) invert(16%) sepia(98%) saturate(7499%) hue-rotate(334deg) brightness(98%) contrast(114%)'}} />
-                <button className="flex items-center gap-1 h-8 p-1 rounded-full hover:bg-[#1a1a1a] transition-colors">
-                  <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px]">
-                    Get an extra life
+              <div className="bg-[#242424] flex flex-col items-start rounded-lg shrink-0 w-full">
+                <button
+                  onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+                  className="flex h-[48px] items-center justify-between px-2 rounded-lg shrink-0 w-full hover:opacity-90 transition-opacity"
+                >
+                  <span className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis whitespace-nowrap">
+                    {selectedLanguage}
                   </span>
-                  <img src={imgChevronRight} alt="" className="w-6 h-6" style={{filter: 'brightness(0) saturate(100%) invert(56%) sepia(98%) saturate(2945%) hue-rotate(175deg) brightness(102%) contrast(101%)'}} />
+                  <div className="shrink-0 w-6 h-6">
+                    <ChevronDownIcon />
+                  </div>
                 </button>
               </div>
             </div>
 
-            {/* Links - 4px gap between buttons */}
-            <div className="flex flex-col gap-1">
-              <button className="flex items-center gap-1 h-8 pl-3 pr-1 py-1 rounded-full hover:bg-[#1a1a1a] transition-colors self-start">
-                <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px]">
+            {/* Battery Level - 1507:7726 */}
+            <div className="flex flex-col gap-2 items-start w-full">
+              <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                Battery level
+              </p>
+              <div className="flex items-center shrink-0">
+                <p className="text-sm font-bold text-[#248456] leading-[1.3] tracking-[-0.42px] w-[29px] shrink-0">90%</p>
+                <div className="w-6 h-6 shrink-0">
+                  <BatteryIcon />
+                </div>
+              </div>
+              <p className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                Approximately 72 hours
+              </p>
+            </div>
+
+            {/* Usage - 1507:7732 */}
+            <div className="flex flex-col gap-2 items-start w-full">
+              <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                Usage
+              </p>
+              <p className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                187 Hours Played
+              </p>
+              <div className="flex gap-0 items-center shrink-0">
+                <div className="shrink-0 w-4 h-4">
+                  <HeartIcon />
+                </div>
+                <button className="flex gap-1 h-8 items-center p-1 rounded-full hover:bg-[#1a1a1a] transition-colors shrink-0">
+                  <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                    Get an extra life
+                  </span>
+                  <div className="shrink-0 w-6 h-6">
+                    <ChevronRightIcon />
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Links - 1507:7738 - 4px gap between buttons */}
+            <div className="flex flex-col gap-1 items-start w-full">
+              <button className="flex gap-1 h-8 items-center pl-3 pr-1 py-1 rounded-full hover:bg-[#1a1a1a] transition-colors shrink-0">
+                <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
                   Relaunch device onboarding
                 </span>
-                <img src={imgChevronRight} alt="" className="w-6 h-6" style={{filter: 'brightness(0) saturate(100%) invert(56%) sepia(98%) saturate(2945%) hue-rotate(175deg) brightness(102%) contrast(101%)'}} />
+                <div className="shrink-0 w-6 h-6">
+                  <ChevronRightIcon />
+                </div>
               </button>
-              <button className="flex items-center gap-1 h-8 pl-3 pr-1 py-1 rounded-full hover:bg-[#1a1a1a] transition-colors self-start">
-                <span className="text-sm font-bold text-[#00b8fc] leading-[#1.3] tracking-[-0.42px]">
+              <button className="flex gap-1 h-8 items-center pl-3 pr-1 py-1 rounded-full hover:bg-[#1a1a1a] transition-colors shrink-0">
+                <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
                   Factory reset
                 </span>
-                <img src={imgChevronRight} alt="" className="w-6 h-6" style={{filter: 'brightness(0) saturate(100%) invert(56%) sepia(98%) saturate(2945%) hue-rotate(175deg) brightness(102%) contrast(101%)'}} />
+                <div className="shrink-0 w-6 h-6">
+                  <ChevronRightIcon />
+                </div>
               </button>
             </div>
           </div>
