@@ -5,6 +5,7 @@ import TriggerDeadzone from './components/TriggerDeadzone';
 import Mapping from './components/Mapping';
 import ButtonMapping from './components/ButtonMapping';
 import ReflexRange from './components/ReflexRange';
+import GeneralSettings from './components/GeneralSettings';
 
 export default function App() {
   // Initialize app session - run once on app load
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/sticks" element={<Mapping />} />
         <Route path="/triggers" element={<TriggerDeadzone />} />
         <Route path="/reflex-range" element={<ReflexRange />} />
+        <Route path="/general-settings" element={<GeneralSettings />} />
       </Routes>
     </BrowserRouter>
   );

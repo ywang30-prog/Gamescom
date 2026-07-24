@@ -128,6 +128,8 @@ export default function Home() {
       navigate('/sticks');
     } else if (menuName === 'Aim Training') {
       navigate('/reflex-range');
+    } else if (menuName === 'General Settings') {
+      navigate('/general-settings');
     } else {
       setSelectedMenu(menuName);
     }
