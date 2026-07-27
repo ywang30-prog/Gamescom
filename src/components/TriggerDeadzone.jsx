@@ -143,9 +143,16 @@ export default function TriggerDeadzone() {
     const presets = {
       'Linear': [
         { x: padding, y: 190 },
-        { x: 93, y: 155 },
-        { x: 186, y: 120 },
-        { x: 279, y: 85 },
+        { x: 93.5, y: 145 },
+        { x: 186.5, y: 100 },
+        { x: 279.5, y: 55 },
+        { x: 372 - padding, y: padding }
+      ],
+      'Delayed': [
+        { x: padding, y: 190 },
+        { x: 93, y: 180 },
+        { x: 186, y: 160 },
+        { x: 279, y: 120 },
         { x: 372 - padding, y: padding }
       ],
       'Aggressive': [
@@ -155,7 +162,7 @@ export default function TriggerDeadzone() {
         { x: 279, y: 28 },
         { x: 372 - padding, y: padding }
       ],
-      'Exponential': [
+      'Smooth': [
         { x: padding, y: 190 },
         { x: 93, y: 165 },
         { x: 186, y: 120 },
@@ -780,7 +787,7 @@ export default function TriggerDeadzone() {
       </nav>
 
       {/* Main Content */}
-      <div className="flex-1 flex px-8 pb-8 gap-4 pt-4" style={{ overflow: 'visible' }}>
+      <div className="flex-1 flex px-8 pb-8 gap-4 pt-4" style={{ overflow: 'hidden' }}>
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Preset Selector */}
@@ -1024,9 +1031,10 @@ export default function TriggerDeadzone() {
                             {activeTriggerPreset}
                           </p>
                           <p className="font-logitech text-[12px] text-[#a7a7a8] leading-[1.3]">
-                            {activeTriggerPreset === 'Linear' && 'Consistent trigger response'}
-                            {activeTriggerPreset === 'Aggressive' && 'Fast trigger activation'}
-                            {activeTriggerPreset === 'Exponential' && 'Gradual then fast activation'}
+                            {activeTriggerPreset === 'Linear' && 'Predictable, no acceleration'}
+                            {activeTriggerPreset === 'Delayed' && 'Sniping and precise shots'}
+                            {activeTriggerPreset === 'Aggressive' && 'Quick reactions, fast flick'}
+                            {activeTriggerPreset === 'Smooth' && 'S curve, most balanced'}
                           </p>
                         </div>
                       </div>
@@ -1043,9 +1051,10 @@ export default function TriggerDeadzone() {
                     {isPresetDropdownOpen && (
                       <div className="absolute top-[calc(100%+4px)] left-0 right-0 bg-[#2e2e2e] rounded-lg shadow-[4px_4px_10px_0px_rgba(0,0,0,0.4)] z-50 overflow-hidden p-2 flex flex-col gap-1">
                         {[
-                          { name: 'Linear', desc: 'Consistent trigger response' },
-                          { name: 'Aggressive', desc: 'Fast trigger activation' },
-                          { name: 'Exponential', desc: 'Gradual then fast activation' }
+                          { name: 'Linear', desc: 'Predictable, no acceleration' },
+                          { name: 'Delayed', desc: 'Sniping and precise shots' },
+                          { name: 'Aggressive', desc: 'Quick reactions, fast flick' },
+                          { name: 'Smooth', desc: 'S curve, most balanced' }
                         ].map((option) => {
                           const isSelected = option.name === activeTriggerPreset;
                           return (
@@ -1108,9 +1117,9 @@ export default function TriggerDeadzone() {
                       }
                     `}
                   </style>
-                  <div className={`border border-[#4d4d4d] rounded overflow-hidden relative h-[194px] ${switchToMouseClick ? 'pointer-events-none' : ''}`}>
+                  <div className={`border border-[#4d4d4d] rounded overflow-hidden relative h-[200px] ${switchToMouseClick ? 'pointer-events-none' : ''}`}>
                     {/* Grid - 18x10 grid */}
-                    <div className="grid grid-cols-[repeat(18,1fr)] grid-rows-[repeat(10,1fr)] h-[200px] w-full">
+                    <div className="grid grid-cols-[repeat(18,1fr)] grid-rows-[repeat(10,1fr)] h-full w-full">
                       {[...Array(180)].map((_, i) => (
                         <div key={i} className="border-[0.5px] border-[#4d4d4d]" />
                       ))}

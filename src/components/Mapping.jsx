@@ -218,16 +218,16 @@ export default function Mapping() {
       'Linear': {
         baseline: [
           { x: padding, y: 190 },
-          { x: 93, y: 155 },
-          { x: 186, y: 120 },
-          { x: 279, y: 85 },
+          { x: 93.5, y: 145 },
+          { x: 186.5, y: 100 },
+          { x: 279.5, y: 55 },
           { x: 372 - padding, y: padding }
         ],
         maximum: [
           { x: padding, y: 190 },
-          { x: 93, y: 130 },
-          { x: 186, y: 70 },
-          { x: 279, y: 20 },
+          { x: 93.5, y: 145 },
+          { x: 186.5, y: 100 },
+          { x: 279.5, y: 55 },
           { x: 372 - padding, y: padding }
         ]
       },
@@ -1406,9 +1406,9 @@ export default function Mapping() {
                 }
               `}
             </style>
-                  <div className="border border-[#4d4d4d] rounded overflow-hidden relative h-[194px]">
+                  <div className="border border-[#4d4d4d] rounded overflow-hidden relative h-[200px]">
                     {/* Grid - 18x10 grid */}
-                    <div className="grid grid-cols-[repeat(18,1fr)] grid-rows-[repeat(10,1fr)] h-[200px] w-full">
+                    <div className="grid grid-cols-[repeat(18,1fr)] grid-rows-[repeat(10,1fr)] h-full w-full">
                       {[...Array(180)].map((_, i) => (
                         <div key={i} className="border-[0.5px] border-[#4d4d4d]" />
                       ))}
