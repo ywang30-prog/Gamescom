@@ -71,7 +71,7 @@ export default function Home() {
       'Profile Button': { left: 664, top: 273 },
     };
 
-    const saved = localStorage.getItem('hotspotPositions');
+    const saved = localStorage.getItem('homeHotspotPositions');
     if (saved) {
       const parsed = JSON.parse(saved);
       // Check if it's the new format with front/back views
@@ -90,7 +90,7 @@ export default function Home() {
   const handleToggleEditMode = () => {
     if (isEditMode) {
       // Exiting edit mode - save positions in the front/back structure for compatibility
-      const saved = localStorage.getItem('hotspotPositions');
+      const saved = localStorage.getItem('homeHotspotPositions');
       let structure = { front: {}, back: {} };
 
       if (saved) {
@@ -103,7 +103,7 @@ export default function Home() {
       // Update the front view with current positions
       structure.front = hotspotPositions;
 
-      localStorage.setItem('hotspotPositions', JSON.stringify(structure));
+      localStorage.setItem('homeHotspotPositions', JSON.stringify(structure));
       console.log('✅ Hotspot positions saved!');
     }
     setIsEditMode(!isEditMode);
@@ -139,35 +139,33 @@ export default function Home() {
     console.log(`Hotspot clicked: ${hotspotName}`);
     setSelectedHotspot(hotspotName);
 
-    // Get hotspot position from its style
-    const hotspotStyle = event.currentTarget.style;
-    const hotspotLeft = parseInt(hotspotStyle.left);
-    const hotspotTop = parseInt(hotspotStyle.top);
+    // Get hotspot position from state
+    const hotspotPos = hotspotPositions[hotspotName];
+    const hotspotLeft = hotspotPos.left;
+    const hotspotTop = hotspotPos.top;
 
     const cardWidth = 340;
     const cardHeight = 400; // approximate height
     const padding = 20;
     const containerWidth = 1188; // controller image width (56% bigger than original)
     const containerHeight = 771; // controller image height (56% bigger than original)
-    const centerX = containerWidth / 2; // 381px
+    const profileButtonX = 664; // Profile Button X position - reference point for card placement
 
     let left, top;
 
-    // Determine which side of the controller the hotspot is on
-    if (hotspotLeft < centerX) {
-      // Hotspot is on the LEFT side - position card to the LEFT
-      left = hotspotLeft - cardWidth - padding;
-      // If card would go off left edge, position it inside with padding
-      if (left < 0) {
-        left = padding;
-      }
+    console.log(`Hotspot: ${hotspotName}, X: ${hotspotLeft}, Profile Button X: ${profileButtonX}`);
+
+    // Determine which side of the Profile Button the hotspot is on
+    // Profile Button and anything to its right -> card on RIGHT
+    // Anything to its left -> card on LEFT
+    if (hotspotLeft >= profileButtonX) {
+      // Hotspot is at Profile Button or to its RIGHT - position card on the RIGHT side
+      left = containerWidth - cardWidth - padding;
+      console.log('Positioning card on RIGHT side');
     } else {
-      // Hotspot is on the RIGHT side - position card to the RIGHT
-      left = hotspotLeft + 24 + padding; // hotspot width + padding
-      // If card would go off right edge, position it inside with padding
-      if (left + cardWidth > containerWidth) {
-        left = containerWidth - cardWidth - padding;
-      }
+      // Hotspot is to the LEFT of Profile Button - position card on the LEFT side
+      left = padding;
+      console.log('Positioning card on LEFT side');
     }
 
     // Vertical positioning - center on hotspot
@@ -463,7 +461,7 @@ export default function Home() {
           <DeviceStatusWidget />
 
           {/* Device image with hotspots */}
-          <div className="flex flex-col items-center justify-center overflow-hidden" style={{ height: 'calc(100vh - 48px - 64px - 32px - 16px)' }}>
+          <div className="flex flex-col items-center justify-center overflow-visible" style={{ height: 'calc(100vh - 48px - 64px - 32px - 16px)' }}>
             <div className="relative controller-container-home">
               <img
                 alt="Ghost Controller"

@@ -131,6 +131,30 @@ const hotspotData = {
     image: '/figmaAssets/hotspot-image.png',
     tips: 4,
   },
+  'Left Trigger': {
+    title: 'Left Trigger',
+    description: "The Ghost Pro controller's trigger settings allow for customizable gaming experience. Adjust the trigger sensitivity and deadzone to suit your playstyle.",
+    image: '/figmaAssets/hotspot-image.png',
+    tips: 5,
+  },
+  'Menu Button': {
+    title: 'Menu Button',
+    description: 'Access in-game menus and pause functionality. Essential for managing settings during gameplay.',
+    image: '/figmaAssets/hotspot-image.png',
+    tips: 2,
+  },
+  'View Button': {
+    title: 'View Button',
+    description: 'Quick access to scoreboard, map, or other game information displays.',
+    image: '/figmaAssets/hotspot-image.png',
+    tips: 2,
+  },
+  'Profile Button': {
+    title: 'Profile Button',
+    description: 'Switch between controller profiles on-the-fly. Quickly adapt to different games or playstyles with pre-configured settings.',
+    image: '/figmaAssets/hotspot-image.png',
+    tips: 3,
+  },
 };
 
 export default function HotspotDetailCard({ hotspotName, position, onClose }) {
