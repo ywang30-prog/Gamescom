@@ -508,9 +508,9 @@ export default function ButtonMapping() {
     // Default leader line paths - store as arrays of {x, y} points
     const defaultsFront = {
       leftStick: [
-        { x: 66.5, y: 149.9 },
-        { x: 153.4, y: 149.9 },
-        { x: 341.6, y: -23.7 }
+        { x: 317.7, y: 149.4 },
+        { x: 152.3, y: 320.2 },
+        { x: 64, y: 320.2 }
       ],
       leftBumper: [
         { x: 261.5, y: 108.1 },
@@ -534,7 +534,7 @@ export default function ButtonMapping() {
       ],
       dPadRight: [
         { x: 301.3, y: 189.3 },
-        { x: 153.9, y: 321.9 },
+        { x: 150.1, y: 321.9 },
         { x: 65.5, y: 321.9 }
       ],
       rightBumper: [
@@ -569,9 +569,9 @@ export default function ButtonMapping() {
         { x: 382.9, y: 160.3 }
       ],
       buttonShare: [
-        { x: 316.8, y: 252.8 },
-        { x: 150.9, y: 425.1 },
-        { x: 66.9, y: 425.1 }
+        { x: 65.6, y: 369.6 },
+        { x: 151.4, y: 369.6 },
+        { x: 343.6, y: 195.2 }
       ],
       viewButton: [
         { x: -25, y: 23.2 },
@@ -1593,6 +1593,19 @@ export default function ButtonMapping() {
                   >
                     Copy Hotspot Positions
                   </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Reset all leader line, tooltip, and hotspot positions to defaults? This will clear your localStorage cache.')) {
+                        localStorage.removeItem('buttonMappingLeaderLinePositions');
+                        localStorage.removeItem('buttonMappingTooltipPositions');
+                        localStorage.removeItem('buttonMappingHotspotPositions');
+                        window.location.reload();
+                      }
+                    }}
+                    className="px-4 py-2 rounded-lg font-logitech font-bold text-sm bg-red-600 text-white hover:bg-red-700 transition-colors"
+                  >
+                    Reset All Positions
+                  </button>
                 </>
               )}
             </div>
@@ -1602,7 +1615,7 @@ export default function ButtonMapping() {
           <DeviceStatusWidget />
 
           {/* Controller visualization centered below */}
-          <div className="flex flex-col items-center justify-center overflow-hidden" style={{ height: 'calc(100vh - 48px - 64px - 32px - 16px - 48px)', marginTop: '16px' }}>
+          <div className="flex flex-col items-center justify-center overflow-visible" style={{ height: 'calc(100vh - 48px - 64px - 32px - 16px - 48px)', marginTop: '16px' }}>
           <div className="relative controller-container" ref={controllerRef}>
             {/* Controller with leader lines and dots */}
             <img
@@ -1943,7 +1956,7 @@ export default function ButtonMapping() {
                 points={currentLeaderLinePositions.leftStick}
                 lineId="leftStick"
                 hoveredTooltipId={hoveredTooltipId}
-                transform={viewMode !== 'back' ? 'scale(0.8085) translateY(250px) translateX(-60px)' : 'scale(0.8085) translateY(42px) translateX(-60px)'}
+                transform={viewMode !== 'back' ? 'scale(0.8085) translateY(100px) translateX(-60px)' : 'scale(0.8085) translateY(42px) translateX(-60px)'}
               />
 
               {/* LB - Left Bumper */}
@@ -2093,7 +2106,7 @@ export default function ButtonMapping() {
                 {
                   id: 'leftStick',
                   points: currentLeaderLinePositions.leftStick,
-                  transform: viewMode !== 'back' ? 'scale(0.8085) translateY(250px) translateX(-60px)' : 'scale(0.8085) translateY(42px) translateX(-60px)'
+                  transform: viewMode !== 'back' ? 'scale(0.8085) translateY(100px) translateX(-60px)' : 'scale(0.8085) translateY(42px) translateX(-60px)'
                 },
                 ...(viewMode !== 'back' ? [{
                   id: 'leftBumper',

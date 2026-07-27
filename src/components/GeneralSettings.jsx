@@ -71,7 +71,7 @@ export default function GeneralSettings() {
   });
 
   const handleStickCalibration = () => {
-    navigate('/sticks');
+    navigate('/stick-calibration');
   };
 
   const handlePresetClick = () => {

@@ -6,6 +6,7 @@ import Mapping from './components/Mapping';
 import ButtonMapping from './components/ButtonMapping';
 import ReflexRange from './components/ReflexRange';
 import GeneralSettings from './components/GeneralSettings';
+import StickCalibration from './components/StickCalibration';
 
 export default function App() {
   // Initialize app session - run once on app load
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/mapping" element={<ButtonMapping />} />
         <Route path="/sticks" element={<Mapping />} />
+        <Route path="/stick-calibration" element={<StickCalibration />} />
         <Route path="/triggers" element={<TriggerDeadzone />} />
         <Route path="/reflex-range" element={<ReflexRange />} />
         <Route path="/general-settings" element={<GeneralSettings />} />
