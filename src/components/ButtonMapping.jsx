@@ -1930,6 +1930,13 @@ export default function ButtonMapping() {
             )}
 
             {/* All Leader Lines in one SVG layer */}
+            {/*
+              KNOWN ISSUE: Leader line positions are optimized for larger screens.
+              On smaller screens (14-inch displays), the leader lines may not align
+              correctly with tooltips and hotspots due to responsive scaling.
+              TODO: Implement responsive leader line positioning that scales with
+              the controller container at different breakpoints (1672px, 1472px, 1372px)
+            */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 567.5 351.5" fill="none" style={{ pointerEvents: 'none', zIndex: 1, overflow: 'visible', transform: `translateY(${controllerYOffset}px)` }}>
               {/* L1 - Top Left (Left Stick) */}
               <LeaderLinePath
