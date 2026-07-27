@@ -164,14 +164,14 @@ export default function ButtonMapping() {
       'Profile Button': { left: 664, top: 273 },
     };
     const defaultsBack = {
-      'Left Stick': { left: 382, top: 439 },      // RP - Right Paddle 2 (bottom left)
-      'Left Trigger': { left: 361, top: 125 },    // Not visible in back view
-      'D Pad Up': { left: 470, top: 126 },        // RT - Right Trigger (top left)
-      'D Pad Down': { left: 368, top: 174 },      // SR - Shoulder Right (left middle)
-      'Right Trigger': { left: 812, top: 125 },   // Not visible in back view
-      'Button Y': { left: 690, top: 126 },        // LT - Left Trigger (top right)
-      'Button A': { left: 798, top: 174 },        // SL - Shoulder Left (right middle)
-      'Right Stick': { left: 782, top: 439 },     // LP - Left Paddle 2 (bottom right)
+      'Left Stick': { left: 459, top: 371 },
+      'Left Trigger': { left: 361, top: 125 },
+      'D Pad Up': { left: 351, top: 184 },
+      'D Pad Down': { left: 278, top: 257 },
+      'Right Trigger': { left: 812, top: 125 },
+      'Button Y': { left: 818, top: 180 },
+      'Button A': { left: 818, top: 340 },
+      'Right Stick': { left: 706, top: 371 },
     };
     const defaults = {
       front: defaultsFront,
@@ -479,14 +479,14 @@ export default function ButtonMapping() {
       profileButton: { left: 1256, top: 569 },
     };
     const defaultsBack = {
-      leftStick: { left: 27, top: 661 },
-      leftTrigger: { left: 27, top: 36 },
+      leftStick: { left: 27, top: 468 },
+      leftTrigger: { left: -79, top: 167 },
       dPadUp: { left: 27, top: 212 },
-      dPadDown: { left: 27, top: 392 },
-      rightTrigger: { left: 1144, top: 36 },
+      dPadDown: { left: 27, top: 49 },
+      rightTrigger: { left: 1259, top: 167 },
       buttonY: { left: 1146, top: 211 },
-      buttonA: { left: 1147, top: 392 },
-      rightStick: { left: 1147, top: 661 },
+      buttonA: { left: 1152, top: 49 },
+      rightStick: { left: 1152, top: 468 },
     };
     const defaults = {
       front: defaultsFront,
@@ -508,127 +508,127 @@ export default function ButtonMapping() {
     // Default leader line paths - store as arrays of {x, y} points
     const defaultsFront = {
       leftStick: [
-        { x: 80.3, y: 143.5 },
-        { x: 152.4, y: 143.5 },
-        { x: 330.6, y: -27.8 }
+        { x: 66.5, y: 149.9 },
+        { x: 153.4, y: 149.9 },
+        { x: 341.6, y: -23.7 }
       ],
       leftBumper: [
-        { x: 270.6, y: 122.2 },
-        { x: 151.7, y: 80.8 },
-        { x: 79.5, y: 80.8 }
+        { x: 261.5, y: 108.1 },
+        { x: 151.2, y: 65.8 },
+        { x: 65.2, y: 65.8 }
       ],
       dPadUp: [
-        { x: 262.7, y: 136.8 },
-        { x: 153.3, y: 157.3 },
-        { x: 81.1, y: 157.3 }
+        { x: 252.7, y: 129.5 },
+        { x: 151.4, y: 152.7 },
+        { x: 65.3, y: 152.7 }
       ],
       dPadLeft: [
-        { x: 220.7, y: 193.3 },
-        { x: 153.8, y: 223.9 },
-        { x: 79.9, y: 223.9 }
+        { x: 209.2, y: 186 },
+        { x: 152.8, y: 216.1 },
+        { x: 66.5, y: 216.1 }
       ],
       dPadDown: [
-        { x: 263.7, y: 220.2 },
-        { x: 153.7, y: 264.1 },
-        { x: 79.2, y: 264.1 }
+        { x: 251.8, y: 219.3 },
+        { x: 151.8, y: 260.5 },
+        { x: 66.3, y: 260.5 }
       ],
       dPadRight: [
-        { x: 313.3, y: 202.9 },
-        { x: 152.9, y: 332.4 },
-        { x: 79.8, y: 332.4 }
+        { x: 301.3, y: 189.3 },
+        { x: 153.9, y: 321.9 },
+        { x: 65.5, y: 321.9 }
       ],
       rightBumper: [
-        { x: 611, y: 58 },
-        { x: 543.1, y: 58 },
+        { x: 626.2, y: 52.5 },
+        { x: 544.1, y: 52.5 },
         { x: 440, y: 99.5 }
       ],
       buttonY: [
-        { x: 612.4, y: 51.6 },
-        { x: 545.9, y: 51.6 },
-        { x: 442.7, y: 26 }
+        { x: 626.2, y: 72.1 },
+        { x: 546.9, y: 72.1 },
+        { x: 453.2, y: 47.9 }
       ],
       buttonB: [
-        { x: -152.3, y: -7.8 },
-        { x: -91.6, y: 23.5 },
-        { x: -24.8, y: 23.5 }
+        { x: 16.3, y: 33.7 },
+        { x: 71.3, y: 66.7 },
+        { x: 149.1, y: 66.7 }
       ],
       buttonX: [
-        { x: 358, y: 54 },
-        { x: 390.7, y: 88.1 },
-        { x: 552.2, y: 217.6 },
-        { x: 613.8, y: 217.6 }
+        { x: 379.5, y: 69.1 },
+        { x: 402.2, y: 102.2 },
+        { x: 554.2, y: 235.9 },
+        { x: 628.1, y: 235.9 }
       ],
       buttonA: [
-        { x: 612.4, y: 161.7 },
-        { x: 548.4, y: 161.7 },
-        { x: 441, y: 127.4 }
+        { x: 627.6, y: 184.1 },
+        { x: 552.2, y: 184.1 },
+        { x: 455.3, y: 142.9 }
       ],
       rightStick: [
-        { x: 612.4, y: 317.7 },
-        { x: 553.6, y: 317.7 },
-        { x: 371.9, y: 145.3 }
+        { x: 627.2, y: 337.8 },
+        { x: 559.8, y: 337.8 },
+        { x: 382.9, y: 160.3 }
       ],
       buttonShare: [
-        { x: 351.1, y: 201.7 },
-        { x: 152.8, y: 378.6 },
-        { x: 79.8, y: 378.6 }
+        { x: 316.8, y: 252.8 },
+        { x: 150.9, y: 425.1 },
+        { x: 66.9, y: 425.1 }
       ],
       viewButton: [
-        { x: -41.2, y: 2.2 },
-        { x: 33.8, y: 2.2 },
-        { x: 201.6, y: 15.1 }
+        { x: -25, y: 23.2 },
+        { x: 60.1, y: 23.2 },
+        { x: 218.3, y: 32.9 }
       ],
       menuButton: [
-        { x: 635.8, y: 176.5 },
-        { x: 568.9, y: 176.5 },
-        { x: 419.5, y: 190.7 }
+        { x: 645.4, y: 153.7 },
+        { x: 562.7, y: 153.7 },
+        { x: 407.6, y: 164.7 }
       ],
       profileButton: [
-        { x: 733.2, y: 371.1 },
-        { x: 672.6, y: 371.1 },
-        { x: 466.1, y: 196.5 }
+        { x: 718.9, y: 362.9 },
+        { x: 643.9, y: 362.9 },
+        { x: 453.7, y: 189.3 }
       ]
     };
     const defaultsBack = {
       leftStick: [
-        { x: 80.3, y: 143.5 },
-        { x: 152.4, y: 143.5 },
-        { x: 330.6, y: -27.8 }
+        { x: 66.5, y: 149.9 },
+        { x: 153.4, y: 149.9 },
+        { x: 341.6, y: -23.7 }
       ],
       leftTrigger: [
-        { x: 270.6, y: 122.2 },
-        { x: 151.7, y: 80.8 },
-        { x: 79.5, y: 80.8 }
+        { x: 263, y: 107.8 },
+        { x: 151, y: 65.5 },
+        { x: 65, y: 65.5 }
       ],
       dPadUp: [
-        { x: 262.7, y: 136.8 },
-        { x: 153.3, y: 157.3 },
-        { x: 81.1, y: 157.3 }
+        { x: 252.7, y: 129.5 },
+        { x: 151.4, y: 152.7 },
+        { x: 65.3, y: 152.7 }
       ],
       dPadDown: [
-        { x: 263.7, y: 220.2 },
-        { x: 153.7, y: 264.1 },
-        { x: 79.2, y: 264.1 }
+        { x: 251.8, y: 219.3 },
+        { x: 151.8, y: 260.5 },
+        { x: 66.3, y: 260.5 }
       ],
       rightTrigger: [
-        { x: 611, y: 58 },
-        { x: 543.1, y: 58 },
-        { x: 440, y: 99.5 }
+        { x: 625.7, y: 51.2 },
+        { x: 543.6, y: 51.2 },
+        { x: 439.5, y: 98.2 }
       ],
       buttonY: [
-        { x: 612.4, y: 51.6 },
-        { x: 545.9, y: 51.6 },
-        { x: 442.7, y: 26 }
+        { x: 626.2, y: 72.1 },
+        { x: 546.9, y: 72.1 },
+        { x: 453.2, y: 47.9 }
       ],
       buttonA: [
-        { x: 612.4, y: 161.7 },
-        { x: 548.4, y: 161.7 },
-        { x: 441, y: 127.4 }
+        { x: 627.6, y: 184.1 },
+        { x: 552.2, y: 184.1 },
+        { x: 455.3, y: 142.9 }
       ],
       rightStick: [
-        { x: 612.4, y: 317.7 },
-        { x: 553.6, y: 317.7 },
-        { x: 371.9, y: 145.3 }
+        { x: 627.2, y: 337.8 },
+        { x: 559.8, y: 337.8 },
+        { x: 382.9, y: 160.3 }
       ],
     };
     const defaults = {
