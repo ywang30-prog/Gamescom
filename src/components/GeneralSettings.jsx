@@ -5,6 +5,7 @@ import ProfileSelector from './ProfileSelector';
 import PresetModal from './PresetModal';
 import ImportProfileModal from './ImportProfileModal';
 import SaveNotification from './SaveNotification';
+import StickCalibrationModal from './StickCalibrationModal';
 
 // Icon Components
 const InfoIcon = () => (
@@ -48,6 +49,7 @@ export default function GeneralSettings() {
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
+  const [stickCalibrationPreference, setStickCalibrationPreference] = useState('Both sticks');
 
   // Profile management
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
@@ -69,9 +71,10 @@ export default function GeneralSettings() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(() => {
     return localStorage.getItem('hasUnsavedChanges') === 'true';
   });
+  const [isCalibrationModalOpen, setIsCalibrationModalOpen] = useState(false);
 
   const handleStickCalibration = () => {
-    navigate('/stick-calibration');
+    setIsCalibrationModalOpen(true);
   };
 
   const handlePresetClick = () => {
@@ -198,10 +201,18 @@ export default function GeneralSettings() {
 
               {/* Stick calibration */}
               <button
-                onClick={handleStickCalibration}
-                className="h-10 px-2 rounded-lg flex items-center hover:bg-[#242424] transition-colors"
+                onClick={() => setActiveTab('calibration')}
+                className={`h-10 px-2 rounded-lg flex items-center transition-colors ${
+                  activeTab === 'calibration'
+                    ? 'bg-[#042f44]'
+                    : 'hover:bg-[#242424]'
+                }`}
               >
-                <span className="text-sm text-[#a7a7a8]">
+                <span className={`text-sm ${
+                  activeTab === 'calibration'
+                    ? 'text-[#00b8fc]'
+                    : 'text-[#a7a7a8]'
+                }`}>
                   Stick calibration
                 </span>
               </button>
@@ -231,12 +242,43 @@ export default function GeneralSettings() {
         <div className="flex-1 flex flex-col">
           {/* Page Title */}
           <h1 className="text-2xl font-bold text-[#fbfbfb] mb-11">
-            General
+            {activeTab === 'general' ? 'General' : activeTab === 'calibration' ? 'Stick Calibration' : 'Power Saving'}
           </h1>
 
-          {/* Settings Content - EXACT spacing: 32px gap */}
-          <div className="flex flex-col gap-8 items-start w-full">
-            {/* Firmware Version - 1507:7717 */}
+          {/* Stick Calibration Content */}
+          {activeTab === 'calibration' && (
+            <div className="flex flex-col gap-8 items-start w-full">
+              {/* Dropdown */}
+              <div className="flex flex-col gap-2 items-start rounded-lg w-[245px]">
+                <label className="text-sm font-bold text-[#e6e6e6] leading-[1.3] tracking-[-0.42px]">
+                  Select stick
+                </label>
+                <div className="bg-[#242424] flex flex-col items-start rounded-lg shrink-0 w-full">
+                  <button className="flex h-[48px] items-center justify-between px-2 rounded-lg shrink-0 w-full hover:opacity-90 transition-opacity">
+                    <span className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px]">
+                      {stickCalibrationPreference}
+                    </span>
+                    <div className="shrink-0 w-6 h-6">
+                      <ChevronDownIcon />
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Start Button */}
+              <button
+                onClick={handleStickCalibration}
+                className="h-8 px-4 text-xs font-bold bg-[#00b8fc] text-[#1a1a1a] rounded-2xl hover:bg-[#00a8ec] transition-colors uppercase tracking-[0.36px] leading-[1.16] flex items-center justify-center"
+              >
+                START
+              </button>
+            </div>
+          )}
+
+          {/* General Settings Content */}
+          {activeTab === 'general' && (
+            <div className="flex flex-col gap-8 items-start w-full">
+              {/* Firmware Version - 1507:7717 */}
             <div className="flex flex-wrap gap-y-1 items-start justify-between w-[245px]">
               <div className="flex flex-col gap-2 shrink-0">
                 <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
@@ -252,91 +294,112 @@ export default function GeneralSettings() {
               </button>
             </div>
 
-            {/* Device Name - 1507:7722 - 16px gap between field and button */}
-            <div className="flex flex-col gap-4 items-start w-full">
-              <div className="flex flex-col gap-2 w-[245px]">
+              {/* Device Name - 1507:7722 - 16px gap between field and button */}
+              <div className="flex flex-col gap-4 items-start w-full">
+                <div className="flex flex-col gap-2 w-[245px]">
+                  <div className="flex gap-2 h-6 items-center w-full">
+                    <label className="text-sm font-bold text-[#e6e6e6] leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis whitespace-nowrap shrink-0">
+                      Device name
+                    </label>
+                    <div className="shrink-0 w-6 h-6">
+                      <InfoIcon />
+                    </div>
+                  </div>
+                  <div className="h-10 px-2 bg-transparent border border-[#2e2e2e] border-solid rounded-lg flex items-center w-full">
+                    <input
+                      type="text"
+                      value={deviceName}
+                      onChange={(e) => setDeviceName(e.target.value)}
+                      className="bg-transparent text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] focus:outline-none w-full h-[21px] overflow-hidden text-ellipsis"
+                      placeholder="Ghost Controller"
+                    />
+                  </div>
+                </div>
+                <button
+                  disabled
+                  className="h-8 w-[78px] text-xs font-bold bg-[#242424] text-[#4d4d4d] rounded-2xl cursor-not-allowed uppercase tracking-[0.36px] leading-[1.16] flex items-center justify-center shrink-0"
+                >
+                  SAVE
+                </button>
+              </div>
+
+              {/* Language Dropdown - 1507:7725 */}
+              <div className="flex flex-col gap-2 items-start rounded-lg w-[245px]">
                 <div className="flex gap-2 h-6 items-center w-full">
                   <label className="text-sm font-bold text-[#e6e6e6] leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis whitespace-nowrap shrink-0">
-                    Device name
+                    Language
                   </label>
                   <div className="shrink-0 w-6 h-6">
                     <InfoIcon />
                   </div>
                 </div>
-                <div className="h-10 px-2 bg-transparent border border-[#2e2e2e] border-solid rounded-lg flex items-center w-full">
-                  <input
-                    type="text"
-                    value={deviceName}
-                    onChange={(e) => setDeviceName(e.target.value)}
-                    className="bg-transparent text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] focus:outline-none w-full h-[21px] overflow-hidden text-ellipsis"
-                    placeholder="Ghost Controller"
-                  />
+                <div className="bg-[#242424] flex flex-col items-start rounded-lg shrink-0 w-full">
+                  <button
+                    onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+                    className="flex h-[48px] items-center justify-between px-2 rounded-lg shrink-0 w-full hover:opacity-90 transition-opacity"
+                  >
+                    <span className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis whitespace-nowrap">
+                      {selectedLanguage}
+                    </span>
+                    <div className="shrink-0 w-6 h-6">
+                      <ChevronDownIcon />
+                    </div>
+                  </button>
                 </div>
               </div>
-              <button
-                disabled
-                className="h-8 w-[78px] text-xs font-bold bg-[#242424] text-[#4d4d4d] rounded-2xl cursor-not-allowed uppercase tracking-[0.36px] leading-[1.16] flex items-center justify-center shrink-0"
-              >
-                SAVE
-              </button>
-            </div>
 
-            {/* Language Dropdown - 1507:7725 */}
-            <div className="flex flex-col gap-2 items-start rounded-lg w-[245px]">
-              <div className="flex gap-2 h-6 items-center w-full">
-                <label className="text-sm font-bold text-[#e6e6e6] leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis whitespace-nowrap shrink-0">
-                  Language
-                </label>
-                <div className="shrink-0 w-6 h-6">
-                  <InfoIcon />
+              {/* Battery Level - 1507:7726 */}
+              <div className="flex flex-col gap-2 items-start w-full">
+                <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                  Battery level
+                </p>
+                <div className="flex items-center shrink-0">
+                  <p className="text-sm font-bold text-[#248456] leading-[1.3] tracking-[-0.42px] w-[29px] shrink-0">90%</p>
+                  <div className="w-6 h-6 shrink-0">
+                    <BatteryIcon />
+                  </div>
+                </div>
+                <p className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                  Approximately 72 hours
+                </p>
+              </div>
+
+              {/* Usage - 1507:7732 */}
+              <div className="flex flex-col gap-2 items-start w-full">
+                <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                  Usage
+                </p>
+                <p className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                  187 Hours Played
+                </p>
+                <div className="flex gap-0 items-center shrink-0">
+                  <div className="shrink-0 w-4 h-4">
+                    <HeartIcon />
+                  </div>
+                  <button className="flex gap-1 h-8 items-center p-1 rounded-full hover:bg-[#1a1a1a] transition-colors shrink-0">
+                    <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                      Get an extra life
+                    </span>
+                    <div className="shrink-0 w-6 h-6">
+                      <ChevronRightIcon />
+                    </div>
+                  </button>
                 </div>
               </div>
-              <div className="bg-[#242424] flex flex-col items-start rounded-lg shrink-0 w-full">
-                <button
-                  onClick={() => setIsLanguageOpen(!isLanguageOpen)}
-                  className="flex h-[48px] items-center justify-between px-2 rounded-lg shrink-0 w-full hover:opacity-90 transition-opacity"
-                >
-                  <span className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis whitespace-nowrap">
-                    {selectedLanguage}
+
+              {/* Links - 1507:7738 - 4px gap between buttons */}
+              <div className="flex flex-col gap-1 items-start w-full">
+                <button className="flex gap-1 h-8 items-center pl-3 pr-1 py-1 rounded-full hover:bg-[#1a1a1a] transition-colors shrink-0">
+                  <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
+                    Relaunch device onboarding
                   </span>
                   <div className="shrink-0 w-6 h-6">
-                    <ChevronDownIcon />
+                    <ChevronRightIcon />
                   </div>
                 </button>
-              </div>
-            </div>
-
-            {/* Battery Level - 1507:7726 */}
-            <div className="flex flex-col gap-2 items-start w-full">
-              <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
-                Battery level
-              </p>
-              <div className="flex items-center shrink-0">
-                <p className="text-sm font-bold text-[#248456] leading-[1.3] tracking-[-0.42px] w-[29px] shrink-0">90%</p>
-                <div className="w-6 h-6 shrink-0">
-                  <BatteryIcon />
-                </div>
-              </div>
-              <p className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
-                Approximately 72 hours
-              </p>
-            </div>
-
-            {/* Usage - 1507:7732 */}
-            <div className="flex flex-col gap-2 items-start w-full">
-              <p className="text-sm font-bold text-[#fbfbfb] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
-                Usage
-              </p>
-              <p className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
-                187 Hours Played
-              </p>
-              <div className="flex gap-0 items-center shrink-0">
-                <div className="shrink-0 w-4 h-4">
-                  <HeartIcon />
-                </div>
-                <button className="flex gap-1 h-8 items-center p-1 rounded-full hover:bg-[#1a1a1a] transition-colors shrink-0">
+                <button className="flex gap-1 h-8 items-center pl-3 pr-1 py-1 rounded-full hover:bg-[#1a1a1a] transition-colors shrink-0">
                   <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
-                    Get an extra life
+                    Factory reset
                   </span>
                   <div className="shrink-0 w-6 h-6">
                     <ChevronRightIcon />
@@ -344,27 +407,14 @@ export default function GeneralSettings() {
                 </button>
               </div>
             </div>
+          )}
 
-            {/* Links - 1507:7738 - 4px gap between buttons */}
-            <div className="flex flex-col gap-1 items-start w-full">
-              <button className="flex gap-1 h-8 items-center pl-3 pr-1 py-1 rounded-full hover:bg-[#1a1a1a] transition-colors shrink-0">
-                <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
-                  Relaunch device onboarding
-                </span>
-                <div className="shrink-0 w-6 h-6">
-                  <ChevronRightIcon />
-                </div>
-              </button>
-              <button className="flex gap-1 h-8 items-center pl-3 pr-1 py-1 rounded-full hover:bg-[#1a1a1a] transition-colors shrink-0">
-                <span className="text-sm font-bold text-[#00b8fc] leading-[1.3] tracking-[-0.42px] whitespace-nowrap">
-                  Factory reset
-                </span>
-                <div className="shrink-0 w-6 h-6">
-                  <ChevronRightIcon />
-                </div>
-              </button>
+          {/* Power Saving Content - Placeholder */}
+          {activeTab === 'power' && (
+            <div className="flex flex-col gap-8 items-start w-full">
+              <p className="text-sm text-[#a7a7a8]">Power saving settings coming soon...</p>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -401,6 +451,11 @@ export default function GeneralSettings() {
         profileName={savedProfileInfo.profileName}
         targetSlot={savedProfileInfo.targetSlot}
         onClose={() => setShowSaveNotification(false)}
+      />
+
+      <StickCalibrationModal
+        isOpen={isCalibrationModalOpen}
+        onClose={() => setIsCalibrationModalOpen(false)}
       />
     </div>
   );
