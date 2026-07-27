@@ -1776,7 +1776,7 @@ export default function Mapping() {
           </div>
 
           {/* Stick Selector Toggle - positioned below controller */}
-          <div className="flex justify-center mt-8">
+          <div className="relative flex justify-center z-20" style={{ bottom: '100px' }}>
             <BinaryToggle
               leftLabel="Left"
               rightLabel="Right"
