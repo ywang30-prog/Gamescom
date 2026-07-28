@@ -151,12 +151,12 @@ export default function ActionsModal({ isOpen, onClose, tooltipLabel, currentVal
       `}</style>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-60 z-50"
+        className="fixed inset-0 bg-black bg-opacity-60 z-[1100]"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[400px] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden bg-[#1a1a1a]"
+      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[1100] w-[400px] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden bg-[#1a1a1a]"
         style={{
           border: '1px solid rgba(255, 255, 255, 0.2)',
           boxShadow: '0 20px 60px rgba(0,0,0,0.6), inset 0 100px 100px -60px rgba(0, 182, 250, 0.06), inset 0 0 0 1px rgba(0, 0, 0, 0.8), inset 0 0 30px 8px rgba(0, 0, 0, 0.6)'
