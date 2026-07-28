@@ -4,6 +4,7 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
   const [progress, setProgress] = useState(0);
   const [angle, setAngle] = useState(0);
   const [stickMagnitude, setStickMagnitude] = useState(0);
+  const [isMovingWrongWay, setIsMovingWrongWay] = useState(false);
 
   const rotationsRef = useRef(0);
   const lastAngleRef = useRef(0);
@@ -36,12 +37,16 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
             angleDiff += 2 * Math.PI;
           }
 
-          // Only increase progress for clockwise motion (positive angleDiff)
+          // Check direction - clockwise (positive) or counter-clockwise (negative)
           if (angleDiff > 0 && angleDiff < 0.5) {
+            // Clockwise motion - increase progress
             rotationsRef.current += angleDiff / (2 * Math.PI);
-            // Update progress immediately - 4 full rotations = 100%
             const newProgress = Math.min(100, (rotationsRef.current / 4) * 100);
             setProgress(newProgress);
+            setIsMovingWrongWay(false);
+          } else if (angleDiff < 0 && angleDiff > -0.5) {
+            // Counter-clockwise motion - show warning
+            setIsMovingWrongWay(true);
           }
 
           lastAngleRef.current = currentAngle;
@@ -66,10 +71,25 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
       setProgress(0);
       setAngle(0);
       setStickMagnitude(0);
+      setIsMovingWrongWay(false);
       rotationsRef.current = 0;
       lastAngleRef.current = 0;
     }
   }, [isOpen]);
+
+  // Get description text based on state
+  const getDescriptionText = () => {
+    if (isComplete) {
+      return 'Calibration completed!';
+    }
+    if (isMovingWrongWay && stickMagnitude > 0.3) {
+      return 'Follow the direction of the animated circle';
+    }
+    if (progress >= 70) {
+      return 'Keep going, we are almost there!';
+    }
+    return 'Move the left stick slowly to follow the animated circle.';
+  };
 
   const handleFinish = () => {
     onClose();
@@ -99,7 +119,7 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
 
         {/* Description */}
         <p className="font-logitech text-[#a7a7a8] text-base tracking-[-0.48px] leading-[1.28] mb-8">
-          {isComplete ? 'Calibration completed!' : 'Move the left stick slowly to follow the animated circle.'}
+          {getDescriptionText()}
         </p>
 
         {/* Visualization Container */}
@@ -153,25 +173,13 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
                 </g>
                 <circle cx="69" cy="65" r="11" stroke="#00B8FC" strokeWidth="0.3"/>
 
-                {/* Animated gradient arc - always spinning */}
-                <g className="arc-animation">
-                  <path
-                    d="M118.036 107.625C125.353 99.2065 130.381 89.0466 132.636 78.1227C134.89 67.1988 134.295 55.8786 130.907 45.2514C127.52 34.6241 121.454 25.0476 113.294 17.4434C105.133 9.8392 95.1534 4.46325 84.3139 1.83289L83.0879 6.88533C93.0602 9.30526 102.242 14.2511 109.749 21.247C117.257 28.2429 122.837 37.0533 125.954 46.8303C129.07 56.6074 129.618 67.022 127.544 77.072C125.47 87.122 120.844 96.469 114.112 104.214L118.036 107.625Z"
-                    fill="url(#paint0_linear)"
-                  >
-                    <animateTransform
-                      attributeName="transform"
-                      attributeType="XML"
-                      type="rotate"
-                      from="0 69 65"
-                      to="360 69 65"
-                      dur="4s"
-                      repeatCount="indefinite"
-                    />
-                  </path>
-                  {/* Blue dot leader with faint glow */}
-                  <g>
-                    <circle cx="115" cy="107" r="6" fill="#00B8FC" opacity="0.3">
+                {/* Animated gradient arc - hide when complete */}
+                {!isComplete && (
+                  <g className="arc-animation">
+                    <path
+                      d="M118.036 107.625C125.353 99.2065 130.381 89.0466 132.636 78.1227C134.89 67.1988 134.295 55.8786 130.907 45.2514C127.52 34.6241 121.454 25.0476 113.294 17.4434C105.133 9.8392 95.1534 4.46325 84.3139 1.83289L83.0879 6.88533C93.0602 9.30526 102.242 14.2511 109.749 21.247C117.257 28.2429 122.837 37.0533 125.954 46.8303C129.07 56.6074 129.618 67.022 127.544 77.072C125.47 87.122 120.844 96.469 114.112 104.214L118.036 107.625Z"
+                      fill="url(#paint0_linear)"
+                    >
                       <animateTransform
                         attributeName="transform"
                         attributeType="XML"
@@ -181,20 +189,34 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
                         dur="4s"
                         repeatCount="indefinite"
                       />
-                    </circle>
-                    <circle cx="115" cy="107" r="3" fill="#00B8FC">
-                      <animateTransform
-                        attributeName="transform"
-                        attributeType="XML"
-                        type="rotate"
-                        from="0 69 65"
-                        to="360 69 65"
-                        dur="4s"
-                        repeatCount="indefinite"
-                      />
-                    </circle>
+                    </path>
+                    {/* Blue dot leader with faint glow */}
+                    <g>
+                      <circle cx="115" cy="107" r="6" fill="#00B8FC" opacity="0.3">
+                        <animateTransform
+                          attributeName="transform"
+                          attributeType="XML"
+                          type="rotate"
+                          from="0 69 65"
+                          to="360 69 65"
+                          dur="4s"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                      <circle cx="115" cy="107" r="3" fill="#00B8FC">
+                        <animateTransform
+                          attributeName="transform"
+                          attributeType="XML"
+                          type="rotate"
+                          from="0 69 65"
+                          to="360 69 65"
+                          dur="4s"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                    </g>
                   </g>
-                </g>
+                )}
 
                 {/* Crosshair lines - thin */}
                 <path d="M69 2L69.0002 54" stroke="#00B8FC" strokeWidth="0.3" strokeLinecap="round"/>
@@ -202,8 +224,26 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
                 <path d="M58 65L5 65" stroke="#00B8FC" strokeWidth="0.3" strokeLinecap="round"/>
                 <path d="M133 65L80 65" stroke="#00B8FC" strokeWidth="0.3" strokeLinecap="round"/>
 
-                {/* Thick blue line with white dot - show when stick is pushed */}
-                {stickMagnitude > 0.3 && (() => {
+                {/* Completion ripple effect - show when complete */}
+                {isComplete && (
+                  <g>
+                    {/* White center dot */}
+                    <circle cx="69" cy="65" r="4" fill="#FBFBFB" />
+
+                    {/* Blue ripple circles - continuously animated outward at half speed */}
+                    <circle cx="69" cy="65" r="11" fill="none" stroke="#00B8FC" strokeWidth="0.3">
+                      <animate attributeName="r" from="11" to="30" dur="4s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" from="0.6" to="0" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="69" cy="65" r="11" fill="none" stroke="#00B8FC" strokeWidth="0.3">
+                      <animate attributeName="r" from="11" to="30" dur="4s" begin="2s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" from="0.6" to="0" dur="4s" begin="2s" repeatCount="indefinite" />
+                    </circle>
+                  </g>
+                )}
+
+                {/* Thick blue line with white dot - show when stick is pushed and not complete */}
+                {!isComplete && stickMagnitude > 0.3 && (() => {
                   // Calculate endpoint - extend to inner edge of circle (radius ~53-54px to touch the stroke)
                   const centerX = 69;
                   const centerY = 65;
@@ -257,7 +297,12 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
         <div className="flex gap-6 justify-end">
           <button
             onClick={handleCancel}
-            className="h-8 px-4 rounded-full border-2 border-[#4d4d4d] font-logitech font-bold text-[#e6e6e6] text-xs tracking-[0.275px] uppercase leading-[1.16] hover:border-[#666] transition-colors"
+            disabled={isComplete}
+            className={`h-8 px-4 rounded-full border-2 font-logitech font-bold text-xs tracking-[0.275px] uppercase leading-[1.16] transition-colors ${
+              isComplete
+                ? 'border-[#2e2e2e] text-[#4d4d4d] cursor-not-allowed'
+                : 'border-[#4d4d4d] text-[#e6e6e6] hover:border-[#666]'
+            }`}
           >
             CANCEL
           </button>

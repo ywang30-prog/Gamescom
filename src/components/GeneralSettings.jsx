@@ -49,7 +49,7 @@ export default function GeneralSettings() {
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
-  const [stickCalibrationPreference, setStickCalibrationPreference] = useState('Both sticks');
+  const [selectedStick, setSelectedStick] = useState('Left');
 
   // Profile management
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
@@ -247,16 +247,29 @@ export default function GeneralSettings() {
 
           {/* Stick Calibration Content */}
           {activeTab === 'calibration' && (
-            <div className="flex flex-col gap-8 items-start w-full">
-              {/* Dropdown */}
-              <div className="flex flex-col gap-2 items-start rounded-lg w-[245px]">
-                <label className="text-sm font-bold text-[#e6e6e6] leading-[1.3] tracking-[-0.42px]">
-                  Select stick
-                </label>
-                <div className="bg-[#242424] flex flex-col items-start rounded-lg shrink-0 w-full">
+            <div className="flex flex-col gap-8 items-start w-[419px]">
+              {/* Before you start section */}
+              <div className="flex flex-col gap-4 items-start">
+                <p className="font-logitech font-bold text-[#fbfbfb] text-sm tracking-[-0.42px] leading-[1.3]">
+                  Before you start
+                </p>
+                <p className="font-logitech text-[#a7a7a8] text-sm tracking-[-0.42px] leading-[1.3]">
+                  Recalibrating your controller will overwrite its current stick settings and may change how it feels in games. For best results, connect your controller directly via USB, close other controller or remap apps, and keep the sticks still until you're prompted to move them. Only continue if you're currently experiencing drift or inaccurate movement and want to update your calibration data.
+                </p>
+              </div>
+
+              {/* Divider */}
+              <div className="h-px bg-[#2e2e2e] rounded-2xl w-full" />
+
+              {/* Stick selection */}
+              <div className="flex flex-col gap-4 items-start">
+                <p className="font-logitech text-[#a7a7a8] text-sm tracking-[-0.42px] leading-[1.3]">
+                  Select the stick you want to recalibrate.
+                </p>
+                <div className="bg-[#242424] flex flex-col items-start rounded-lg w-[245px]">
                   <button className="flex h-[48px] items-center justify-between px-2 rounded-lg shrink-0 w-full hover:opacity-90 transition-opacity">
                     <span className="text-sm text-[#a7a7a8] leading-[1.3] tracking-[-0.42px]">
-                      {stickCalibrationPreference}
+                      {selectedStick}
                     </span>
                     <div className="shrink-0 w-6 h-6">
                       <ChevronDownIcon />
