@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 export default function StickCalibrationModal({ isOpen, onClose }) {
   const [progress, setProgress] = useState(0);
   const [angle, setAngle] = useState(0);
-  const [isCalibrating, setIsCalibrating] = useState(false);
+  const [stickMagnitude, setStickMagnitude] = useState(0);
 
   const rotationsRef = useRef(0);
   const lastAngleRef = useRef(0);
@@ -21,14 +21,14 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
         const y = gamepad.axes[1];
 
         const magnitude = Math.sqrt(x * x + y * y);
-        if (magnitude > 0.3) {
-          if (!isCalibrating) {
-            setIsCalibrating(true);
-          }
+        setStickMagnitude(magnitude);
 
+        if (magnitude > 0.3) {
           let currentAngle = Math.atan2(y, x);
+
+          // Only track clockwise progress when moving
           let lastAngle = lastAngleRef.current;
-          let angleDiff = lastAngle - currentAngle;
+          let angleDiff = currentAngle - lastAngle;
 
           if (angleDiff > Math.PI) {
             angleDiff -= 2 * Math.PI;
@@ -36,8 +36,10 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
             angleDiff += 2 * Math.PI;
           }
 
+          // Only increase progress for clockwise motion (positive angleDiff)
           if (angleDiff > 0 && angleDiff < 0.5) {
             rotationsRef.current += angleDiff / (2 * Math.PI);
+            // Update progress immediately - 4 full rotations = 100%
             const newProgress = Math.min(100, (rotationsRef.current / 4) * 100);
             setProgress(newProgress);
           }
@@ -57,13 +59,13 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
         cancelAnimationFrame(gamepadRafRef.current);
       }
     };
-  }, [isOpen, isCalibrating]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
       setProgress(0);
       setAngle(0);
-      setIsCalibrating(false);
+      setStickMagnitude(0);
       rotationsRef.current = 0;
       lastAngleRef.current = 0;
     }
@@ -151,15 +153,48 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
                 </g>
                 <circle cx="69" cy="65" r="11" stroke="#00B8FC" strokeWidth="0.3"/>
 
-                {/* Animated gradient arc - only show when NOT calibrating */}
-                {!isCalibrating && (
-                  <g style={{ transformOrigin: '69px 65px', animation: 'rotate-arc 2s linear infinite' }}>
-                    <path
-                      d="M118.036 107.625C125.353 99.2065 130.381 89.0466 132.636 78.1227C134.89 67.1988 134.295 55.8786 130.907 45.2514C127.52 34.6241 121.454 25.0476 113.294 17.4434C105.133 9.8392 95.1534 4.46325 84.3139 1.83289L83.0879 6.88533C93.0602 9.30526 102.242 14.2511 109.749 21.247C117.257 28.2429 122.837 37.0533 125.954 46.8303C129.07 56.6074 129.618 67.022 127.544 77.072C125.47 87.122 120.844 96.469 114.112 104.214L118.036 107.625Z"
-                      fill="url(#paint0_linear)"
+                {/* Animated gradient arc - always spinning */}
+                <g className="arc-animation">
+                  <path
+                    d="M118.036 107.625C125.353 99.2065 130.381 89.0466 132.636 78.1227C134.89 67.1988 134.295 55.8786 130.907 45.2514C127.52 34.6241 121.454 25.0476 113.294 17.4434C105.133 9.8392 95.1534 4.46325 84.3139 1.83289L83.0879 6.88533C93.0602 9.30526 102.242 14.2511 109.749 21.247C117.257 28.2429 122.837 37.0533 125.954 46.8303C129.07 56.6074 129.618 67.022 127.544 77.072C125.47 87.122 120.844 96.469 114.112 104.214L118.036 107.625Z"
+                    fill="url(#paint0_linear)"
+                  >
+                    <animateTransform
+                      attributeName="transform"
+                      attributeType="XML"
+                      type="rotate"
+                      from="0 69 65"
+                      to="360 69 65"
+                      dur="4s"
+                      repeatCount="indefinite"
                     />
+                  </path>
+                  {/* Blue dot leader with faint glow */}
+                  <g>
+                    <circle cx="115" cy="107" r="6" fill="#00B8FC" opacity="0.3">
+                      <animateTransform
+                        attributeName="transform"
+                        attributeType="XML"
+                        type="rotate"
+                        from="0 69 65"
+                        to="360 69 65"
+                        dur="4s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+                    <circle cx="115" cy="107" r="3" fill="#00B8FC">
+                      <animateTransform
+                        attributeName="transform"
+                        attributeType="XML"
+                        type="rotate"
+                        from="0 69 65"
+                        to="360 69 65"
+                        dur="4s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
                   </g>
-                )}
+                </g>
 
                 {/* Crosshair lines - thin */}
                 <path d="M69 2L69.0002 54" stroke="#00B8FC" strokeWidth="0.3" strokeLinecap="round"/>
@@ -167,17 +202,18 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
                 <path d="M58 65L5 65" stroke="#00B8FC" strokeWidth="0.3" strokeLinecap="round"/>
                 <path d="M133 65L80 65" stroke="#00B8FC" strokeWidth="0.3" strokeLinecap="round"/>
 
-                {/* Thick blue line with white dot - only show when calibrating */}
-                {isCalibrating && (() => {
-                  // Calculate endpoint based on angle (47px radius from center)
+                {/* Thick blue line with white dot - show when stick is pushed */}
+                {stickMagnitude > 0.3 && (() => {
+                  // Calculate endpoint - extend to inner edge of circle (radius ~53-54px to touch the stroke)
                   const centerX = 69;
                   const centerY = 65;
-                  const radius = 47;
+                  const maxRadius = 54;
+                  const radius = Math.min(stickMagnitude, 1) * maxRadius;
                   const endX = centerX + radius * Math.cos(angle);
                   const endY = centerY + radius * Math.sin(angle);
 
                   return (
-                    <g>
+                    <g style={{ transition: 'opacity 0.2s ease-out' }}>
                       <line x1={centerX} y1={centerY} x2={endX} y2={endY} stroke="#2CCBFF" strokeWidth="4" strokeLinecap="round"/>
                       <circle cx={endX} cy={endY} r="4" fill="#FBFBFB"/>
                     </g>
@@ -193,17 +229,21 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
               </div>
 
               {/* Progress bar */}
-              <div className="flex gap-1 items-center">
+              <div className="flex gap-1 items-center w-full">
                 <div className="flex-1 py-1.5">
-                  <div className="w-full h-1 bg-[#4d4d4d] rounded-full overflow-hidden">
+                  <div className="h-1 bg-[#4d4d4d] rounded-full overflow-hidden relative">
                     <div
-                      className="h-full bg-[#00b6fa] rounded-full transition-all duration-300"
-                      style={{ width: `${progress}%` }}
+                      className="absolute left-0 top-0 h-full bg-[#00b6fa] rounded-full"
+                      style={{
+                        width: `${Math.min(Math.max(progress, 0), 100)}%`
+                      }}
                     />
                   </div>
                 </div>
-                <div className="font-logitech font-bold text-[#a7a7a8] text-xs leading-[1.3] w-12 text-right pl-1">
-                  {Math.round(progress)}%
+                <div className="h-4 flex items-center justify-center pl-1 min-w-[48px]">
+                  <span className="font-logitech font-bold text-[#a7a7a8] text-xs leading-[1.3]">
+                    {Math.round(progress)}%
+                  </span>
                 </div>
               </div>
             </div>
@@ -235,16 +275,6 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
         </div>
       </div>
 
-      <style>{`
-        @keyframes rotate-arc {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </div>
   );
 }
