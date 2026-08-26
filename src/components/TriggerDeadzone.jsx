@@ -7,6 +7,9 @@ import ImportProfileModal from './ImportProfileModal';
 import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
 import DeviceStatusWidget from './DeviceStatusWidget';
+import SystemHeader from './SystemHeader';
+import ProfileHeader from './ProfileHeader';
+import ProfileModal from './ProfileModal';
 import BinaryToggle from './BinaryToggle';
 import Toggle from './Toggle';
 import MouseClickIndicator from './MouseClickIndicator';
@@ -51,21 +54,21 @@ export default function TriggerDeadzone() {
 
   // Position values for left trigger (finalized)
   const leftTriggerX = 78;
-  const leftTriggerY = -30;
+  const leftTriggerY = 0; // Moved down 30px from -30
   const leftTriggerScale = 1.8;
 
   // Arc position for left trigger (finalized)
   const arcLeftOffset = -20;
-  const arcTopOffset = -200;
+  const arcTopOffset = -170; // Moved down 30px from -200
 
   // Right trigger position (finalized - Y compensated for editor removal)
   const rightTriggerX = -80;
-  const rightTriggerY = -25; // Moved up 20px more from -5px
+  const rightTriggerY = 5; // Moved down 30px from -25
   const rightTriggerScale = 1.8;
 
   // Right trigger arc position (finalized - also compensated for editor removal)
   const rightArcLeftOffset = 273;
-  const rightArcTopOffset = -193; // Moved up 20px more from -173px
+  const rightArcTopOffset = -163; // Moved down 30px from -193
   const [isDraggingStart, setIsDraggingStart] = useState(false);
   const [isDraggingEnd, setIsDraggingEnd] = useState(false);
   const [isHoveringStart, setIsHoveringStart] = useState(false);
@@ -84,6 +87,7 @@ export default function TriggerDeadzone() {
 
   // Profile management state - synced with localStorage
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [currentPreset, setCurrentPreset] = useState(() => {
     return localStorage.getItem('currentPreset') || 'desktop';
   });
@@ -202,7 +206,50 @@ export default function TriggerDeadzone() {
 
   // Profile management handlers
   const handlePresetClick = () => {
-    setIsPresetModalOpen(true);
+    setIsProfileModalOpen(true);
+  };
+
+  const handleProfileSelect = (profileId) => {
+    setCurrentPreset(profileId);
+    localStorage.setItem('currentPreset', profileId);
+
+    // Load saved settings for the new profile (same logic as handlePresetSave)
+    const savedLeftStart = localStorage.getItem(`leftTriggerStartValue_${profileId}`);
+    const savedLeftEnd = localStorage.getItem(`leftTriggerEndValue_${profileId}`);
+    const savedLeftMode = localStorage.getItem(`leftTriggerMode_${profileId}`);
+    const savedLeftPreset = localStorage.getItem(`leftTriggerPreset_${profileId}`);
+    const savedRightStart = localStorage.getItem(`rightTriggerStartValue_${profileId}`);
+    const savedRightEnd = localStorage.getItem(`rightTriggerEndValue_${profileId}`);
+    const savedRightMode = localStorage.getItem(`rightTriggerMode_${profileId}`);
+    const savedRightPreset = localStorage.getItem(`rightTriggerPreset_${profileId}`);
+    const savedActive = localStorage.getItem(`activeTrigger_${profileId}`);
+
+    setLeftStartValue(savedLeftStart !== null ? JSON.parse(savedLeftStart) : 30);
+    setLeftEndValue(savedLeftEnd !== null ? JSON.parse(savedLeftEnd) : 70);
+    setLeftTriggerMode(savedLeftMode || 'analog');
+    setLeftTriggerPreset(savedLeftPreset || 'Linear');
+    setRightStartValue(savedRightStart !== null ? JSON.parse(savedRightStart) : 30);
+    setRightEndValue(savedRightEnd !== null ? JSON.parse(savedRightEnd) : 70);
+    setRightTriggerMode(savedRightMode || 'analog');
+    setRightTriggerPreset(savedRightPreset || 'Linear');
+    setActiveTrigger(savedActive || 'left');
+
+    // Set saved settings baseline
+    setTimeout(() => {
+      setSavedSettings({
+        leftStartValue: savedLeftStart !== null ? JSON.parse(savedLeftStart) : 30,
+        leftEndValue: savedLeftEnd !== null ? JSON.parse(savedLeftEnd) : 70,
+        leftTriggerMode: savedLeftMode || 'analog',
+        leftTriggerPreset: savedLeftPreset || 'Linear',
+        rightStartValue: savedRightStart !== null ? JSON.parse(savedRightStart) : 30,
+        rightEndValue: savedRightEnd !== null ? JSON.parse(savedRightEnd) : 70,
+        rightTriggerMode: savedRightMode || 'analog',
+        rightTriggerPreset: savedRightPreset || 'Linear',
+        activeTrigger: savedActive || 'left',
+      });
+      setHasUnsavedChanges(false);
+      localStorage.setItem('hasUnsavedChanges', 'false');
+    }, 0);
   };
 
   const handlePresetSave = (presetId) => {
@@ -752,54 +799,28 @@ export default function TriggerDeadzone() {
 
   return (
     <div className="bg-black w-full min-w-[1440px] h-screen flex flex-col">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between gap-4 px-8 py-2 border-b border-solid border-[#333]">
-        <div className="inline-flex items-center gap-4">
-          <button
-            onClick={() => navigate('/')}
-            className="rounded-full bg-[#242424] w-10 h-10 flex items-center justify-center hover:bg-[#333] transition-colors shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5 text-[#a7a7a8]" />
-          </button>
-
-          <div className="flex gap-1 items-center h-10">
-            <button
-              onClick={() => navigate('/')}
-              className="flex flex-col gap-[19px] items-center pt-[18px] px-4 cursor-pointer hover:opacity-80 transition-opacity outline-none focus-visible:ring-2 focus-visible:ring-primary-default rounded"
-            >
-              <span className="font-logitech text-[14px] text-[#a7a7a8] tracking-[-0.42px] leading-[1.3]">
-                GHOST
-              </span>
-              <div className="h-px rounded-[1px] shrink-0 w-10" />
-            </button>
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4 w-[5px]">
-              <ChevronRight className="w-4 h-4 text-[#a7a7a8]" />
-              <div className="h-px rounded-[1px] shrink-0 w-10" />
-            </div>
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4">
-              <span className="font-logitech font-bold leading-[1.3] text-[#00b6fa] text-sm text-center tracking-[-0.42px] whitespace-nowrap">
-                TRIGGERS
-              </span>
-              <div className="bg-[#00b6fa] h-px rounded-[1px] shrink-0 w-6" />
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Global Headers */}
+      <SystemHeader />
+      <ProfileHeader
+        breadcrumb={['DEVICES', 'GHOST', 'TRIGGERS']}
+        activeProfile={
+          currentPreset === 'desktop' ? 'Desktop: Default' :
+          currentPreset === 'fps' ? 'FPS' :
+          currentPreset === 'figma' ? 'Figma' :
+          currentPreset === 'marvelRivals' ? 'Marvel Rivals' :
+          currentPreset === 'p1' ? 'P1' :
+          currentPreset === 'p2' ? 'P2' :
+          currentPreset === 'p3' ? 'P3' :
+          'Desktop: Default'
+        }
+        isOnboard={['p1', 'p2', 'p3'].includes(currentPreset)}
+        onProfileClick={handlePresetClick}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex px-8 pb-8 gap-4 pt-4" style={{ overflow: 'hidden' }}>
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
-          {/* Preset Selector */}
-          <div className="bg-[#1a1a1a] p-4 rounded-2xl w-full">
-            <ProfileSelector
-              currentPreset={currentPreset}
-              hasUnsavedChanges={hasUnsavedChanges}
-              onPresetClick={handlePresetClick}
-              onSaveSettings={handleSaveSettings}
-            />
-          </div>
-
           {/* Trigger Controls Panel */}
           <div className="bg-[#1a1a1a] rounded-t-2xl flex-1 pt-4 px-4 overflow-y-auto">
             {/* Header with back button */}
@@ -1420,6 +1441,14 @@ export default function TriggerDeadzone() {
         onSave={handlePresetSave}
         currentPreset={currentPreset}
         onOpenImportModal={handleOpenImportModal}
+      />
+
+      {/* Profile Modal (New) */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        activeProfile={currentPreset}
+        onProfileSelect={handleProfileSelect}
       />
 
       {/* Import Profile Modal */}
