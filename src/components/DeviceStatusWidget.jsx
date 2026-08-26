@@ -124,7 +124,7 @@ export default function DeviceStatusWidget() {
             width: '219px',
             height: isHovered ? '237px' : '48px',
             overflow: 'hidden',
-            borderRadius: '16px',
+            borderRadius: '8px',
             transform: 'translateZ(0)',
             transition: 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
@@ -137,13 +137,13 @@ export default function DeviceStatusWidget() {
             fill="none"
             style={{ display: 'block', cursor: 'default', userSelect: 'none' }}
           >
-          {/* Outer container - always full size, clipping handles collapse */}
-          <path d="M16 0.5H203C211.56 0.500002 218.5 7.43959 218.5 16V221C218.5 229.56 211.56 236.5 203 236.5H16C7.43959 236.5 0.5 229.56 0.5 221V16C0.5 7.43959 7.43959 0.5 16 0.5Z" fill="#1A1A1A"/>
-          <path d="M16 0.5H203C211.56 0.500002 218.5 7.43959 218.5 16V221C218.5 229.56 211.56 236.5 203 236.5H16C7.43959 236.5 0.5 229.56 0.5 221V16C0.5 7.43959 7.43959 0.5 16 0.5Z" stroke="#242424"/>
+          {/* Outer container - always full size, clipping handles collapse - 8px radius */}
+          <path d="M8 0.5H211C215.142 0.500002 218.5 3.85787 218.5 8V229C218.5 233.142 215.142 236.5 211 236.5H8C3.85787 236.5 0.5 233.142 0.5 229V8C0.5 3.85787 3.85787 0.5 8 0.5Z" fill="#1A1A1A"/>
+          <path d="M8 0.5H211C215.142 0.500002 218.5 3.85787 218.5 8V229C218.5 233.142 215.142 236.5 211 236.5H8C3.85787 236.5 0.5 233.142 0.5 229V8C0.5 3.85787 3.85787 0.5 8 0.5Z" stroke="#242424"/>
 
           <g clipPath="url(#clip0)">
-            {/* Left section background */}
-            <path d="M8 12C8 9.79086 9.79086 8 12 8H118C120.209 8 122 9.79086 122 12V36C122 38.2091 120.209 40 118 40H12C9.79086 40 8 38.2091 8 36V12Z" fill="#242424"/>
+            {/* Left section background - 4px radius */}
+            <path d="M8 12C8 10.3431 9.34315 8 11 8H119C120.657 8 122 10.3431 122 12V36C122 37.6569 120.657 40 119 40H11C9.34315 40 8 37.6569 8 36V12Z" fill="#242424"/>
 
             {/* Pulsing dot */}
             <circle cx="20" cy="24" r="4" fill={pollingState.color} opacity={dotOpacity}/>
@@ -155,8 +155,8 @@ export default function DeviceStatusWidget() {
           </g>
 
           <g clipPath="url(#clip1)">
-            {/* Right section background */}
-            <path d="M132 12C132 9.79086 133.791 8 136 8H207C209.209 8 211 9.79086 211 12V36C211 38.2091 209.209 40 207 40H136C133.791 40 132 38.2091 132 36V12Z" fill="#242424"/>
+            {/* Right section background - 4px radius */}
+            <path d="M132 12C132 10.3431 133.343 8 135 8H208C209.657 8 211 10.3431 211 12V36C211 37.6569 209.657 40 208 40H135C133.343 40 132 37.6569 132 36V12Z" fill="#242424"/>
 
             {/* Battery icon - exact from SVG */}
             <path fillRule="evenodd" clipRule="evenodd" d="M161 22.5L161 25.5C161 26.052 160.552 26.5 160 26.5C159.448 26.5 159 26.052 159 25.5L159 22.5C159 21.948 159.448 21.5 160 21.5C160.552 21.5 161 21.948 161 22.5ZM158 27.214L158 20.786C158 20.076 157.483 19.5 156.846 19.5L144.154 19.5C143.517 19.5 143 20.076 143 20.786L143 27.214C143 27.924 143.517 28.5 144.154 28.5L156.846 28.5C157.483 28.5 158 27.924 158 27.214Z" fill="#30A46C"/>
@@ -200,10 +200,10 @@ export default function DeviceStatusWidget() {
 
           <defs>
             <clipPath id="clip0">
-              <path d="M8 16C8 11.5817 11.5817 8 16 8H114C118.418 8 122 11.5817 122 16V32C122 36.4183 118.418 40 114 40H16C11.5817 40 8 36.4183 8 32V16Z" fill="white"/>
+              <path d="M8 12C8 10.3431 9.34315 8 11 8H119C120.657 8 122 10.3431 122 12V36C122 37.6569 120.657 40 119 40H11C9.34315 40 8 37.6569 8 36V12Z" fill="white"/>
             </clipPath>
             <clipPath id="clip1">
-              <path d="M132 16C132 11.5817 135.582 8 140 8H203C207.418 8 211 11.5817 211 16V32C211 36.4183 207.418 40 203 40H140C135.582 40 132 36.4183 132 32V16Z" fill="white"/>
+              <path d="M132 12C132 10.3431 133.343 8 135 8H208C209.657 8 211 10.3431 211 12V36C211 37.6569 209.657 40 208 40H135C133.343 40 132 37.6569 132 36V12Z" fill="white"/>
             </clipPath>
           </defs>
         </svg>

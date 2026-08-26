@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import TabHorizontal from './TabHorizontal';
 import ListItem from './ListItem';
-import Button from './Button';
 import PresetModal from './PresetModal';
 import ImportProfileModal from './ImportProfileModal';
 import HotspotDetailCard from './HotspotDetailCard';
 import SaveNotification from './SaveNotification';
 import DeviceStatusWidget from './DeviceStatusWidget';
+import SystemHeader from './SystemHeader';
+import ProfileHeader from './ProfileHeader';
 
 // Image assets
 const imgIcon = "/figmaAssets/chevron-icon.svg";
@@ -336,39 +335,18 @@ export default function Home() {
           }
         }
       `}</style>
-      {/* Navigation */}
-      <nav className="flex items-center justify-between gap-4 px-8 py-2 border-b border-solid border-[#333]">
-        <div className="inline-flex items-center gap-4" data-name="Tab: Main Navigation">
-          <button
-            onClick={handleBackClick}
-            className="rounded-full bg-[#242424] w-10 h-10 flex items-center justify-center hover:bg-[#333] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary-default shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5 text-[#a7a7a8]" />
-          </button>
-          <div className="flex gap-1 items-center h-10">
-            <TabHorizontal active={false} className="flex flex-col gap-[19px] items-center pt-[18px] px-4 rounded shrink-0" insertLabel="HOME" />
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4 rounded shrink-0 w-[5px]">
-              <div className="overflow-hidden relative shrink-0 w-4 h-4" data-name="chevron-right">
-                <div className="absolute bottom-1/4 left-[37.5%] right-[37.5%] top-1/4">
-                  <div className="absolute inset-[-8.33%_-16.67%]">
-                    <img alt="Chevron" className="block max-w-none w-full h-full" src={imgIcon} />
-                  </div>
-                </div>
-              </div>
-              <div className="h-px rounded-[1px] shrink-0 w-10" />
-            </div>
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4 rounded shrink-0">
-              <p className="font-logitech font-bold leading-[1.3] text-primary-default text-sm text-center tracking-[-0.42px] whitespace-nowrap">
-                GHOST
-              </p>
-              <div className="bg-stroke-primary-default h-px rounded-[1px] shrink-0 w-6" />
-            </div>
-          </div>
-        </div>
-      </nav>
 
-      {/* Main content */}
-      <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-4">
+      {/* Global Headers */}
+      <SystemHeader />
+      <ProfileHeader
+        breadcrumb={['DEVICES', 'GHOST']}
+        activeProfile={currentPreset === 'desktop' ? 'Desktop: Default' : currentPreset === 'fps' ? 'First Person Shooter' : currentPreset === 'p1' ? 'P1' : currentPreset === 'p2' ? 'P2: Ghost' : currentPreset === 'p3' ? 'P3' : 'Desktop: Default'}
+        isOnboard={isOnboardPreset(currentPreset)}
+        onProfileClick={handlePresetClick}
+      />
+
+      {/* Main content - adjusted for new headers */}
+      <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-4" style={{ marginTop: '0px' }}>
         {/* Side Panel - matches Figma design */}
         <div className="w-[419px] shrink-0">
           <div className="bg-[#1a1a1a] border border-[#242424] border-solid flex flex-col gap-4 items-start p-4 rounded-2xl w-full h-full">
