@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { ArrowLeft, ChevronRight as LucideChevronRight } from 'lucide-react';
+import Headers from './Headers';
 import ProfileSelector from './ProfileSelector';
 import PresetModal from './PresetModal';
 import ImportProfileModal from './ImportProfileModal';
@@ -109,55 +109,32 @@ export default function GeneralSettings() {
   };
 
   return (
-    <div className="bg-black w-full min-w-[1440px] h-screen flex flex-col">
-      {/* Navigation - EXACT COPY from TriggerDeadzone */}
-      <nav className="flex items-center justify-between gap-4 px-8 py-2 border-b border-solid border-[#333]">
-        <div className="inline-flex items-center gap-4">
-          <button
-            onClick={() => navigate('/')}
-            className="rounded-full bg-[#242424] w-10 h-10 flex items-center justify-center hover:bg-[#333] transition-colors shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5 text-[#a7a7a8]" />
-          </button>
-
-          <div className="flex gap-1 items-center h-10">
-            <button
-              onClick={() => navigate('/')}
-              className="flex flex-col gap-[19px] items-center pt-[18px] px-4 cursor-pointer hover:opacity-80 transition-opacity outline-none focus-visible:ring-2 focus-visible:ring-primary-default rounded"
-            >
-              <span className="font-logitech text-[14px] text-[#a7a7a8] tracking-[-0.42px] leading-[1.3]">
-                GHOST
-              </span>
-              <div className="h-px rounded-[1px] shrink-0 w-10" />
-            </button>
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4 w-[5px]">
-              <LucideChevronRight className="w-4 h-4 text-[#a7a7a8]" />
-              <div className="h-px rounded-[1px] shrink-0 w-10" />
-            </div>
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4">
-              <span className="font-logitech font-bold leading-[1.3] text-[#00b6fa] text-sm text-center tracking-[-0.42px] whitespace-nowrap">
-                GENERAL SETTINGS
-              </span>
-              <div className="bg-[#00b6fa] h-px rounded-[1px] shrink-0 w-6" />
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="bg-black w-full h-screen relative overflow-hidden">
+      {/* Global Headers */}
+      <Headers
+        breadcrumb={[
+          'DEVICES',
+          { label: 'GHOST', onClick: () => navigate('/') },
+          'GENERAL SETTINGS'
+        ]}
+        activeProfile={
+          currentPreset === 'desktop' ? 'Desktop: Default' :
+          currentPreset === 'fps' ? 'FPS' :
+          currentPreset === 'figma' ? 'Figma' :
+          currentPreset === 'marvelRivals' ? 'Marvel Rivals' :
+          currentPreset === 'p1' ? 'P1' :
+          currentPreset === 'p2' ? 'P2' :
+          currentPreset === 'p3' ? 'P3' :
+          'Desktop: Default'
+        }
+        isOnboard={['p1', 'p2', 'p3'].includes(currentPreset)}
+        onProfileClick={handlePresetClick}
+      />
 
       {/* Main Content */}
-      <div className="flex-1 flex px-8 pb-8 gap-[102px] pt-4" style={{ overflow: 'visible' }}>
+      <div className="absolute top-[120px] left-0 right-0 bottom-8 flex px-8 gap-[102px] overflow-hidden">
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
-          {/* Preset Selector */}
-          <div className="bg-[#1a1a1a] p-4 rounded-2xl w-full">
-            <ProfileSelector
-              currentPreset={currentPreset}
-              hasUnsavedChanges={hasUnsavedChanges}
-              onPresetClick={handlePresetClick}
-              onSaveSettings={handleSaveSettings}
-            />
-          </div>
-
           {/* General Settings Navigation Panel */}
           <div className="bg-[#1a1a1a] rounded-2xl flex-1 pt-4 px-4">
             {/* Header with back button */}
