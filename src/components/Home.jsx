@@ -318,7 +318,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-black w-full h-screen flex flex-col" data-name="Home" data-node-id="175:3182">
+    <div className="bg-black w-full h-screen relative overflow-hidden" data-name="Home" data-node-id="175:3182">
       <style>{`
         /* Scale controller based on available width */
         .controller-container-home {
@@ -365,7 +365,7 @@ export default function Home() {
       />
 
       {/* Main content - adjusted for new headers */}
-      <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-10">
+      <div className="absolute top-[120px] left-0 right-0 bottom-0 flex gap-4 overflow-hidden pb-8 px-8">
         {/* Side Panel - matches Figma design */}
         <div className="w-[419px] shrink-0">
           <div className="bg-[#1a1a1a] border border-[#242424] border-solid flex flex-col gap-4 items-start p-4 rounded-2xl w-full h-full">

@@ -7,9 +7,6 @@ import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
 import ActionsModal from './ActionsModal';
 import DeviceStatusWidget from './DeviceStatusWidget';
-import SystemHeader from './SystemHeader';
-import ProfileHeader from './ProfileHeader';
-import ProfileModal from './ProfileModal';
 import BinaryToggle from './BinaryToggle';
 
 // Image assets
@@ -121,7 +118,7 @@ const allModalActions = [
 ];
 
 // Feature flags
-const ENABLE_EDIT_LAYOUT = false; // Set to true to enable Edit Layout feature
+const ENABLE_EDIT_LAYOUT = true; // Set to true to enable Edit Layout feature
 
 export default function ButtonMapping() {
   const navigate = useNavigate();
@@ -435,7 +432,6 @@ export default function ButtonMapping() {
 
   // Profile management state
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [currentPreset, setCurrentPreset] = useState(() => {
     return localStorage.getItem('currentPreset') || 'desktop';
   });
@@ -764,52 +760,7 @@ export default function ButtonMapping() {
   };
 
   const handlePresetClick = () => {
-    setIsProfileModalOpen(true);
-  };
-
-  const handleProfileSelect = (profileId) => {
-    setCurrentPreset(profileId);
-    localStorage.setItem('currentPreset', profileId);
-
-    // Load saved settings for the new profile (same logic as handlePresetSave)
-    const savedMappings = localStorage.getItem(`buttonMappings_${profileId}`);
-    const savedTooltips = localStorage.getItem(`tooltipAssignments_${profileId}_${presetConfig}`);
-
-    if (savedMappings) {
-      const loadedMappings = JSON.parse(savedMappings);
-      setAssignments(loadedMappings);
-    } else {
-      // Reset to defaults if no saved data
-      const defaults = {};
-      buttonMappings.forEach(btn => {
-        defaults[btn.id] = btn.defaultAssignment;
-      });
-      setAssignments(defaults);
-    }
-
-    const defaults = getDefaultTooltipAssignments(presetConfig);
-    if (savedTooltips) {
-      const loadedTooltips = JSON.parse(savedTooltips);
-      // Merge with defaults to include any new keys
-      setTooltipAssignments({...defaults, ...loadedTooltips});
-    } else {
-      // Clear old format key if it exists
-      localStorage.removeItem(`tooltipAssignments_${profileId}`);
-      // Reset to defaults if no saved data
-      setTooltipAssignments({...defaults});
-    }
-
-    // Set saved settings baseline
-    setTimeout(() => {
-      setSavedSettings({
-        assignments: savedMappings ? JSON.parse(savedMappings) : (
-          buttonMappings.reduce((acc, btn) => ({ ...acc, [btn.id]: btn.defaultAssignment }), {})
-        ),
-        tooltips: savedTooltips ? JSON.parse(savedTooltips) : {...defaults},
-      });
-      setHasUnsavedChanges(false);
-      localStorage.setItem('hasUnsavedChanges', 'false');
-    }, 0);
+    setIsPresetModalOpen(true);
   };
 
   const handlePresetSave = (presetId) => {
@@ -1171,7 +1122,7 @@ export default function ButtonMapping() {
   const defaultTooltipAssignments = getDefaultTooltipAssignments(presetConfig);
 
   return (
-    <div className="bg-black relative overflow-hidden h-screen w-full">
+    <div className="bg-black flex flex-col h-screen w-full">
       <style>{`
         .custom-scrollbar {
           overflow: overlay;
@@ -1218,28 +1169,54 @@ export default function ButtonMapping() {
           }
         }
       `}</style>
-      {/* Global Headers */}
-      <SystemHeader />
-      <ProfileHeader
-        breadcrumb={['DEVICES', 'GHOST', 'BUTTON REMAPPING']}
-        activeProfile={
-          currentPreset === 'desktop' ? 'Desktop: Default' :
-          currentPreset === 'fps' ? 'FPS' :
-          currentPreset === 'figma' ? 'Figma' :
-          currentPreset === 'marvelRivals' ? 'Marvel Rivals' :
-          currentPreset === 'p1' ? 'P1' :
-          currentPreset === 'p2' ? 'P2' :
-          currentPreset === 'p3' ? 'P3' :
-          'Desktop: Default'
-        }
-        isOnboard={['p1', 'p2', 'p3'].includes(currentPreset)}
-        onProfileClick={handlePresetClick}
-      />
+      {/* Navigation */}
+      <nav className="flex items-center justify-between gap-4 px-8 py-2 border-b border-solid border-[#333]">
+        <div className="inline-flex items-center gap-4">
+          <button
+            onClick={() => navigate('/')}
+            className="rounded-full bg-[#242424] w-10 h-10 flex items-center justify-center hover:bg-[#333] transition-colors shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5 text-[#a7a7a8]" />
+          </button>
+
+          <div className="flex gap-1 items-center h-10">
+            <button
+              onClick={() => navigate('/')}
+              className="flex flex-col gap-[19px] items-center pt-[18px] px-4 cursor-pointer hover:opacity-80 transition-opacity outline-none focus-visible:ring-2 focus-visible:ring-primary-default rounded"
+            >
+              <span className="font-logitech text-[14px] text-[#a7a7a8] tracking-[-0.42px] leading-[1.3]">
+                GHOST
+              </span>
+              <div className="h-px rounded-[1px] shrink-0 w-10" />
+            </button>
+            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4 w-[5px]">
+              <ChevronRight className="w-4 h-4 text-[#a7a7a8]" />
+              <div className="h-px rounded-[1px] shrink-0 w-10" />
+            </div>
+            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4">
+              <span className="font-logitech font-bold leading-[1.3] text-[#00b6fa] text-sm text-center tracking-[-0.42px] whitespace-nowrap">
+                BUTTON REMAPPING
+              </span>
+              <div className="bg-[#00b6fa] h-px rounded-[1px] shrink-0 w-6" />
+            </div>
+          </div>
+        </div>
+      </nav>
 
       {/* Main content */}
-      <div className="absolute top-[120px] left-0 right-0 bottom-0 flex gap-4 overflow-hidden pb-8 px-8">
+      <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-4">
         {/* Left Panel */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
+          {/* Profile Selector */}
+          <div className="bg-[#1a1a1a] p-4 rounded-2xl w-full">
+            <ProfileSelector
+              currentPreset={currentPreset}
+              hasUnsavedChanges={hasUnsavedChanges}
+              onPresetClick={handlePresetClick}
+              onSaveSettings={handleSaveSettings}
+            />
+          </div>
+
           {/* Button Remapping Panel */}
           <div className="bg-[#1a1a1a] rounded-2xl flex-1 flex flex-col overflow-hidden w-full">
             {/* Header */}
@@ -2258,7 +2235,9 @@ export default function ButtonMapping() {
               <ResetButton
                 position={currentTooltipPositions.leftStick}
                 align="right"
-                onClick={() => handleResetTooltip('leftStick')} offset={resetButtonOffset}/>
+                onClick={() => handleResetTooltip('leftStick')}
+                offset={resetButtonOffset}
+              />
             )}
             <HotspotTooltip
               key={`leftStick-${viewMode}`}
@@ -2289,7 +2268,10 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.leftBumper}
                     align="right"
-                    onClick={() => handleResetTooltip('leftBumper')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('leftBumper')}
+                    offset={resetButtonOffset}
+                  />
                 )}
                 <HotspotTooltip
                   label="Bumper"
@@ -2319,7 +2301,9 @@ export default function ButtonMapping() {
               <ResetButton
                 position={viewMode === 'back' ? currentTooltipPositions.rightTrigger : currentTooltipPositions.dPadUp}
                 align="right"
-                    onClick={() => handleResetTooltip(viewMode === 'back' ? 'rightTrigger' : 'dPadUp')} offset={resetButtonOffset}/>
+                offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip(viewMode === 'back' ? 'rightTrigger' : 'dPadUp')}
+              />
             )}
             <HotspotTooltip
               key={`dPadUp-${viewMode}`}
@@ -2350,7 +2334,9 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.dPadLeft}
                     align="right"
-                    onClick={() => handleResetTooltip('dPadLeft')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('dPadLeft')}
+                  />
                 )}
                 <HotspotTooltip
                   label="D Pad L"
@@ -2380,7 +2366,9 @@ export default function ButtonMapping() {
               <ResetButton
                 position={currentTooltipPositions.dPadDown}
                 align="right"
-                    onClick={() => handleResetTooltip('dPadDown')} offset={resetButtonOffset}/>
+                offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('dPadDown')}
+              />
             )}
             <HotspotTooltip
               key={`dPadDown-${viewMode}`}
@@ -2411,7 +2399,9 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.dPadRight}
                     align="right"
-                    onClick={() => handleResetTooltip('dPadRight')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('dPadRight')}
+                  />
                 )}
                 <HotspotTooltip
                   label="D Pad R"
@@ -2443,7 +2433,9 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.rightBumper}
                     align="left"
-                    onClick={() => handleResetTooltip('rightBumper')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('rightBumper')}
+                  />
                 )}
                 <HotspotTooltip
                   label="Bumper"
@@ -2474,7 +2466,9 @@ export default function ButtonMapping() {
               <ResetButton
                 position={viewMode === 'back' ? currentTooltipPositions.leftTrigger : currentTooltipPositions.buttonY}
                 align="left"
-                    onClick={() => handleResetTooltip(viewMode === 'back' ? 'leftTrigger' : 'buttonY')} offset={resetButtonOffset}/>
+                offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip(viewMode === 'back' ? 'leftTrigger' : 'buttonY')}
+              />
             )}
             <HotspotTooltip
               key={`buttonY-${viewMode}`}
@@ -2506,7 +2500,9 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.buttonB}
                     align="left"
-                    onClick={() => handleResetTooltip('buttonB')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('buttonB')}
+                  />
                 )}
                 <HotspotTooltip
                   label="Button"
@@ -2539,7 +2535,9 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.buttonX}
                     align="left"
-                    onClick={() => handleResetTooltip('buttonX')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('buttonX')}
+                  />
                 )}
                 <HotspotTooltip
                   label="Button"
@@ -2570,7 +2568,9 @@ export default function ButtonMapping() {
               <ResetButton
                 position={currentTooltipPositions.buttonA}
                 align="left"
-                    onClick={() => handleResetTooltip('buttonA')} offset={resetButtonOffset}/>
+                offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('buttonA')}
+              />
             )}
             <HotspotTooltip
               key={`buttonA-${viewMode}`}
@@ -2600,7 +2600,9 @@ export default function ButtonMapping() {
               <ResetButton
                 position={currentTooltipPositions.rightStick}
                 align="left"
-                    onClick={() => handleResetTooltip('rightStick')} offset={resetButtonOffset}/>
+                offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('rightStick')}
+              />
             )}
             <HotspotTooltip
               key={`rightStick-${viewMode}`}
@@ -2632,7 +2634,9 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.buttonShare}
                     align="right"
-                    onClick={() => handleResetTooltip('buttonShare')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('buttonShare')}
+                  />
                 )}
                 <HotspotTooltip
                   key={`buttonShare-${viewMode}`}
@@ -2666,7 +2670,9 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.viewButton}
                     align="left"
-                    onClick={() => handleResetTooltip('viewButton')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('viewButton')}
+                  />
                 )}
                 <HotspotTooltip
                   key={`viewButton-${viewMode}`}
@@ -2700,7 +2706,9 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.menuButton}
                     align="right"
-                    onClick={() => handleResetTooltip('menuButton')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('menuButton')}
+                  />
                 )}
                 <HotspotTooltip
                   key={`menuButton-${viewMode}`}
@@ -2734,7 +2742,9 @@ export default function ButtonMapping() {
                   <ResetButton
                     position={currentTooltipPositions.profileButton}
                     align="right"
-                    onClick={() => handleResetTooltip('profileButton')} offset={resetButtonOffset}/>
+                    offset={resetButtonOffset}
+                    onClick={() => handleResetTooltip('profileButton')}
+                  />
                 )}
                 <HotspotTooltip
                   key={`profileButton-${viewMode}`}
@@ -2771,7 +2781,7 @@ export default function ButtonMapping() {
                 ? 'bg-[#242424] cursor-not-allowed'
                 : 'bg-[#2e2e2e] border-2 border-[#4d4d4d] hover:border-[#666] cursor-pointer'
             }`}
-            style={{ bottom: '640px', width: '159px' }}
+            style={{ bottom: '715px', width: '159px' }}
           >
             <span className={`font-logitech text-[11px] font-bold tracking-[0.275px] uppercase leading-[11px] whitespace-nowrap ${
               JSON.stringify(tooltipAssignments) === JSON.stringify(defaultTooltipAssignments)
@@ -2783,7 +2793,7 @@ export default function ButtonMapping() {
           </button>
 
           {/* View Mode Toggle - Front/Back buttons */}
-          <div className="relative flex justify-center z-20" style={{ bottom: '18px' }}>
+          <div className="relative flex justify-center z-20" style={{ bottom: '64px' }}>
             <BinaryToggle
               leftLabel="FRONT"
               rightLabel="BACK"
@@ -2802,14 +2812,6 @@ export default function ButtonMapping() {
         onSave={handlePresetSave}
         currentPreset={currentPreset}
         onOpenImportModal={handleOpenImportModal}
-      />
-
-      {/* Profile Modal (New) */}
-      <ProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-        activeProfile={currentPreset}
-        onProfileSelect={handleProfileSelect}
       />
 
       <ImportProfileModal
@@ -3074,15 +3076,13 @@ function HotspotTooltip({ label, value, position = {left: 0, top: 0}, isActive, 
 
 // Reset Button Component - appears above active tooltip
 function ResetButton({ position, align = 'right', onClick, offset = -40 }) {
-  // HARDCODED TEST - forcing offset to 60
-  const testOffset = 60;
   return (
     <div
       className="absolute z-50"
       data-reset-button
       style={{
         left: `${position.left}px`,
-        top: `${position.top + testOffset}px`,
+        top: `${position.top + offset}px`,
         transform: align === 'right' ? 'translateX(-100%)' : 'none'
       }}
     >

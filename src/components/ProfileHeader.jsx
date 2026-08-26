@@ -14,7 +14,7 @@ const imgArrowRightSmall = "/figmaAssets/arrow-right-small-profile.svg";
  */
 export default function ProfileHeader({ breadcrumb = ['DEVICES', 'GHOST'], activeProfile = 'Desktop: Default', isOnboard = false, onProfileClick }) {
   return (
-    <div className="h-12 w-full bg-black border-b border-[#242424]">
+    <div className="absolute top-10 left-0 right-0 h-12 bg-black border-b border-[#242424] z-10">
       <div className="h-full w-full flex items-center justify-between px-8">
         {/* Left: Logo + Breadcrumb */}
         <div className="flex gap-4 items-center">

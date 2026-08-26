@@ -798,7 +798,7 @@ export default function TriggerDeadzone() {
   }, [activeTrigger, activeStartValue, activeEndValue]);
 
   return (
-    <div className="bg-black w-full min-w-[1440px] h-screen flex flex-col">
+    <div className="bg-black w-full min-w-[1440px] h-screen relative overflow-hidden">
       {/* Global Headers */}
       <SystemHeader />
       <ProfileHeader
@@ -818,7 +818,7 @@ export default function TriggerDeadzone() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex px-8 pb-8 gap-4 pt-10" style={{ overflow: 'hidden' }}>
+      <div className="absolute top-[120px] left-0 right-0 bottom-0 flex px-8 pb-8 gap-4" style={{ overflow: 'hidden' }}>
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Trigger Controls Panel */}

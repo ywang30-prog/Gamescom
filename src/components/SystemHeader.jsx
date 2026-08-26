@@ -6,7 +6,7 @@ const imgWindowControls = "/figmaAssets/window-controls.svg";
  */
 export default function SystemHeader() {
   return (
-    <div className="h-8 w-full bg-black border-b border-[#242424]">
+    <div className="absolute top-0 left-0 right-0 h-8 bg-black border-b border-[#242424] z-10">
       <div className="h-full w-full relative">
         <div className="absolute right-[11px] top-[11px] flex items-center justify-center h-[10px] w-[50px]">
           <div className="flex-none -scale-y-100 rotate-180">

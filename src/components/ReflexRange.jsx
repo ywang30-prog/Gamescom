@@ -772,7 +772,7 @@ export default function ReflexRange() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
       {/* Global Headers */}
       <SystemHeader />
       <ProfileHeader
@@ -792,7 +792,7 @@ export default function ReflexRange() {
       />
 
       {gameState === 'menu' && (
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="absolute top-[120px] left-0 right-0 bottom-0 flex flex-col items-center justify-center p-8">
           <div className="w-full max-w-[800px]">
             {/* Top content area */}
             <div className="bg-[#1a1a1a] p-10 rounded-t-xl">
@@ -945,7 +945,7 @@ export default function ReflexRange() {
       )}
 
       {gameState === 'playing' && (
-        <div className="flex-1 relative">
+        <div className="absolute top-[120px] left-0 right-0 bottom-0">
           {/* Score Banner Overlay */}
           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 flex gap-[8px] items-center">
             {/* Points Section */}
