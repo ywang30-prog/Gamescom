@@ -5,6 +5,7 @@ const imgChevronSmallRight = "/figmaAssets/chevron-small-right.svg";
 const imgNotificationOn = "/figmaAssets/notification-on.svg";
 const imgProfileAvatar = "/figmaAssets/profile-avatar.png";
 const imgArrowRightSmall = "/figmaAssets/arrow-right-small-profile.svg";
+const imgOnboardMemoryEmpty = "/figmaAssets/onboard-memory-empty.svg";
 
 /**
  * Unified Headers Component
@@ -92,10 +93,10 @@ export default function Headers({ breadcrumb = ['DEVICES', 'GHOST'], activeProfi
             >
               <div className="flex gap-2 h-10 items-center pl-2 pr-0 rounded-lg shrink-0 w-full">
                 <div className="flex gap-2 h-full items-center py-2 shrink-0">
-                  {/* G HUB icon */}
+                  {/* Profile icon - chip for onboard, G logo for G HUB */}
                   <div className="flex gap-1 h-full items-center shrink-0">
                     <div className="w-6 h-6 relative shrink-0">
-                      <img alt="" className="absolute block max-w-none w-full h-full" src={imgLogoLogitechG} />
+                      <img alt="" className="absolute block max-w-none w-full h-full" src={isOnboard ? imgOnboardMemoryEmpty : imgLogoLogitechG} />
                     </div>
                   </div>
 
