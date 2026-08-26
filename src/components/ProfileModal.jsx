@@ -1,38 +1,42 @@
 import { useState } from 'react';
 
 const imgLogoLogitechG = "/figmaAssets/logo-logitech-g.svg";
-const imgChevronSmallRight = "/figmaAssets/chevron-small-right.svg";
-const imgSearchIcon = "/figmaAssets/search-icon.svg"; // TODO: Download this asset
-const imgMoreOptions = "/figmaAssets/more-options.svg"; // TODO: Download this asset
+const imgCloseSmall = "/figmaAssets/close-small.svg";
+const imgSearch = "/figmaAssets/search.svg";
+const imgChevronUpSmall = "/figmaAssets/chevron-up-small.svg";
+const imgChevronDownSmall = "/figmaAssets/chevron-down-small.svg";
+const imgMoreOptionsVertical = "/figmaAssets/more-options-vertical.svg";
+const imgOnboardMemoryEmpty = "/figmaAssets/onboard-memory-empty.svg";
 
 /**
  * ProfileModal - Profile selector modal with G HUB and Onboard sections
  * @param {Object} props
  * @param {boolean} props.isOpen - Whether modal is visible
  * @param {Function} props.onClose - Handler for closing modal
- * @param {string} props.activeProfile - Current active profile (e.g., 'desktop', 'fps', 'p1')
+ * @param {string} props.activeProfile - Current active profile (e.g., 'desktop', 'fps', 'p2')
  * @param {Function} props.onProfileSelect - Handler for profile selection (profileId)
  */
 export default function ProfileModal({ isOpen, onClose, activeProfile, onProfileSelect }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [gHubExpanded, setGHubExpanded] = useState(!activeProfile.startsWith('p'));
-  const [onboardExpanded, setOnboardExpanded] = useState(activeProfile.startsWith('p'));
+
+  // Determine which section should be expanded based on active profile type
+  const isOnboardActive = activeProfile.startsWith('p');
+  const [expandedSection, setExpandedSection] = useState(isOnboardActive ? 'onboard' : 'ghub');
 
   if (!isOpen) return null;
 
   // G HUB profiles
   const gHubProfiles = [
-    { id: 'desktop', name: 'Desktop: Default', isActive: activeProfile === 'desktop' },
-    { id: 'fps', name: 'FPS', isActive: activeProfile === 'fps' },
-    { id: 'figma', name: 'Figma', isActive: activeProfile === 'figma' },
-    { id: 'marvelRivals', name: 'Marvel Rivals', isActive: activeProfile === 'marvelRivals' },
+    { id: 'desktop', name: 'Desktop: Default' },
+    { id: 'fps', name: 'First Person Shoother' },
+    { id: 'p3ghost', name: 'P3: Ghost' },
   ];
 
   // Onboard profiles
   const onboardProfiles = [
-    { id: 'p1', name: 'P1', isActive: activeProfile === 'p1' },
-    { id: 'p2', name: 'P2', isActive: activeProfile === 'p2' },
-    { id: 'p3', name: 'P3', isActive: activeProfile === 'p3' },
+    { id: 'p1', name: 'P1' },
+    { id: 'p2', name: 'P2: Ghost' },
+    { id: 'p3', name: 'P3' },
   ];
 
   // Filter profiles based on search
@@ -43,181 +47,266 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Sort profiles - active profile first
+  const sortedGHub = [...filteredGHub].sort((a, b) => {
+    if (a.id === activeProfile) return -1;
+    if (b.id === activeProfile) return 1;
+    return 0;
+  });
+
+  const sortedOnboard = [...filteredOnboard].sort((a, b) => {
+    if (a.id === activeProfile) return -1;
+    if (b.id === activeProfile) return 1;
+    return 0;
+  });
+
   const handleProfileClick = (profileId) => {
     onProfileSelect(profileId);
     onClose();
+  };
+
+  const toggleSection = (section) => {
+    setExpandedSection(expandedSection === section ? null : section);
   };
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-40"
+        className="fixed inset-0 bg-black/70 z-40"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="fixed top-16 right-8 w-[320px] bg-[#1a1a1a] border border-[#242424] rounded-lg shadow-2xl z-50 flex flex-col max-h-[calc(100vh-96px)]">
-        {/* Search bar */}
-        <div className="p-3 border-b border-[#242424]">
-          <div className="bg-[#242424] flex items-center gap-2 px-3 h-10 rounded-lg">
-            <div className="w-4 h-4 opacity-60">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle cx="7" cy="7" r="5" stroke="#A7A7A8" strokeWidth="1.5"/>
-                <path d="M11 11L14 14" stroke="#A7A7A8" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
+      <div className="fixed left-[504px] top-[101px] w-[432px] bg-[#1a1a1a] border border-[#242424] rounded-2xl shadow-[20px_20px_40px_0px_rgba(0,0,0,0.4)] z-50 flex flex-col overflow-hidden">
+        {/* Title bar */}
+        <div className="border-b border-[#242424] flex flex-col gap-6 items-start p-4">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex flex-col justify-center leading-[0]">
+              <p className="font-logitech font-bold text-xl leading-[28px] text-[#e6e6e6] tracking-[-0.8px]">
+                Profiles
+              </p>
             </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search profiles"
-              className="flex-1 bg-transparent outline-none text-sm text-[#e6e6e6] placeholder:text-[#666] font-logitech"
-            />
+            <div className="flex gap-4 items-center">
+              <button
+                onClick={onClose}
+                className="border-2 border-[#2e2e2e] flex gap-0 items-center justify-center overflow-clip p-0 rounded-full w-8 h-8 hover:bg-[#242424] transition-colors"
+              >
+                <div className="flex flex-1 gap-2 h-full items-center justify-center min-w-0 p-0">
+                  <div className="w-6 h-6 relative shrink-0">
+                    <img alt="Close" className="absolute block max-w-none w-full h-full" src={imgCloseSmall} />
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+        {/* Search bar */}
+        <div className="border-b border-[#242424] flex flex-col gap-6 items-start justify-center pb-4 px-4">
+          <div className="border border-[#2e2e2e] flex flex-wrap gap-y-2 h-10 items-center px-0 rounded-lg w-full">
+            <div className="flex flex-1 flex-row items-center self-stretch">
+              <div className="flex flex-1 gap-2 h-full items-center min-w-0 px-2 py-0 rounded-lg">
+                <div className="flex gap-2 items-center shrink-0">
+                  <div className="w-6 h-6 relative shrink-0">
+                    <img alt="" className="absolute block max-w-none w-full h-full" src={imgSearch} />
+                  </div>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search"
+                    className="flex flex-col justify-center leading-[0] overflow-hidden text-ellipsis whitespace-nowrap bg-transparent outline-none font-logitech text-sm leading-[1.3] text-[#a7a7a8] tracking-[-0.42px] border-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex flex-col gap-2 items-start px-4 py-2">
           {/* G HUB Profiles Section */}
-          <div className="border-b border-[#242424]">
+          <div className="flex flex-col gap-1 items-start w-full">
             {/* Section header */}
             <button
-              onClick={() => setGHubExpanded(!gHubExpanded)}
-              className="w-full px-3 py-3 flex items-center justify-between hover:bg-[#242424] transition-colors"
+              onClick={() => toggleSection('ghub')}
+              className="flex flex-wrap gap-y-2 h-10 items-center justify-center w-full hover:opacity-80 transition-opacity"
             >
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5">
-                  <img alt="G HUB" src={imgLogoLogitechG} className="w-full h-full" />
+              <div className="flex flex-1 flex-row items-center self-stretch">
+                <div className="flex flex-1 h-full items-center justify-between min-w-0 pr-1">
+                  <div className="flex gap-2 items-center shrink-0">
+                    <div className="w-6 h-6 relative shrink-0">
+                      <img alt="" className="absolute block max-w-none w-full h-full" src={imgLogoLogitechG} />
+                    </div>
+                    <div className="flex flex-col justify-center leading-[0] overflow-hidden text-ellipsis whitespace-nowrap">
+                      <p className="font-logitech font-bold text-sm leading-[1.3] text-[#00b8fc] tracking-[-0.42px] overflow-hidden text-ellipsis">
+                        G HUB Profiles
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 items-center shrink-0">
+                    <div className="w-6 h-6 relative shrink-0">
+                      <img alt="" className="absolute block max-w-none w-full h-full" src={expandedSection === 'ghub' ? imgChevronUpSmall : imgChevronDownSmall} />
+                    </div>
+                  </div>
                 </div>
-                <p className="font-logitech font-bold text-xs text-[#a7a7a8] uppercase tracking-wider">
-                  G HUB PROFILES
-                </p>
-              </div>
-              <div className={`w-5 h-5 transition-transform ${gHubExpanded ? 'rotate-90' : ''}`}>
-                <img alt="" src={imgChevronSmallRight} className="w-full h-full" />
               </div>
             </button>
 
             {/* Profile list */}
-            {gHubExpanded && (
-              <div className="pb-2">
-                {filteredGHub.map((profile) => (
-                  <button
-                    key={profile.id}
-                    onClick={() => handleProfileClick(profile.id)}
-                    className={`w-full px-3 py-2 flex items-center justify-between group hover:bg-[#242424] transition-colors ${
-                      profile.isActive ? 'bg-[rgba(0,184,252,0.14)]' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      {/* Profile icon - G logo for G HUB profiles */}
-                      <div className="w-6 h-6 shrink-0">
-                        <img alt="" src={imgLogoLogitechG} className="w-full h-full" />
+            {expandedSection === 'ghub' && (
+              <div className="border border-[#242424] flex gap-1 items-start p-1 rounded-lg w-full">
+                <div className="flex flex-1 flex-col gap-1 items-start min-w-0">
+                  {sortedGHub.map((profile) => {
+                    const isActive = profile.id === activeProfile;
+                    return (
+                      <div key={profile.id} className="flex flex-wrap gap-y-2 items-start w-full">
+                        <button
+                          onClick={() => handleProfileClick(profile.id)}
+                          className={`flex flex-1 gap-2 h-10 items-center min-w-0 pl-3 pr-0 rounded ${
+                            isActive ? 'bg-[rgba(0,184,252,0.14)]' : 'hover:bg-[#242424]'
+                          } transition-colors`}
+                        >
+                          <div className={`flex flex-1 flex-col h-6 justify-center leading-[0] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${
+                            isActive ? 'font-bold' : ''
+                          }`}>
+                            <p className={`font-logitech text-sm leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis ${
+                              isActive ? 'text-[#00b8fc] font-bold' : 'text-[#e6e6e6]'
+                            }`}>
+                              {profile.name}
+                            </p>
+                          </div>
+                          {isActive && (
+                            <div className="border border-[#00b8fc] flex flex-wrap h-6 items-center justify-center max-h-6 min-h-6 rounded shrink-0">
+                              <div className="flex flex-row items-center self-stretch">
+                                <div className="flex gap-0 h-full items-center overflow-clip p-0 rounded shrink-0">
+                                  <div className="flex h-full items-center justify-center px-3 py-0 shrink-0">
+                                    <div className="flex flex-col justify-center leading-[0] whitespace-nowrap">
+                                      <p className="font-logitech text-xs leading-[1.3] text-[#00b8fc] text-center">
+                                        Active
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          <div className="w-6 h-6 relative shrink-0">
+                            <img alt="" className="absolute block max-w-none w-full h-full" src={imgMoreOptionsVertical} />
+                          </div>
+                        </button>
                       </div>
-                      {/* Profile name */}
-                      <p className={`font-logitech font-normal text-sm ${
-                        profile.isActive ? 'text-primary-default font-bold' : 'text-[#e6e6e6]'
-                      } truncate`}>
-                        {profile.name}
-                      </p>
-                      {/* Active chip */}
-                      {profile.isActive && (
-                        <div className="bg-primary-default/20 px-2 py-0.5 rounded">
-                          <p className="font-logitech font-bold text-[10px] text-primary-default uppercase tracking-wider">
-                            Active
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                    {/* More options (three dots) */}
-                    <div className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="10" cy="5" r="1.5" fill="#A7A7A8"/>
-                        <circle cx="10" cy="10" r="1.5" fill="#A7A7A8"/>
-                        <circle cx="10" cy="15" r="1.5" fill="#A7A7A8"/>
-                      </svg>
-                    </div>
-                  </button>
-                ))}
+                    );
+                  })}
+                </div>
+                <div className="bg-[rgba(251,251,251,0.02)] rounded-3xl self-stretch w-[6px] shrink-0">
+                  <div className="bg-[#2e2e2e] h-14 w-[6px] rounded-lg" />
+                </div>
               </div>
             )}
           </div>
 
           {/* Onboard Memory Section */}
-          <div>
+          <div className="flex flex-col gap-1 items-start w-full">
             {/* Section header */}
-            <button
-              onClick={() => setOnboardExpanded(!onboardExpanded)}
-              className="w-full px-3 py-3 flex items-center justify-between hover:bg-[#242424] transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5">
-                  {/* Using G logo as placeholder for onboard icon */}
-                  <img alt="Onboard" src={imgLogoLogitechG} className="w-full h-full opacity-60" />
+            <div className="flex flex-wrap gap-y-2 h-12 items-center justify-center w-full">
+              <button
+                onClick={() => toggleSection('onboard')}
+                className="flex flex-1 flex-row items-center self-stretch hover:opacity-80 transition-opacity"
+              >
+                <div className="flex flex-1 h-full items-center justify-between min-w-0 pr-1">
+                  <div className="flex gap-2 items-center shrink-0">
+                    <div className="w-6 h-6 relative shrink-0">
+                      <img alt="" className="absolute block max-w-none w-full h-full" src={imgOnboardMemoryEmpty} />
+                    </div>
+                    <div className="flex flex-col justify-center leading-[0] overflow-hidden text-ellipsis whitespace-nowrap">
+                      <p className="font-logitech font-bold text-sm leading-[1.3] text-[#e6e6e6] tracking-[-0.42px] overflow-hidden text-ellipsis">
+                        Onboard Memory
+                      </p>
+                    </div>
+                    <div className="border-2 border-[#2e2e2e] flex h-7 items-center max-h-7 min-h-7 px-3 py-0 rounded-full shrink-0 hover:bg-[#242424] transition-colors">
+                      <div className="flex flex-col justify-center leading-[0] whitespace-nowrap">
+                        <p className="font-logitech font-bold text-xs leading-[1.3] text-[#a7a7a8]">
+                          Restore
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center shrink-0">
+                    <div className="w-6 h-6 relative shrink-0">
+                      <img alt="" className="absolute block max-w-none w-full h-full" src={expandedSection === 'onboard' ? imgChevronUpSmall : imgChevronDownSmall} />
+                    </div>
+                  </div>
                 </div>
-                <p className="font-logitech font-bold text-xs text-[#a7a7a8] uppercase tracking-wider">
-                  ONBOARD MEMORY
-                </p>
-              </div>
-              <div className={`w-5 h-5 transition-transform ${onboardExpanded ? 'rotate-90' : ''}`}>
-                <img alt="" src={imgChevronSmallRight} className="w-full h-full" />
-              </div>
-            </button>
+              </button>
+            </div>
 
             {/* Profile list */}
-            {onboardExpanded && (
-              <div className="pb-2">
-                {filteredOnboard.map((profile) => (
-                  <button
-                    key={profile.id}
-                    onClick={() => handleProfileClick(profile.id)}
-                    className={`w-full px-3 py-2 flex items-center justify-between group hover:bg-[#242424] transition-colors ${
-                      profile.isActive ? 'bg-[rgba(0,184,252,0.14)]' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      {/* Profile icon - onboard icon placeholder */}
-                      <div className="w-6 h-6 shrink-0">
-                        <img alt="" src={imgLogoLogitechG} className="w-full h-full opacity-60" />
+            {expandedSection === 'onboard' && (
+              <div className="border border-[#242424] flex gap-1 items-start p-1 rounded-lg w-full">
+                <div className="flex flex-1 flex-col gap-1 items-start min-w-0">
+                  {sortedOnboard.map((profile) => {
+                    const isActive = profile.id === activeProfile;
+                    return (
+                      <div key={profile.id} className="flex flex-wrap gap-y-2 items-start w-full">
+                        <button
+                          onClick={() => handleProfileClick(profile.id)}
+                          className={`flex flex-1 gap-2 h-10 items-center min-w-0 pl-3 pr-0 rounded ${
+                            isActive ? 'bg-[rgba(0,184,252,0.14)]' : 'hover:bg-[#242424]'
+                          } transition-colors`}
+                        >
+                          <div className={`flex flex-1 flex-col h-6 justify-center leading-[0] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${
+                            isActive ? 'font-bold' : ''
+                          }`}>
+                            <p className={`font-logitech text-sm leading-[1.3] tracking-[-0.42px] overflow-hidden text-ellipsis ${
+                              isActive ? 'text-[#00b8fc] font-bold' : 'text-[#e6e6e6]'
+                            }`}>
+                              {profile.name}
+                            </p>
+                          </div>
+                          {isActive && (
+                            <div className="border border-[#00b8fc] flex flex-wrap h-6 items-center justify-center max-h-6 min-h-6 rounded shrink-0">
+                              <div className="flex flex-row items-center self-stretch">
+                                <div className="flex gap-0 h-full items-center overflow-clip p-0 rounded shrink-0">
+                                  <div className="flex h-full items-center justify-center px-3 py-0 shrink-0">
+                                    <div className="flex flex-col justify-center leading-[0] whitespace-nowrap">
+                                      <p className="font-logitech text-xs leading-[1.3] text-[#00b8fc] text-center">
+                                        Active
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          <div className="w-6 h-6 relative shrink-0">
+                            <img alt="" className="absolute block max-w-none w-full h-full" src={imgMoreOptionsVertical} />
+                          </div>
+                        </button>
                       </div>
-                      {/* Profile name */}
-                      <p className={`font-logitech font-normal text-sm ${
-                        profile.isActive ? 'text-primary-default font-bold' : 'text-[#e6e6e6]'
-                      } truncate`}>
-                        {profile.name}
-                      </p>
-                      {/* Active chip */}
-                      {profile.isActive && (
-                        <div className="bg-primary-default/20 px-2 py-0.5 rounded">
-                          <p className="font-logitech font-bold text-[10px] text-primary-default uppercase tracking-wider">
-                            Active
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                    {/* More options (three dots) */}
-                    <div className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="10" cy="5" r="1.5" fill="#A7A7A8"/>
-                        <circle cx="10" cy="10" r="1.5" fill="#A7A7A8"/>
-                        <circle cx="10" cy="15" r="1.5" fill="#A7A7A8"/>
-                      </svg>
-                    </div>
-                  </button>
-                ))}
+                    );
+                  })}
+                </div>
+                <div className="bg-[rgba(251,251,251,0.02)] rounded-3xl self-stretch w-[6px] shrink-0">
+                  <div className="bg-[#2e2e2e] h-14 w-[6px] rounded-lg" />
+                </div>
               </div>
             )}
           </div>
         </div>
 
         {/* Manage profiles button */}
-        <div className="p-3 border-t border-[#242424]">
-          <button className="w-full h-10 bg-[#242424] hover:bg-[#2d2d2d] rounded-lg flex items-center justify-center transition-colors">
-            <p className="font-logitech font-bold text-sm text-[#e6e6e6]">
-              Manage profiles
-            </p>
-          </button>
+        <div className="border-t border-[#242424] flex items-center justify-center pt-4 px-4 pb-4">
+          <div className="flex gap-4 items-center shrink-0">
+            <button className="border-2 border-[#2e2e2e] h-8 px-3 py-0 rounded-full hover:bg-[#242424] transition-colors">
+              <div className="flex flex-col justify-center leading-[0] whitespace-nowrap">
+                <p className="font-logitech font-bold text-xs leading-[1.3] text-[#a7a7a8] uppercase tracking-[0.36px]">
+                  Manage profiles
+                </p>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </>

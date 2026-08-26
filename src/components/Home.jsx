@@ -350,11 +350,10 @@ export default function Home() {
         breadcrumb={['DEVICES', 'GHOST']}
         activeProfile={
           currentPreset === 'desktop' ? 'Desktop: Default' :
-          currentPreset === 'fps' ? 'FPS' :
-          currentPreset === 'figma' ? 'Figma' :
-          currentPreset === 'marvelRivals' ? 'Marvel Rivals' :
+          currentPreset === 'fps' ? 'First Person Shoother' :
+          currentPreset === 'p3ghost' ? 'P3: Ghost' :
           currentPreset === 'p1' ? 'P1' :
-          currentPreset === 'p2' ? 'P2' :
+          currentPreset === 'p2' ? 'P2: Ghost' :
           currentPreset === 'p3' ? 'P3' :
           'Desktop: Default'
         }
