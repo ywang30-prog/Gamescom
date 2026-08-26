@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const imgLogoLogitechG = "/figmaAssets/logo-logitech-g.svg";
 const imgCloseSmall = "/figmaAssets/close-small.svg";
@@ -15,10 +15,19 @@ const imgOnboardMemoryEmpty = "/figmaAssets/onboard-memory-empty.svg";
 export default function ProfileModal({ isOpen, onClose, activeProfile, onProfileSelect }) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Both sections can be expanded independently
+  // Both sections can be expanded independently, but by default only the one with active profile is expanded
   const isOnboardActive = activeProfile.startsWith('p');
   const [gHubExpanded, setGHubExpanded] = useState(!isOnboardActive);
   const [onboardExpanded, setOnboardExpanded] = useState(isOnboardActive);
+
+  // Reset expansion state when modal opens or active profile changes
+  useEffect(() => {
+    if (isOpen) {
+      const shouldExpandOnboard = activeProfile.startsWith('p');
+      setGHubExpanded(!shouldExpandOnboard);
+      setOnboardExpanded(shouldExpandOnboard);
+    }
+  }, [isOpen, activeProfile]);
 
   if (!isOpen) return null;
 
