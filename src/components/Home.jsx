@@ -8,6 +8,7 @@ import SaveNotification from './SaveNotification';
 import DeviceStatusWidget from './DeviceStatusWidget';
 import SystemHeader from './SystemHeader';
 import ProfileHeader from './ProfileHeader';
+import ProfileModal from './ProfileModal';
 
 // Image assets
 const imgIcon = "/figmaAssets/chevron-icon.svg";
@@ -28,6 +29,7 @@ export default function Home() {
   const [selectedHotspot, setSelectedHotspot] = useState(null);
   const [hoveredTooltipId, setHoveredTooltipId] = useState(null);
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [currentPreset, setCurrentPreset] = useState(() => {
     return localStorage.getItem('currentPreset') || 'desktop';
   });
@@ -188,8 +190,16 @@ export default function Home() {
   };
 
   const handlePresetClick = () => {
-    console.log('Preset selector clicked');
-    setIsPresetModalOpen(true);
+    console.log('Profile selector clicked');
+    setIsProfileModalOpen(true);
+  };
+
+  const handleProfileSelect = (profileId) => {
+    console.log(`Profile selected: ${profileId}`);
+    setCurrentPreset(profileId);
+    localStorage.setItem('currentPreset', profileId);
+    // Reset saved settings when switching profiles
+    setSavedSettings(null);
   };
 
   const handlePresetSave = (presetId) => {
@@ -340,7 +350,16 @@ export default function Home() {
       <SystemHeader />
       <ProfileHeader
         breadcrumb={['DEVICES', 'GHOST']}
-        activeProfile={currentPreset === 'desktop' ? 'Desktop: Default' : currentPreset === 'fps' ? 'First Person Shooter' : currentPreset === 'p1' ? 'P1' : currentPreset === 'p2' ? 'P2: Ghost' : currentPreset === 'p3' ? 'P3' : 'Desktop: Default'}
+        activeProfile={
+          currentPreset === 'desktop' ? 'Desktop: Default' :
+          currentPreset === 'fps' ? 'FPS' :
+          currentPreset === 'figma' ? 'Figma' :
+          currentPreset === 'marvelRivals' ? 'Marvel Rivals' :
+          currentPreset === 'p1' ? 'P1' :
+          currentPreset === 'p2' ? 'P2' :
+          currentPreset === 'p3' ? 'P3' :
+          'Desktop: Default'
+        }
         isOnboard={isOnboardPreset(currentPreset)}
         onProfileClick={handlePresetClick}
       />
@@ -500,6 +519,14 @@ export default function Home() {
         onSave={handlePresetSave}
         currentPreset={currentPreset}
         onOpenImportModal={handleOpenImportModal}
+      />
+
+      {/* Profile Modal (New) */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        activeProfile={currentPreset}
+        onProfileSelect={handleProfileSelect}
       />
 
       {/* Import Profile Modal */}
