@@ -6,6 +6,9 @@ import ImportProfileModal from './ImportProfileModal';
 import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
 import DeviceStatusWidget from './DeviceStatusWidget';
+import SystemHeader from './SystemHeader';
+import ProfileHeader from './ProfileHeader';
+import ProfileModal from './ProfileModal';
 import BinaryToggle from './BinaryToggle';
 import Toggle from './Toggle';
 
@@ -60,6 +63,7 @@ export default function Mapping() {
 
   // Profile management state - synced with localStorage
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [currentPreset, setCurrentPreset] = useState(() => {
     return localStorage.getItem('currentPreset') || 'desktop';
   });
@@ -101,7 +105,39 @@ export default function Mapping() {
 
   // Profile management handlers
   const handlePresetClick = () => {
-    setIsPresetModalOpen(true);
+    setIsProfileModalOpen(true);
+  };
+
+  const handleProfileSelect = (profileId) => {
+    setCurrentPreset(profileId);
+    localStorage.setItem('currentPreset', profileId);
+
+    // Load saved settings for the new profile (same logic as handlePresetSave)
+    const savedDeadzone = localStorage.getItem(`stickDeadzone_${profileId}`);
+    const savedDeadzone2 = localStorage.getItem(`stickDeadzone2_${profileId}`);
+    const savedCurve = localStorage.getItem(`stickCurveAdjustment_${profileId}`);
+    const savedSens = localStorage.getItem(`stickSensitivity_${profileId}`);
+    const savedPoints = localStorage.getItem(`stickControlPoints_${profileId}`);
+
+    const loadedSensitivity = savedSens || 'Linear';
+    const loadedCurveAdjustment = savedCurve !== null ? JSON.parse(savedCurve) : 0;
+    const defaultControlPoints = getPresetControlPoints(loadedSensitivity, loadedCurveAdjustment);
+
+    setLeftDeadzone(savedDeadzone !== null ? JSON.parse(savedDeadzone) : 18);
+    setRightDeadzone(savedDeadzone2 !== null ? JSON.parse(savedDeadzone2) : 5);
+    setCurveAdjustment(loadedCurveAdjustment);
+    setSensitivity(loadedSensitivity);
+    setControlPoints(savedPoints ? JSON.parse(savedPoints) : defaultControlPoints);
+    setActiveStick('left');
+
+    // Set saved settings baseline
+    setSavedSettings({
+      leftDeadzone: savedDeadzone !== null ? JSON.parse(savedDeadzone) : 18,
+      rightDeadzone: savedDeadzone2 !== null ? JSON.parse(savedDeadzone2) : 5,
+      curveAdjustment: loadedCurveAdjustment,
+      sensitivity: loadedSensitivity,
+      controlPoints: savedPoints ? JSON.parse(savedPoints) : defaultControlPoints,
+    });
   };
 
   const handlePresetSave = (presetId) => {
@@ -989,74 +1025,30 @@ export default function Mapping() {
 
   return (
     <div className="bg-black w-full min-w-[1440px] h-screen flex flex-col">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between gap-4 px-8 py-2 border-b border-solid border-[#333]">
-        <div className="inline-flex items-center gap-4">
-          <button
-            onClick={() => navigate('/')}
-            className="rounded-full bg-[#242424] w-10 h-10 flex items-center justify-center hover:bg-[#333] transition-colors shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5 text-[#a7a7a8]" />
-          </button>
-
-          <div className="flex gap-1 items-center h-10">
-            <button
-              onClick={() => navigate('/')}
-              className="flex flex-col gap-[19px] items-center pt-[18px] px-4 cursor-pointer hover:opacity-80 transition-opacity outline-none focus-visible:ring-2 focus-visible:ring-primary-default rounded"
-            >
-              <span className="font-logitech text-[14px] text-[#a7a7a8] tracking-[-0.42px] leading-[1.3]">
-                GHOST
-              </span>
-              <div className="h-px rounded-[1px] shrink-0 w-10" />
-            </button>
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4 w-[5px]">
-              <ChevronRight className="w-4 h-4 text-[#a7a7a8]" />
-              <div className="h-px rounded-[1px] shrink-0 w-10" />
-            </div>
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4">
-              <span className="font-logitech font-bold leading-[1.3] text-[#00b6fa] text-sm text-center tracking-[-0.42px] whitespace-nowrap">
-                BUTTON REMAPPING
-              </span>
-              <div className="bg-[#00b6fa] h-px rounded-[1px] shrink-0 w-6" />
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Global Headers */}
+      <SystemHeader />
+      <ProfileHeader
+        breadcrumb={['DEVICES', 'GHOST', 'STICKS']}
+        activeProfile={
+          currentPreset === 'desktop' ? 'Desktop: Default' :
+          currentPreset === 'fps' ? 'FPS' :
+          currentPreset === 'figma' ? 'Figma' :
+          currentPreset === 'marvelRivals' ? 'Marvel Rivals' :
+          currentPreset === 'p1' ? 'P1' :
+          currentPreset === 'p2' ? 'P2' :
+          currentPreset === 'p3' ? 'P3' :
+          'Desktop: Default'
+        }
+        isOnboard={['p1', 'p2', 'p3'].includes(currentPreset)}
+        onProfileClick={handlePresetClick}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex px-8 pb-8 gap-4 overflow-hidden pt-4">
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
-          {/* Preset Selector */}
-          <div className="bg-[#1a1a1a] p-4 rounded-2xl w-full">
-            <ProfileSelector
-              currentPreset={currentPreset}
-              hasUnsavedChanges={hasUnsavedChanges}
-              onPresetClick={handlePresetClick}
-              onSaveSettings={handleSaveSettings}
-            />
-          </div>
-
           {/* Controls Panel */}
           <div className="bg-[#1a1a1a] rounded-t-2xl flex-1 pt-4 px-4 overflow-y-auto">
-            {/* Header with back button */}
-            <div className="mb-6 pb-4 border-b border-[#2e2e2e]">
-              <div className="flex items-center gap-4">
-                {/* Back button */}
-                <button
-                  onClick={() => navigate('/')}
-                  className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-[#2e2e2e] shrink-0 hover:bg-[#2e2e2e] transition-colors cursor-pointer"
-                >
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                    <path d="M14 7L9 12L14 17" stroke="#e6e6e6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                {/* Title */}
-                <h2 className="font-logitech font-bold text-[#e6e6e6] text-[16px] tracking-[-0.48px] leading-[1.28]">
-                  Sticks
-                </h2>
-              </div>
-            </div>
 
             {/* Inner Deadzone */}
             <div className="mb-6">
@@ -1796,6 +1788,14 @@ export default function Mapping() {
         onSave={handlePresetSave}
         currentPreset={currentPreset}
         onOpenImportModal={handleOpenImportModal}
+      />
+
+      {/* Profile Modal (New) */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        activeProfile={currentPreset}
+        onProfileSelect={handleProfileSelect}
       />
 
       {/* Import Profile Modal */}
