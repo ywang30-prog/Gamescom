@@ -818,7 +818,7 @@ export default function TriggerDeadzone() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex px-8 pb-8 gap-4 pt-4" style={{ overflow: 'hidden' }}>
+      <div className="flex-1 flex px-8 pb-8 gap-4 pt-10" style={{ overflow: 'hidden' }}>
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Trigger Controls Panel */}

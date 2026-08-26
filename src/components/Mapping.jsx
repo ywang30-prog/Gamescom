@@ -1044,7 +1044,7 @@ export default function Mapping() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex px-8 pb-8 gap-4 overflow-hidden pt-4">
+      <div className="flex-1 flex px-8 pb-8 gap-4 overflow-hidden pt-10">
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Controls Panel */}

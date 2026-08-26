@@ -1237,7 +1237,7 @@ export default function ButtonMapping() {
       />
 
       {/* Main content */}
-      <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-4">
+      <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-10">
         {/* Left Panel */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Button Remapping Panel */}

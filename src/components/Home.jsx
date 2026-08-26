@@ -365,7 +365,7 @@ export default function Home() {
       />
 
       {/* Main content - adjusted for new headers */}
-      <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-4" style={{ marginTop: '0px' }}>
+      <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-10">
         {/* Side Panel - matches Figma design */}
         <div className="w-[419px] shrink-0">
           <div className="bg-[#1a1a1a] border border-[#242424] border-solid flex flex-col gap-4 items-start p-4 rounded-2xl w-full h-full">

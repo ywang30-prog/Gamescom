@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import Button from './Button';
 import DeviceStatusWidget from './DeviceStatusWidget';
+import SystemHeader from './SystemHeader';
+import ProfileHeader from './ProfileHeader';
+import ProfileModal from './ProfileModal';
 
 export default function ReflexRange() {
   const navigate = useNavigate();
@@ -15,6 +18,12 @@ export default function ReflexRange() {
   const [totalShots, setTotalShots] = useState(0);
   const [totalHits, setTotalHits] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(30);
+
+  // Profile management state
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [currentPreset, setCurrentPreset] = useState(() => {
+    return localStorage.getItem('currentPreset') || 'desktop';
+  });
 
   // Calculate accuracy on the fly
   const accuracy = totalShots === 0 ? 0 : Math.round((totalHits / totalShots) * 100);
@@ -53,6 +62,17 @@ export default function ReflexRange() {
   const AIM_ASSIST_ACTIVATION_ANGLE = 0.15; // radians (~8.5 degrees) - moderate zone
   const AIM_ASSIST_SLOWDOWN = 0.5; // 50% sensitivity reduction when near target
   const AIM_ASSIST_MAGNETISM = 0.25; // 25% pull strength toward target
+
+  // Profile management handlers
+  const handleProfileClick = () => {
+    setIsProfileModalOpen(true);
+  };
+
+  const handleProfileSelect = (profileId) => {
+    setCurrentPreset(profileId);
+    localStorage.setItem('currentPreset', profileId);
+    // Note: Aim training doesn't persist settings per profile
+  };
 
   // Detect gamepad
   useEffect(() => {
@@ -753,6 +773,24 @@ export default function ReflexRange() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+      {/* Global Headers */}
+      <SystemHeader />
+      <ProfileHeader
+        breadcrumb={['DEVICES', 'GHOST', 'AIM TRAINING']}
+        activeProfile={
+          currentPreset === 'desktop' ? 'Desktop: Default' :
+          currentPreset === 'fps' ? 'FPS' :
+          currentPreset === 'figma' ? 'Figma' :
+          currentPreset === 'marvelRivals' ? 'Marvel Rivals' :
+          currentPreset === 'p1' ? 'P1' :
+          currentPreset === 'p2' ? 'P2' :
+          currentPreset === 'p3' ? 'P3' :
+          'Desktop: Default'
+        }
+        isOnboard={['p1', 'p2', 'p3'].includes(currentPreset)}
+        onProfileClick={handleProfileClick}
+      />
+
       {gameState === 'menu' && (
         <div className="flex-1 flex flex-col items-center justify-center p-8">
           <div className="w-full max-w-[800px]">
@@ -955,6 +993,14 @@ export default function ReflexRange() {
           />
         </div>
       )}
+
+      {/* Profile Modal */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        activeProfile={currentPreset}
+        onProfileSelect={handleProfileSelect}
+      />
     </div>
   );
 }
