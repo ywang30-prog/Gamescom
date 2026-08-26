@@ -137,14 +137,16 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
             >
               <div className="flex flex-1 h-full items-center justify-between pr-1">
                 <div className="flex gap-2 items-center shrink-0">
-                  <div className="w-6 h-6 relative shrink-0">
+                  <div className="w-6 h-6 relative shrink-0" style={!isOnboardActive ? { filter: 'brightness(0) saturate(100%) invert(52%) sepia(96%) saturate(3206%) hue-rotate(175deg) brightness(102%) contrast(101%)' } : {}}>
                     <img alt="" className="absolute block max-w-none w-full h-full" src={imgLogoLogitechG} />
                   </div>
-                  <p className="font-logitech font-bold text-sm leading-[1.3] text-[#00b8fc] tracking-[-0.42px]">
+                  <p className={`font-logitech font-bold text-sm leading-[1.3] tracking-[-0.42px] ${
+                    !isOnboardActive ? 'text-[#00b8fc]' : 'text-[#e6e6e6]'
+                  }`}>
                     G HUB Profiles
                   </p>
                 </div>
-                <div className="w-6 h-6 relative shrink-0">
+                <div className="w-6 h-6 relative shrink-0" style={!isOnboardActive ? { filter: 'brightness(0) saturate(100%) invert(52%) sepia(96%) saturate(3206%) hue-rotate(175deg) brightness(102%) contrast(101%)' } : {}}>
                   <img alt="" className="absolute block max-w-none w-full h-full" src={gHubExpanded ? imgChevronUpSmall : imgChevronDownSmall} />
                 </div>
               </div>
@@ -210,10 +212,12 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
             >
               <div className="flex flex-1 h-full items-center justify-between pr-1">
                 <div className="flex gap-2 items-center shrink-0">
-                  <div className="w-6 h-6 relative shrink-0">
+                  <div className="w-6 h-6 relative shrink-0" style={isOnboardActive ? { filter: 'brightness(0) saturate(100%) invert(52%) sepia(96%) saturate(3206%) hue-rotate(175deg) brightness(102%) contrast(101%)' } : {}}>
                     <img alt="" className="absolute block max-w-none w-full h-full" src={imgOnboardMemoryEmpty} />
                   </div>
-                  <p className="font-logitech font-bold text-sm leading-[1.3] text-[#e6e6e6] tracking-[-0.42px]">
+                  <p className={`font-logitech font-bold text-sm leading-[1.3] tracking-[-0.42px] ${
+                    isOnboardActive ? 'text-[#00b8fc]' : 'text-[#e6e6e6]'
+                  }`}>
                     Onboard Memory
                   </p>
                   <div className="border-2 border-[#2e2e2e] flex h-7 items-center px-3 rounded-full shrink-0 hover:bg-[#242424] transition-colors">
@@ -222,7 +226,7 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
                     </p>
                   </div>
                 </div>
-                <div className="w-6 h-6 relative shrink-0">
+                <div className="w-6 h-6 relative shrink-0" style={isOnboardActive ? { filter: 'brightness(0) saturate(100%) invert(52%) sepia(96%) saturate(3206%) hue-rotate(175deg) brightness(102%) contrast(101%)' } : {}}>
                   <img alt="" className="absolute block max-w-none w-full h-full" src={onboardExpanded ? imgChevronUpSmall : imgChevronDownSmall} />
                 </div>
               </div>
