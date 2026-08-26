@@ -15,9 +15,10 @@ const imgOnboardMemoryEmpty = "/figmaAssets/onboard-memory-empty.svg";
 export default function ProfileModal({ isOpen, onClose, activeProfile, onProfileSelect }) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Determine which section should be expanded based on active profile type
+  // Both sections can be expanded independently
   const isOnboardActive = activeProfile.startsWith('p');
-  const [expandedSection, setExpandedSection] = useState(isOnboardActive ? 'onboard' : 'ghub');
+  const [gHubExpanded, setGHubExpanded] = useState(!isOnboardActive);
+  const [onboardExpanded, setOnboardExpanded] = useState(isOnboardActive);
 
   if (!isOpen) return null;
 
@@ -59,10 +60,6 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
   const handleProfileClick = (profileId) => {
     onProfileSelect(profileId);
     onClose();
-  };
-
-  const toggleSection = (section) => {
-    setExpandedSection(expandedSection === section ? null : section);
   };
 
   return (
@@ -126,7 +123,7 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
           <div className="flex flex-col gap-1 items-start w-full">
             {/* Section header - h-10 */}
             <button
-              onClick={() => toggleSection('ghub')}
+              onClick={() => setGHubExpanded(!gHubExpanded)}
               className="flex h-10 items-center w-full hover:opacity-80 transition-opacity"
             >
               <div className="flex flex-1 h-full items-center justify-between pr-1">
@@ -139,13 +136,13 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
                   </p>
                 </div>
                 <div className="w-6 h-6 relative shrink-0">
-                  <img alt="" className="absolute block max-w-none w-full h-full" src={expandedSection === 'ghub' ? imgChevronUpSmall : imgChevronDownSmall} />
+                  <img alt="" className="absolute block max-w-none w-full h-full" src={gHubExpanded ? imgChevronUpSmall : imgChevronDownSmall} />
                 </div>
               </div>
             </button>
 
             {/* Profile list - border, p-1, gap-1 */}
-            {expandedSection === 'ghub' && (
+            {gHubExpanded && (
               <div className="border border-[#242424] flex gap-1 items-start p-1 rounded-lg w-full">
                 <div className="flex flex-1 flex-col gap-1 items-start">
                   {sortedGHub.map((profile) => {
@@ -199,7 +196,7 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
           <div className="flex flex-col gap-1 items-start w-full">
             {/* Section header - h-12 */}
             <button
-              onClick={() => toggleSection('onboard')}
+              onClick={() => setOnboardExpanded(!onboardExpanded)}
               className="flex h-12 items-center w-full hover:opacity-80 transition-opacity"
             >
               <div className="flex flex-1 h-full items-center justify-between pr-1">
@@ -217,13 +214,13 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
                   </div>
                 </div>
                 <div className="w-6 h-6 relative shrink-0">
-                  <img alt="" className="absolute block max-w-none w-full h-full" src={expandedSection === 'onboard' ? imgChevronUpSmall : imgChevronDownSmall} />
+                  <img alt="" className="absolute block max-w-none w-full h-full" src={onboardExpanded ? imgChevronUpSmall : imgChevronDownSmall} />
                 </div>
               </div>
             </button>
 
             {/* Profile list */}
-            {expandedSection === 'onboard' && (
+            {onboardExpanded && (
               <div className="border border-[#242424] flex gap-1 items-start p-1 rounded-lg w-full">
                 <div className="flex flex-1 flex-col gap-1 items-start">
                   {sortedOnboard.map((profile) => {
