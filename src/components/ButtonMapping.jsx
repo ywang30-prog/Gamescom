@@ -7,6 +7,9 @@ import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
 import ActionsModal from './ActionsModal';
 import DeviceStatusWidget from './DeviceStatusWidget';
+import SystemHeader from './SystemHeader';
+import ProfileHeader from './ProfileHeader';
+import ProfileModal from './ProfileModal';
 import BinaryToggle from './BinaryToggle';
 
 // Image assets
@@ -432,6 +435,7 @@ export default function ButtonMapping() {
 
   // Profile management state
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [currentPreset, setCurrentPreset] = useState(() => {
     return localStorage.getItem('currentPreset') || 'desktop';
   });
@@ -760,7 +764,52 @@ export default function ButtonMapping() {
   };
 
   const handlePresetClick = () => {
-    setIsPresetModalOpen(true);
+    setIsProfileModalOpen(true);
+  };
+
+  const handleProfileSelect = (profileId) => {
+    setCurrentPreset(profileId);
+    localStorage.setItem('currentPreset', profileId);
+
+    // Load saved settings for the new profile (same logic as handlePresetSave)
+    const savedMappings = localStorage.getItem(`buttonMappings_${profileId}`);
+    const savedTooltips = localStorage.getItem(`tooltipAssignments_${profileId}_${presetConfig}`);
+
+    if (savedMappings) {
+      const loadedMappings = JSON.parse(savedMappings);
+      setAssignments(loadedMappings);
+    } else {
+      // Reset to defaults if no saved data
+      const defaults = {};
+      buttonMappings.forEach(btn => {
+        defaults[btn.id] = btn.defaultAssignment;
+      });
+      setAssignments(defaults);
+    }
+
+    const defaults = getDefaultTooltipAssignments(presetConfig);
+    if (savedTooltips) {
+      const loadedTooltips = JSON.parse(savedTooltips);
+      // Merge with defaults to include any new keys
+      setTooltipAssignments({...defaults, ...loadedTooltips});
+    } else {
+      // Clear old format key if it exists
+      localStorage.removeItem(`tooltipAssignments_${profileId}`);
+      // Reset to defaults if no saved data
+      setTooltipAssignments({...defaults});
+    }
+
+    // Set saved settings baseline
+    setTimeout(() => {
+      setSavedSettings({
+        assignments: savedMappings ? JSON.parse(savedMappings) : (
+          buttonMappings.reduce((acc, btn) => ({ ...acc, [btn.id]: btn.defaultAssignment }), {})
+        ),
+        tooltips: savedTooltips ? JSON.parse(savedTooltips) : {...defaults},
+      });
+      setHasUnsavedChanges(false);
+      localStorage.setItem('hasUnsavedChanges', 'false');
+    }, 0);
   };
 
   const handlePresetSave = (presetId) => {
@@ -1169,54 +1218,28 @@ export default function ButtonMapping() {
           }
         }
       `}</style>
-      {/* Navigation */}
-      <nav className="flex items-center justify-between gap-4 px-8 py-2 border-b border-solid border-[#333]">
-        <div className="inline-flex items-center gap-4">
-          <button
-            onClick={() => navigate('/')}
-            className="rounded-full bg-[#242424] w-10 h-10 flex items-center justify-center hover:bg-[#333] transition-colors shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5 text-[#a7a7a8]" />
-          </button>
-
-          <div className="flex gap-1 items-center h-10">
-            <button
-              onClick={() => navigate('/')}
-              className="flex flex-col gap-[19px] items-center pt-[18px] px-4 cursor-pointer hover:opacity-80 transition-opacity outline-none focus-visible:ring-2 focus-visible:ring-primary-default rounded"
-            >
-              <span className="font-logitech text-[14px] text-[#a7a7a8] tracking-[-0.42px] leading-[1.3]">
-                GHOST
-              </span>
-              <div className="h-px rounded-[1px] shrink-0 w-10" />
-            </button>
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4 w-[5px]">
-              <ChevronRight className="w-4 h-4 text-[#a7a7a8]" />
-              <div className="h-px rounded-[1px] shrink-0 w-10" />
-            </div>
-            <div className="flex flex-col gap-[19px] items-center pt-[18px] px-4">
-              <span className="font-logitech font-bold leading-[1.3] text-[#00b6fa] text-sm text-center tracking-[-0.42px] whitespace-nowrap">
-                BUTTON REMAPPING
-              </span>
-              <div className="bg-[#00b6fa] h-px rounded-[1px] shrink-0 w-6" />
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Global Headers */}
+      <SystemHeader />
+      <ProfileHeader
+        breadcrumb={['DEVICES', 'GHOST', 'BUTTON REMAPPING']}
+        activeProfile={
+          currentPreset === 'desktop' ? 'Desktop: Default' :
+          currentPreset === 'fps' ? 'FPS' :
+          currentPreset === 'figma' ? 'Figma' :
+          currentPreset === 'marvelRivals' ? 'Marvel Rivals' :
+          currentPreset === 'p1' ? 'P1' :
+          currentPreset === 'p2' ? 'P2' :
+          currentPreset === 'p3' ? 'P3' :
+          'Desktop: Default'
+        }
+        isOnboard={['p1', 'p2', 'p3'].includes(currentPreset)}
+        onProfileClick={handlePresetClick}
+      />
 
       {/* Main content */}
       <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-4">
         {/* Left Panel */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
-          {/* Profile Selector */}
-          <div className="bg-[#1a1a1a] p-4 rounded-2xl w-full">
-            <ProfileSelector
-              currentPreset={currentPreset}
-              hasUnsavedChanges={hasUnsavedChanges}
-              onPresetClick={handlePresetClick}
-              onSaveSettings={handleSaveSettings}
-            />
-          </div>
-
           {/* Button Remapping Panel */}
           <div className="bg-[#1a1a1a] rounded-2xl flex-1 flex flex-col overflow-hidden w-full">
             {/* Header */}
@@ -2779,6 +2802,14 @@ export default function ButtonMapping() {
         onSave={handlePresetSave}
         currentPreset={currentPreset}
         onOpenImportModal={handleOpenImportModal}
+      />
+
+      {/* Profile Modal (New) */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        activeProfile={currentPreset}
+        onProfileSelect={handleProfileSelect}
       />
 
       <ImportProfileModal
