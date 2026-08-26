@@ -1,74 +1,59 @@
-import { useState } from 'react';
+const imgArrowRightSmall = "/figmaAssets/arrow-right-small.svg";
 
 /**
- * ListItem component with Elysium Design System states
- * States: Enabled, Hovered, Pressed, Focused, Disabled
+ * ListItem component matching Figma Side Panel design
+ * Two-line list item with icon, title, subtitle, and arrow button
  */
 export default function ListItem({
   icon,
   title,
   subtitle,
-  iconRotation = 0,
   onClick,
   disabled = false,
-  chevron = true,
 }) {
-  const [isFocused, setIsFocused] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const imgVector1 = "/figmaAssets/chevron-icon.svg";
-
   return (
     <button
-      className={`
-        w-full bg-surface-neutral-default flex items-center justify-between p-08 rounded-08
-        transition-all duration-200 ease-in outline-none
-        hover:bg-[#2d2d2d]
-        active:bg-[#383838] active:scale-[0.99]
-        focus-visible:ring-2 focus-visible:ring-primary-default focus-visible:ring-offset-2 focus-visible:ring-offset-black
-        disabled:bg-[#1f1f1f] disabled:cursor-not-allowed disabled:opacity-50
-        ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
-      `}
+      className="bg-[#242424] w-full h-[56px] flex items-center justify-center p-0 rounded-lg transition-all duration-200 ease-in outline-none hover:bg-[#2d2d2d] active:bg-[#333] focus-visible:ring-2 focus-visible:ring-primary-default disabled:opacity-50 disabled:cursor-not-allowed"
       onClick={onClick}
       disabled={disabled}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex gap-12 items-center relative shrink-0">
-        <div className="bg-background-950 relative rounded-40 shrink-0 w-10 h-10 flex items-center justify-center">
-          <div
-            className="overflow-hidden w-6 h-6 transition-transform duration-200 ease-in"
-            style={{ transform: `rotate(${iconRotation}deg) scale(${isHovered ? '1.15' : '1'})` }}
-          >
-            <div className="absolute inset-[8.33%_12.5%]">
-              <img alt={title} className="absolute block max-w-none w-full h-full" src={icon} />
+      <div className="flex flex-1 gap-4 h-full items-center min-w-0 px-2">
+        <div className="flex flex-1 gap-3 items-center min-w-0">
+          {/* Icon container - 36px circle */}
+          <div className="relative rounded-full shrink-0 w-9 h-9 flex items-center justify-center">
+            <div className="w-6 h-6">
+              <img alt={title} className="w-full h-full" src={icon} />
+            </div>
+          </div>
+
+          {/* Text content */}
+          <div className="flex flex-col gap-[2px] items-start flex-1 min-w-0">
+            {/* Title */}
+            <div className="flex items-start w-full">
+              <p className="font-logitech font-bold text-sm leading-[1.3] text-[#e6e6e6] tracking-[-0.42px] whitespace-nowrap overflow-hidden text-ellipsis">
+                {title}
+              </p>
+            </div>
+            {/* Subtitle */}
+            <div className="flex items-start w-full">
+              <p className="font-logitech font-normal text-xs leading-[1.3] text-[#a7a7a8] whitespace-nowrap overflow-hidden text-ellipsis">
+                {subtitle}
+              </p>
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-[6px] items-start relative shrink-0">
-          <p className="font-logitech font-bold leading-[1.3] text-text-neutral-default text-sm tracking-[-0.42px] whitespace-nowrap">
-            {title}
-          </p>
-          <p className="font-logitech font-normal leading-[1.3] text-text-neutral-muted text-xs whitespace-nowrap">
-            {subtitle}
-          </p>
+
+        {/* Arrow icon button - 32px circle with border */}
+        <div className="flex items-center justify-center w-8 h-8 min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] shrink-0">
+          <div className="border-2 border-[#2e2e2e] border-solid flex gap-0 items-center justify-center overflow-clip p-0 rounded-full w-8 h-8">
+            <div className="flex flex-1 gap-2 h-full items-center justify-center min-w-0 p-0">
+              <div className="w-6 h-6 shrink-0">
+                <img alt="" className="w-full h-full" src={imgArrowRightSmall} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      {chevron && (
-        <div className="h-14 relative shrink-0 w-6">
-          <div className="absolute left-0 overflow-hidden w-6 h-6 top-16">
-            <div className="absolute inset-[29.17%_37.5%]">
-              <img
-                alt="Chevron right"
-                className="absolute block max-w-none w-full h-full transition-transform duration-200 ease-in group-hover:translate-x-0.5"
-                src={imgVector1}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </button>
   );
 }

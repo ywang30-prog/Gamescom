@@ -8,17 +8,16 @@ import PresetModal from './PresetModal';
 import ImportProfileModal from './ImportProfileModal';
 import HotspotDetailCard from './HotspotDetailCard';
 import SaveNotification from './SaveNotification';
-import ProfileSelector from './ProfileSelector';
 import DeviceStatusWidget from './DeviceStatusWidget';
 
 // Image assets
 const imgIcon = "/figmaAssets/chevron-icon.svg";
-const imgFunctionIconsViewCards = "/figmaAssets/actions-icon.svg";
+const imgButtonRemappingIcon = "/figmaAssets/button-remapping-icon.svg";
 const imgVector1 = "/figmaAssets/chevron-icon.svg";
-const imgVector2 = "/figmaAssets/sticks-icon.svg";
-const imgVector3 = "/figmaAssets/triggers-icon.svg";
-const imgVector4 = "/figmaAssets/input-test-icon.svg";
-const imgVector5 = "/figmaAssets/general-settings-icon.svg";
+const imgSticksIcon = "/figmaAssets/sticks-icon-new.svg";
+const imgTriggersIcon = "/figmaAssets/triggers-icon-new.svg";
+const imgAimTrainingIcon = "/figmaAssets/aim-training-icon.svg";
+const imgGeneralSettingsIcon = "/figmaAssets/settings-icon-new.svg";
 const imgGhostController = "/ghost-controller-white.png";
 
 // Feature flags
@@ -370,55 +369,46 @@ export default function Home() {
 
       {/* Main content */}
       <div className="flex-1 flex gap-4 overflow-hidden pb-8 px-8 pt-4">
-        {/* Side Panel */}
-        <div className="w-[420px] flex flex-col gap-2 shrink-0">
-          {/* Preset selector */}
-          <div className="bg-[#1a1a1a] p-4 rounded-2xl w-full">
-            <ProfileSelector
-              currentPreset={currentPreset}
-              hasUnsavedChanges={hasUnsavedChanges}
-              onPresetClick={handlePresetClick}
-              onSaveSettings={handleSaveSettings}
-            />
-          </div>
-
-          {/* Menu items */}
-          <div className="bg-[#1a1a1a] flex-1 flex flex-col gap-1 p-4 rounded-xl overflow-y-auto">
-            {/* Button Remapping */}
-            <ListItem
-              icon={imgFunctionIconsViewCards}
-              title="Button Remapping"
-              subtitle="Configure button mappings"
-              onClick={() => handleMenuClick('Actions')}
-            />
-            {/* Sticks */}
-            <ListItem
-              icon={imgVector2}
-              title="Sticks"
-              subtitle="Adjust analog stick settings"
-              onClick={() => handleMenuClick('Sticks')}
-            />
-            {/* Triggers */}
-            <ListItem
-              icon={imgVector3}
-              title="Triggers"
-              subtitle="Customize trigger behavior"
-              onClick={() => handleMenuClick('Triggers')}
-            />
-            {/* Aim Training */}
-            <ListItem
-              icon={imgVector4}
-              title="Aim Training"
-              subtitle="Test controller inputs"
-              onClick={() => handleMenuClick('Aim Training')}
-            />
-            {/* General Settings */}
-            <ListItem
-              icon={imgVector5}
-              title="General Settings"
-              subtitle="Configure device settings"
-              onClick={() => handleMenuClick('General Settings')}
-            />
+        {/* Side Panel - matches Figma design */}
+        <div className="w-[419px] shrink-0">
+          <div className="bg-[#1a1a1a] border border-[#242424] border-solid flex flex-col gap-4 items-start p-4 rounded-2xl w-full h-full">
+            <div className="flex flex-col gap-2 items-start w-full">
+              {/* Button Remapping */}
+              <ListItem
+                icon={imgButtonRemappingIcon}
+                title="Button Remapping"
+                subtitle="Customise your device buttons"
+                onClick={() => handleMenuClick('Actions')}
+              />
+              {/* Sticks */}
+              <ListItem
+                icon={imgSticksIcon}
+                title="Sticks"
+                subtitle="Change the stick settings"
+                onClick={() => handleMenuClick('Sticks')}
+              />
+              {/* Triggers */}
+              <ListItem
+                icon={imgTriggersIcon}
+                title="Triggers"
+                subtitle="Customise your trigger click settings"
+                onClick={() => handleMenuClick('Triggers')}
+              />
+              {/* Aim Training */}
+              <ListItem
+                icon={imgAimTrainingIcon}
+                title="Aim Training"
+                subtitle="Test settings with a mini game"
+                onClick={() => handleMenuClick('Aim Training')}
+              />
+              {/* General Settings */}
+              <ListItem
+                icon={imgGeneralSettingsIcon}
+                title="General Settings"
+                subtitle="General global device settings"
+                onClick={() => handleMenuClick('General Settings')}
+              />
+            </div>
           </div>
         </div>
 
