@@ -7,8 +7,7 @@ import ImportProfileModal from './ImportProfileModal';
 import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
 import DeviceStatusWidget from './DeviceStatusWidget';
-import SystemHeader from './SystemHeader';
-import ProfileHeader from './ProfileHeader';
+import Headers from './Headers';
 import ProfileModal from './ProfileModal';
 import BinaryToggle from './BinaryToggle';
 import Toggle from './Toggle';
@@ -798,11 +797,14 @@ export default function TriggerDeadzone() {
   }, [activeTrigger, activeStartValue, activeEndValue]);
 
   return (
-    <div className="bg-black w-full min-w-[1440px] h-screen relative overflow-hidden">
+    <div className="bg-black w-full h-screen relative overflow-hidden">
       {/* Global Headers */}
-      <SystemHeader />
-      <ProfileHeader
-        breadcrumb={['DEVICES', 'GHOST', 'TRIGGERS']}
+      <Headers
+        breadcrumb={[
+          'DEVICES',
+          { label: 'GHOST', onClick: () => navigate('/') },
+          'TRIGGERS'
+        ]}
         activeProfile={
           currentPreset === 'desktop' ? 'Desktop: Default' :
           currentPreset === 'fps' ? 'FPS' :
@@ -818,7 +820,7 @@ export default function TriggerDeadzone() {
       />
 
       {/* Main Content */}
-      <div className="absolute top-[120px] left-0 right-0 bottom-0 flex px-8 pb-8 gap-4" style={{ overflow: 'hidden' }}>
+      <div className="absolute top-[120px] left-0 right-0 bottom-8 flex px-8 gap-4" style={{ overflow: 'hidden' }}>
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Trigger Controls Panel */}

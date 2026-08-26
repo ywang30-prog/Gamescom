@@ -6,8 +6,7 @@ import ImportProfileModal from './ImportProfileModal';
 import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
 import DeviceStatusWidget from './DeviceStatusWidget';
-import SystemHeader from './SystemHeader';
-import ProfileHeader from './ProfileHeader';
+import Headers from './Headers';
 import ProfileModal from './ProfileModal';
 import BinaryToggle from './BinaryToggle';
 import Toggle from './Toggle';
@@ -1024,11 +1023,14 @@ export default function Mapping() {
   }, []);
 
   return (
-    <div className="bg-black w-full min-w-[1440px] h-screen relative overflow-hidden">
+    <div className="bg-black w-full h-screen relative overflow-hidden">
       {/* Global Headers */}
-      <SystemHeader />
-      <ProfileHeader
-        breadcrumb={['DEVICES', 'GHOST', 'STICKS']}
+      <Headers
+        breadcrumb={[
+          'DEVICES',
+          { label: 'GHOST', onClick: () => navigate('/') },
+          'STICKS'
+        ]}
         activeProfile={
           currentPreset === 'desktop' ? 'Desktop: Default' :
           currentPreset === 'fps' ? 'FPS' :
@@ -1044,11 +1046,29 @@ export default function Mapping() {
       />
 
       {/* Main Content */}
-      <div className="absolute top-[120px] left-0 right-0 bottom-0 flex px-8 pb-8 gap-4 overflow-hidden">
+      <div className="absolute top-[120px] left-0 right-0 bottom-8 flex px-8 gap-4 overflow-hidden">
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Controls Panel */}
           <div className="bg-[#1a1a1a] rounded-t-2xl flex-1 pt-4 px-4 overflow-y-auto">
+            {/* Header with back button */}
+            <div className="mb-6 pb-4 border-b border-[#2e2e2e]">
+              <div className="flex items-center gap-4">
+                {/* Back button */}
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-[#2e2e2e] shrink-0 hover:bg-[#2e2e2e] transition-colors cursor-pointer"
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                    <path d="M14 7L9 12L14 17" stroke="#e6e6e6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                {/* Title */}
+                <h2 className="font-logitech font-bold text-[#e6e6e6] text-[16px] tracking-[-0.48px] leading-[1.28]">
+                  Sticks
+                </h2>
+              </div>
+            </div>
 
             {/* Inner Deadzone */}
             <div className="mb-6">

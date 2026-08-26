@@ -3,8 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import Button from './Button';
 import DeviceStatusWidget from './DeviceStatusWidget';
-import SystemHeader from './SystemHeader';
-import ProfileHeader from './ProfileHeader';
+import Headers from './Headers';
 import ProfileModal from './ProfileModal';
 
 export default function ReflexRange() {
@@ -772,11 +771,14 @@ export default function ReflexRange() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
+    <div className="bg-black w-full h-screen relative overflow-hidden">
       {/* Global Headers */}
-      <SystemHeader />
-      <ProfileHeader
-        breadcrumb={['DEVICES', 'GHOST', 'AIM TRAINING']}
+      <Headers
+        breadcrumb={[
+          'DEVICES',
+          { label: 'GHOST', onClick: () => navigate('/') },
+          'AIM TRAINING'
+        ]}
         activeProfile={
           currentPreset === 'desktop' ? 'Desktop: Default' :
           currentPreset === 'fps' ? 'FPS' :
@@ -792,7 +794,7 @@ export default function ReflexRange() {
       />
 
       {gameState === 'menu' && (
-        <div className="absolute top-[120px] left-0 right-0 bottom-0 flex flex-col items-center justify-center p-8">
+        <div className="absolute top-[120px] left-0 right-0 bottom-8 flex flex-col items-center justify-center px-8">
           <div className="w-full max-w-[800px]">
             {/* Top content area */}
             <div className="bg-[#1a1a1a] p-10 rounded-t-xl">
@@ -945,7 +947,7 @@ export default function ReflexRange() {
       )}
 
       {gameState === 'playing' && (
-        <div className="absolute top-[120px] left-0 right-0 bottom-0">
+        <div className="absolute top-[120px] left-0 right-0 bottom-8">
           {/* Score Banner Overlay */}
           <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 flex gap-[8px] items-center">
             {/* Points Section */}

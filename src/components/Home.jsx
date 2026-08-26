@@ -6,8 +6,7 @@ import ImportProfileModal from './ImportProfileModal';
 import HotspotDetailCard from './HotspotDetailCard';
 import SaveNotification from './SaveNotification';
 import DeviceStatusWidget from './DeviceStatusWidget';
-import SystemHeader from './SystemHeader';
-import ProfileHeader from './ProfileHeader';
+import Headers from './Headers';
 import ProfileModal from './ProfileModal';
 
 // Image assets
@@ -347,8 +346,7 @@ export default function Home() {
       `}</style>
 
       {/* Global Headers */}
-      <SystemHeader />
-      <ProfileHeader
+      <Headers
         breadcrumb={['DEVICES', 'GHOST']}
         activeProfile={
           currentPreset === 'desktop' ? 'Desktop: Default' :
@@ -364,10 +362,10 @@ export default function Home() {
         onProfileClick={handlePresetClick}
       />
 
-      {/* Main content - adjusted for new headers */}
-      <div className="absolute top-[120px] left-0 right-0 bottom-0 flex gap-4 overflow-hidden pb-8 px-8">
+      {/* Main content - 32px spacing from header (88px) + 32px bottom spacing */}
+      <div className="absolute top-[120px] left-0 right-0 bottom-8 flex gap-4 overflow-hidden px-8">
         {/* Side Panel - matches Figma design */}
-        <div className="w-[419px] shrink-0">
+        <div className="w-[419px] shrink-0 h-full">
           <div className="bg-[#1a1a1a] border border-[#242424] border-solid flex flex-col gap-4 items-start p-4 rounded-2xl w-full h-full">
             <div className="flex flex-col gap-2 items-start w-full">
               {/* Button Remapping */}

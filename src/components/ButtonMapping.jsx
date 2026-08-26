@@ -7,8 +7,7 @@ import SaveNotification from './SaveNotification';
 import ProfileSelector from './ProfileSelector';
 import ActionsModal from './ActionsModal';
 import DeviceStatusWidget from './DeviceStatusWidget';
-import SystemHeader from './SystemHeader';
-import ProfileHeader from './ProfileHeader';
+import Headers from './Headers';
 import ProfileModal from './ProfileModal';
 import BinaryToggle from './BinaryToggle';
 
@@ -1219,9 +1218,12 @@ export default function ButtonMapping() {
         }
       `}</style>
       {/* Global Headers */}
-      <SystemHeader />
-      <ProfileHeader
-        breadcrumb={['DEVICES', 'GHOST', 'BUTTON REMAPPING']}
+      <Headers
+        breadcrumb={[
+          'DEVICES',
+          { label: 'GHOST', onClick: () => navigate('/') },
+          'BUTTON REMAPPING'
+        ]}
         activeProfile={
           currentPreset === 'desktop' ? 'Desktop: Default' :
           currentPreset === 'fps' ? 'FPS' :
@@ -1237,7 +1239,7 @@ export default function ButtonMapping() {
       />
 
       {/* Main content */}
-      <div className="absolute top-[120px] left-0 right-0 bottom-0 flex gap-4 overflow-hidden pb-8 px-8">
+      <div className="absolute top-[120px] left-0 right-0 bottom-8 flex gap-4 overflow-hidden px-8">
         {/* Left Panel */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Button Remapping Panel */}
