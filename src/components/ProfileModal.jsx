@@ -194,10 +194,10 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
 
           {/* Onboard Memory Section */}
           <div className="flex flex-col gap-1 items-start w-full">
-            {/* Section header - h-12 */}
+            {/* Section header - h-10 (same as G HUB) */}
             <button
               onClick={() => setOnboardExpanded(!onboardExpanded)}
-              className="flex h-12 items-center w-full hover:opacity-80 transition-opacity"
+              className="flex h-10 items-center w-full hover:opacity-80 transition-opacity"
             >
               <div className="flex flex-1 h-full items-center justify-between pr-1">
                 <div className="flex gap-2 items-center shrink-0">
