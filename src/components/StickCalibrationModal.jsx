@@ -1,17 +1,50 @@
 import { useState, useEffect, useRef } from 'react';
 
 export default function StickCalibrationModal({ isOpen, onClose }) {
+  const [calibrationPhase, setCalibrationPhase] = useState('centering'); // 'centering', 'calibrating', 'complete'
   const [progress, setProgress] = useState(0);
   const [angle, setAngle] = useState(0);
   const [stickMagnitude, setStickMagnitude] = useState(0);
   const [isMovingWrongWay, setIsMovingWrongWay] = useState(false);
+  const [completedCircles, setCompletedCircles] = useState(0);
 
   const rotationsRef = useRef(0);
   const lastAngleRef = useRef(0);
   const gamepadRafRef = useRef(null);
+  const centeringTimerRef = useRef(null);
 
+  // Centering phase timer
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || calibrationPhase !== 'centering') return;
+
+    const startTime = Date.now();
+    const duration = 2000; // 2 seconds
+
+    const updateCenteringProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const newProgress = Math.min(100, (elapsed / duration) * 100);
+      setProgress(newProgress);
+
+      if (elapsed >= duration) {
+        setCalibrationPhase('calibrating');
+        setProgress(0);
+      } else {
+        centeringTimerRef.current = requestAnimationFrame(updateCenteringProgress);
+      }
+    };
+
+    centeringTimerRef.current = requestAnimationFrame(updateCenteringProgress);
+
+    return () => {
+      if (centeringTimerRef.current) {
+        cancelAnimationFrame(centeringTimerRef.current);
+      }
+    };
+  }, [isOpen, calibrationPhase]);
+
+  // Calibrating phase - gamepad polling
+  useEffect(() => {
+    if (!isOpen || calibrationPhase !== 'calibrating') return;
 
     const pollGamepad = () => {
       const gamepads = navigator.getGamepads();
@@ -41,9 +74,22 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
           if (angleDiff > 0 && angleDiff < 0.5) {
             // Clockwise motion - increase progress
             rotationsRef.current += angleDiff / (2 * Math.PI);
-            const newProgress = Math.min(100, (rotationsRef.current / 4) * 100);
+
+            // Calculate completed full circles (0, 1, 2, 3)
+            const fullCircles = Math.floor(rotationsRef.current);
+            if (fullCircles !== completedCircles && fullCircles <= 3) {
+              setCompletedCircles(fullCircles);
+            }
+
+            // Progress based on 3 full circles
+            const newProgress = Math.min(100, (rotationsRef.current / 3) * 100);
             setProgress(newProgress);
             setIsMovingWrongWay(false);
+
+            // Check if completed
+            if (newProgress >= 100) {
+              setCalibrationPhase('complete');
+            }
           } else if (angleDiff < 0 && angleDiff > -0.5) {
             // Counter-clockwise motion - show warning
             setIsMovingWrongWay(true);
@@ -64,14 +110,16 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
         cancelAnimationFrame(gamepadRafRef.current);
       }
     };
-  }, [isOpen]);
+  }, [isOpen, calibrationPhase, completedCircles]);
 
   useEffect(() => {
     if (!isOpen) {
+      setCalibrationPhase('centering');
       setProgress(0);
       setAngle(0);
       setStickMagnitude(0);
       setIsMovingWrongWay(false);
+      setCompletedCircles(0);
       rotationsRef.current = 0;
       lastAngleRef.current = 0;
     }
@@ -79,9 +127,13 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
 
   // Get description text based on state
   const getDescriptionText = () => {
-    if (isComplete) {
+    if (calibrationPhase === 'centering') {
+      return 'Release the stick and let it rest at the center position.';
+    }
+    if (calibrationPhase === 'complete') {
       return 'Calibration completed!';
     }
+    // calibrating phase
     if (isMovingWrongWay && stickMagnitude > 0.3) {
       return 'Follow the direction of the animated circle';
     }
@@ -101,7 +153,22 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const isComplete = progress >= 100;
+  const isComplete = calibrationPhase === 'complete';
+
+  // Get label text above progress bar
+  const getLabelText = () => {
+    if (calibrationPhase === 'centering') {
+      return 'Detecting center';
+    }
+    if (calibrationPhase === 'complete') {
+      return 'Your left stick is calibrated!';
+    }
+    // calibrating phase
+    if (completedCircles === 0) {
+      return 'Calibrating';
+    }
+    return `Calibrating (${completedCircles}/3)`;
+  };
 
   return (
     <div
@@ -173,8 +240,8 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
                 </g>
                 <circle cx="69" cy="65" r="11" stroke="#00B8FC" strokeWidth="0.3"/>
 
-                {/* Animated gradient arc - hide when complete */}
-                {!isComplete && (
+                {/* Animated gradient arc - show only during calibrating phase */}
+                {calibrationPhase === 'calibrating' && (
                   <g className="arc-animation">
                     <path
                       d="M118.036 107.625C125.353 99.2065 130.381 89.0466 132.636 78.1227C134.89 67.1988 134.295 55.8786 130.907 45.2514C127.52 34.6241 121.454 25.0476 113.294 17.4434C105.133 9.8392 95.1534 4.46325 84.3139 1.83289L83.0879 6.88533C93.0602 9.30526 102.242 14.2511 109.749 21.247C117.257 28.2429 122.837 37.0533 125.954 46.8303C129.07 56.6074 129.618 67.022 127.544 77.072C125.47 87.122 120.844 96.469 114.112 104.214L118.036 107.625Z"
@@ -224,13 +291,13 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
                 <path d="M58 65L5 65" stroke="#00B8FC" strokeWidth="0.3" strokeLinecap="round"/>
                 <path d="M133 65L80 65" stroke="#00B8FC" strokeWidth="0.3" strokeLinecap="round"/>
 
-                {/* Completion ripple effect - show when complete */}
-                {isComplete && (
+                {/* Ripple effect - show during centering phase only (with white dot) */}
+                {calibrationPhase === 'centering' && (
                   <g>
                     {/* White center dot */}
                     <circle cx="69" cy="65" r="4" fill="#FBFBFB" />
 
-                    {/* Blue ripple circles - continuously animated outward at half speed */}
+                    {/* Blue ripple circles - continuously animated outward */}
                     <circle cx="69" cy="65" r="11" fill="none" stroke="#00B8FC" strokeWidth="0.3">
                       <animate attributeName="r" from="11" to="30" dur="4s" repeatCount="indefinite" />
                       <animate attributeName="opacity" from="0.6" to="0" dur="4s" repeatCount="indefinite" />
@@ -242,8 +309,40 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
                   </g>
                 )}
 
-                {/* Thick blue line with white dot - show when stick is pushed and not complete */}
-                {!isComplete && stickMagnitude > 0.3 && (() => {
+                {/* Ripple effect for complete phase - no white dot, just ripples */}
+                {calibrationPhase === 'complete' && (
+                  <g>
+                    {/* Blue ripple circles - continuously animated outward */}
+                    <circle cx="69" cy="65" r="11" fill="none" stroke="#00B8FC" strokeWidth="0.3">
+                      <animate attributeName="r" from="11" to="30" dur="4s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" from="0.6" to="0" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="69" cy="65" r="11" fill="none" stroke="#00B8FC" strokeWidth="0.3">
+                      <animate attributeName="r" from="11" to="30" dur="4s" begin="2s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" from="0.6" to="0" dur="4s" begin="2s" repeatCount="indefinite" />
+                    </circle>
+                  </g>
+                )}
+
+                {/* Checkmark badge - show when complete with scale animation */}
+                {calibrationPhase === 'complete' && (
+                  <g transform="translate(57, 53)">
+                    {/* Checkmark badge from Figma - scaled from 24x24 original */}
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M22 12C22 17.5228 17.5227 22 12 22C6.47727 22 2 17.5228 2 12C2 6.47715 6.47727 2 12 2C17.5227 2 22 6.47715 22 12ZM8.293 12.9497L11.243 15.8995L16.435 10.7071C16.826 10.3166 16.826 9.6834 16.435 9.2929C16.045 8.9024 15.411 8.9024 15.021 9.2929L11.243 13.0711L9.707 11.5355C9.317 11.145 8.683 11.145 8.293 11.5355C7.902 11.9261 7.902 12.5592 8.293 12.9497Z"
+                      fill="#00B8FC"
+                      style={{
+                        transformOrigin: '12px 12px',
+                        animation: 'checkmarkScale 0.5s ease-out forwards'
+                      }}
+                    />
+                  </g>
+                )}
+
+                {/* Thick blue line with white dot - show when stick is pushed during calibrating */}
+                {calibrationPhase === 'calibrating' && stickMagnitude > 0.3 && (() => {
                   // Calculate endpoint - extend to inner edge of circle (radius ~53-54px to touch the stroke)
                   const centerX = 69;
                   const centerY = 65;
@@ -260,12 +359,24 @@ export default function StickCalibrationModal({ isOpen, onClose }) {
                   );
                 })()}
               </svg>
+
+              {/* CSS for checkmark scale animation */}
+              <style>{`
+                @keyframes checkmarkScale {
+                  0% {
+                    transform: scale(0);
+                  }
+                  100% {
+                    transform: scale(1);
+                  }
+                }
+              `}</style>
             </div>
 
             {/* Progress indicator */}
             <div className="flex flex-col gap-2 w-full">
               <div className="font-logitech font-bold text-[#e6e6e6] text-sm tracking-[-0.42px] leading-[1.3] text-center">
-                Calibrating
+                {getLabelText()}
               </div>
 
               {/* Progress bar */}
