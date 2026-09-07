@@ -46,8 +46,13 @@ export default function ReflexRange() {
   const startTimeRef = useRef(0);
 
   // Game settings
-  const CANVAS_WIDTH = 1200;
-  const CANVAS_HEIGHT = 800;
+  // The canvas is stretched to fill its container by CSS, so the drawing buffer
+  // must track the element's real size — otherwise a buffer of a fixed aspect
+  // gets scaled unevenly and circles render as ellipses. Updated on resize;
+  // read as CSS pixels (the context is pre-scaled by devicePixelRatio).
+  const CANVAS_FALLBACK_WIDTH = 1200;
+  const CANVAS_FALLBACK_HEIGHT = 800;
+  const canvasSizeRef = useRef({ width: CANVAS_FALLBACK_WIDTH, height: CANVAS_FALLBACK_HEIGHT, dpr: 1 });
   const MOVE_SPEED = 0.08; // Units per frame
   const LOOK_SENSITIVITY = 0.04;
   const SHOT_COOLDOWN = 250;
@@ -121,6 +126,35 @@ export default function ReflexRange() {
   };
 
   // Main game loop
+  // Keep the drawing buffer matched to the element's rendered size (and to the
+  // display's pixel density), so nothing is scaled unevenly and the render is
+  // sharp. Declared before the game loop so the first frame has a correct size.
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const dpr = window.devicePixelRatio || 1;
+      const width = Math.round(rect.width);
+      const height = Math.round(rect.height);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvasSizeRef.current = { width, height, dpr };
+    };
+
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas);
+    window.addEventListener('resize', resize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', resize);
+    };
+  }, [gameState]);
+
   useEffect(() => {
     if (gameState !== 'playing') return;
 
@@ -351,6 +385,7 @@ export default function ReflexRange() {
   };
 
   const project3DTo2D = (x, y, z) => {
+    const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT } = canvasSizeRef.current;
     const camera = cameraRef.current;
 
     // Translate to camera space
@@ -383,6 +418,11 @@ export default function ReflexRange() {
   };
 
   const render = (ctx, now) => {
+    const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT, dpr } = canvasSizeRef.current;
+
+    // Buffer is sized in device pixels; draw in CSS pixels.
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
     // Dark background
     ctx.fillStyle = '#000510';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -637,6 +677,7 @@ export default function ReflexRange() {
   };
 
   const drawTarget = (ctx, target, now) => {
+    const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT } = canvasSizeRef.current;
     const projected = project3DTo2D(target.x, target.y, target.z);
     if (!projected) return;
 
@@ -691,6 +732,7 @@ export default function ReflexRange() {
   };
 
   const drawParticle = (ctx, particle) => {
+    const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT } = canvasSizeRef.current;
     const projected = project3DTo2D(particle.x, particle.y, particle.z);
     if (!projected) return;
 
@@ -709,6 +751,7 @@ export default function ReflexRange() {
   };
 
   const drawBullet = (ctx, bullet) => {
+    const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT } = canvasSizeRef.current;
     const projected = project3DTo2D(bullet.x, bullet.y, bullet.z);
     if (!projected) return;
 
@@ -725,6 +768,7 @@ export default function ReflexRange() {
   };
 
   const drawCrosshair = (ctx) => {
+    const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT } = canvasSizeRef.current;
     const cx = CANVAS_WIDTH / 2;
     const cy = CANVAS_HEIGHT / 2;
 
@@ -884,7 +928,9 @@ export default function ReflexRange() {
       )}
 
       {gameState === 'finished' && (
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
+        // Same container as the 'menu' state: the page root is not a flex
+        // parent, so flex-1 was inert here and the panel sat under the header.
+        <div className="absolute top-[120px] left-0 right-0 bottom-8 flex flex-col items-center justify-center px-8">
           <div className="w-full max-w-[600px]">
             {/* Results content area */}
             <div className="bg-[#1a1a1a] p-10 rounded-t-xl">
@@ -989,9 +1035,7 @@ export default function ReflexRange() {
           {/* Game Canvas - Full Screen */}
           <canvas
             ref={canvasRef}
-            width={CANVAS_WIDTH}
-            height={CANVAS_HEIGHT}
-            className="w-full h-full"
+            className="w-full h-full block"
           />
         </div>
       )}
