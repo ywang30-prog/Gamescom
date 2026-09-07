@@ -17,7 +17,7 @@ const imgSticksIcon = "/figmaAssets/sticks-icon-new.svg";
 const imgTriggersIcon = "/figmaAssets/triggers-icon-new.svg";
 const imgAimTrainingIcon = "/figmaAssets/aim-training-icon.svg";
 const imgGeneralSettingsIcon = "/figmaAssets/settings-icon-new.svg";
-const imgGhostController = "/ghost-controller-white.png";
+const imgGhostController = "/ghost-controller-white-updated.png";
 
 // Feature flags
 const ENABLE_EDIT_HOTSPOTS = false; // Set to true to enable Edit Hotspots feature
@@ -451,7 +451,14 @@ export default function Home() {
                 alt="Ghost Controller"
                 className="absolute inset-0 w-full h-full object-contain"
                 src={imgGhostController}
-                style={{ pointerEvents: 'none' }}
+                style={{
+                  pointerEvents: 'none',
+                  // This render is 5:4 where the previous one was 16:9, so
+                  // object-contain fits it ~19% smaller. Scale/offset derived by
+                  // matching the two silhouettes' area and centroid, which keeps
+                  // the controller in the same place and the hotspots aligned.
+                  transform: 'translate(-10.5px, -7px) scale(1.2298)',
+                }}
               />
 
               {/* Hotspots at line endpoints */}
