@@ -12,6 +12,7 @@ import ProfileModal from './ProfileModal';
 import BinaryToggle from './BinaryToggle';
 import Toggle from './Toggle';
 import MouseClickIndicator from './MouseClickIndicator';
+import { FEATURES } from '../config/featureFlags';
 
 // Image assets
 const imgBatteryIcon = "/figmaAssets/battery-icon.svg";
@@ -52,7 +53,7 @@ export default function TriggerDeadzone() {
   const [activeTrigger, setActiveTrigger] = useState('left');
 
   // Position values for left trigger (finalized)
-  const leftTriggerX = 78;
+  const leftTriggerX = 87; // 78 -> 87: +16px on screen (x1.8 scale)
   const leftTriggerY = 0; // Moved down 30px from -30
   const leftTriggerScale = 1.8;
 
@@ -80,6 +81,44 @@ export default function TriggerDeadzone() {
   const sliderRef = useRef(null);
   const presetDropdownRef = useRef(null);
   const [currentTriggerValue, setCurrentTriggerValue] = useState(0);
+  // Left-trigger press renders, ordered rest -> full. `enter` is the physical
+  // travel (pre-deadzone, %) at which a frame takes over on the way down;
+  // `exit` is where it hands back on the way up. The gap between them is
+  // hysteresis: without it, the ~1-2% jitter of an analog trigger held near a
+  // boundary would flip the image back and forth several times a second.
+  // Adding a frame here is a data change - nothing below needs to know.
+  const LEFT_TRIGGER_FRAMES = [
+    { src: '/ghost-controller-left-trigger.png', enter: 0, exit: 0 },
+    { src: '/ghost-controller-left-trigger-half-pressed.png', enter: 1, exit: 1 },
+    { src: '/ghost-controller-left-trigger-pressed.png', enter: 50, exit: 44 },
+  ];
+
+  // Index of the visible frame. Held in state so the previous frame is known
+  // and the exit thresholds can be applied against it.
+  const [triggerFrameIndex, setTriggerFrameIndex] = useState(0);
+
+  useEffect(() => {
+    if (activeTrigger !== 'left') {
+      setTriggerFrameIndex(0);
+      return;
+    }
+    setTriggerFrameIndex((prev) => {
+      // Highest frame whose enter threshold the trigger has reached.
+      let next = 0;
+      for (let i = LEFT_TRIGGER_FRAMES.length - 1; i >= 0; i--) {
+        if (currentTriggerValue >= LEFT_TRIGGER_FRAMES[i].enter) {
+          next = i;
+          break;
+        }
+      }
+      // Stepping back down requires clearing the current frame's exit
+      // threshold, which sits below its enter threshold.
+      if (next < prev && currentTriggerValue >= LEFT_TRIGGER_FRAMES[prev].exit) {
+        return prev;
+      }
+      return next;
+    });
+  }, [currentTriggerValue, activeTrigger]);
   const [registeredTriggerValue, setRegisteredTriggerValue] = useState(0);
   const previousHasChangedRef = useRef(false);
   const gamepadRafRef = useRef(0);
@@ -128,6 +167,9 @@ export default function TriggerDeadzone() {
     return saved !== null ? JSON.parse(saved) : false;
   });
   const [switchToMouseClick, setSwitchToMouseClick] = useState(() => {
+    // Feature-flagged off: ignore any persisted value so a stale `true` from a
+    // previous session can't strand the page in mouse-click mode.
+    if (!FEATURES.mouseClickTrigger) return false;
     const saved = localStorage.getItem('switchToMouseClick');
     return saved !== null ? JSON.parse(saved) : false;
   });
@@ -475,6 +517,7 @@ export default function TriggerDeadzone() {
   }, [showAdvancedTriggerControl]);
 
   useEffect(() => {
+    if (!FEATURES.mouseClickTrigger) return;
     localStorage.setItem('switchToMouseClick', JSON.stringify(switchToMouseClick));
 
     // Force applyToBothTriggers ON when mouse click mode is enabled
@@ -844,23 +887,25 @@ export default function TriggerDeadzone() {
               </div>
             </div>
 
-            {/* Switch to mouse click trigger */}
-            <div className="bg-[#242424] flex gap-3 items-center p-2 rounded-lg mb-6 w-full">
-              <Toggle
-                enabled={switchToMouseClick}
-                onChange={setSwitchToMouseClick}
-              />
-              <div className="flex gap-2 h-8 items-center py-0.5 flex-1">
-                <span className="font-logitech text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
-                  Switch to mouse click trigger
-                </span>
-                <div className="overflow-clip relative shrink-0 w-6 h-6">
-                  <div className="absolute inset-[8.33%]">
-                    <img src="/info-icon.svg" alt="" className="absolute block inset-0 max-w-none w-full h-full" />
+            {/* Switch to mouse click trigger — behind FEATURES.mouseClickTrigger (?ff=mouseClickTrigger) */}
+            {FEATURES.mouseClickTrigger && (
+              <div className="bg-[#242424] flex gap-3 items-center p-2 rounded-lg mb-6 w-full">
+                <Toggle
+                  enabled={switchToMouseClick}
+                  onChange={setSwitchToMouseClick}
+                />
+                <div className="flex gap-2 h-8 items-center py-0.5 flex-1">
+                  <span className="font-logitech text-[14px] text-[#e6e6e6] tracking-[-0.42px] leading-[1.3]">
+                    Switch to mouse click trigger
+                  </span>
+                  <div className="overflow-clip relative shrink-0 w-6 h-6">
+                    <div className="absolute inset-[8.33%]">
+                      <img src="/info-icon.svg" alt="" className="absolute block inset-0 max-w-none w-full h-full" />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Start and End Inputs */}
             <div className={`flex gap-4 mb-6 ${switchToMouseClick ? 'opacity-45 pointer-events-none' : ''}`}>
@@ -1244,21 +1289,56 @@ export default function TriggerDeadzone() {
           {/* Controller visualization centered below */}
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="w-full max-w-[800px] relative" style={{ overflow: 'visible' }}>
-              <img
-                src={
-                  activeTrigger === 'left'
-                    ? '/ghost-controller-left-trigger.png'
-                    : '/ghost-controller-right-trigger.png'
-                }
-                alt={`Ghost Controller - ${activeTrigger === 'left' ? 'Left' : 'Right'} Trigger`}
-                className="w-full h-auto"
+              {/*
+                Base image sets the layout box; the pressed variant is stacked on
+                top and cross-faded via opacity only. Both stay mounted, so the
+                pressed render is decoded up front and swapping causes no reflow,
+                no flash, and no shift in position.
+              */}
+              <div
+                className="relative w-full"
                 style={{
                   transform: activeTrigger === 'right'
                     ? `scale(${rightTriggerScale}) translateX(${rightTriggerX}px) translateY(${rightTriggerY}px)`
                     : `scale(${leftTriggerScale}) translateX(${leftTriggerX}px) translateY(${leftTriggerY}px)`,
                   pointerEvents: 'none'
                 }}
-              />
+              >
+                <img
+                  src={
+                    activeTrigger === 'left'
+                      ? LEFT_TRIGGER_FRAMES[0].src
+                      : '/ghost-controller-right-trigger.png'
+                  }
+                  alt={`Ghost Controller - ${activeTrigger === 'left' ? 'Left' : 'Right'} Trigger`}
+                  className="w-full h-auto block"
+                  style={{
+                    // Hidden via opacity, never display/visibility: the element
+                    // keeps its box so it still sizes the container and nothing
+                    // reflows when the renders trade places.
+                    opacity: activeTrigger === 'left' && triggerFrameIndex !== 0 ? 0 : 1,
+                    willChange: 'opacity'
+                  }}
+                />
+                {/* Press-state frames (left trigger only). All stay mounted so
+                    each is decoded up front and swapping is a GPU opacity flip. */}
+                {activeTrigger === 'left' && LEFT_TRIGGER_FRAMES.slice(1).map((frame, i) => (
+                  <img
+                    key={frame.src}
+                    src={frame.src}
+                    alt=""
+                    aria-hidden="true"
+                    className="w-full h-auto block absolute inset-0"
+                    style={{
+                      opacity: triggerFrameIndex === i + 1 ? 1 : 0,
+                      // Own compositor layer, so the flip is a GPU opacity
+                      // change rather than a re-raster of a large upscaled
+                      // bitmap. Keeps rapid presses frame-accurate.
+                      willChange: 'opacity'
+                    }}
+                  />
+                ))}
+              </div>
 
               {/* Trigger Range Indicator - Arc or Binary */}
               {switchToMouseClick ? (
