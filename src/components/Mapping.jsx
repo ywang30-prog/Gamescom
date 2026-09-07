@@ -57,6 +57,15 @@ export default function Mapping() {
     const saved = localStorage.getItem('rightStickDeadzonePosition');
     return saved ? JSON.parse(saved) : { left: 743, top: 322 };
   });
+  // Nudge applied to the controller render only, so it lines up with the
+  // deadzone ring (which is positioned separately). Values found by hand
+  // against the 2026-09-07 renders.
+  const STICK_IMAGE_OFFSETS = {
+    left: { x: -12, y: -10, scale: 1 },
+    right: { x: -12, y: -10, scale: 1 },
+  };
+  const activeStickImage = STICK_IMAGE_OFFSETS[activeStick];
+
   const [isDraggingOverlay, setIsDraggingOverlay] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
@@ -1050,7 +1059,7 @@ export default function Mapping() {
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Controls Panel */}
-          <div className="bg-[#1a1a1a] rounded-t-2xl flex-1 pt-4 px-4 overflow-y-auto">
+          <div className="bg-[#1a1a1a] rounded-2xl flex-1 pt-4 px-4 overflow-y-auto">
             {/* Header with back button */}
             <div className="mb-6 pb-4 border-b border-[#2e2e2e]">
               <div className="flex items-center gap-4">
@@ -1528,7 +1537,12 @@ export default function Mapping() {
               src={activeStick === 'left' ? '/ghost-controller-left-stick.png' : '/ghost-controller-right-stick.png'}
               alt={`Ghost Controller - ${activeStick === 'left' ? 'Left' : 'Right'} Stick Focus`}
               className="absolute inset-0 w-full h-full object-contain"
-              style={{ pointerEvents: 'none' }}
+              style={{
+                pointerEvents: 'none',
+                // Applied to the image alone, not the container, so nudging it
+                // moves the render relative to the deadzone ring.
+                transform: `translate(${activeStickImage.x}px, ${activeStickImage.y}px) scale(${activeStickImage.scale})`,
+              }}
             />
 
             {/* Deadzone Indicator on Left Thumbstick - centered concentrically */}
@@ -1787,8 +1801,11 @@ export default function Mapping() {
             </div>
           </div>
 
-          {/* Stick Selector Toggle - positioned below controller */}
-          <div className="relative flex justify-center z-20" style={{ bottom: '100px' }}>
+          {/* Stick Selector Toggle - positioned below controller.
+              128px lifts it to the same Y as the Triggers page toggle; measured,
+              not guessed. See note in the commit: the two pages centre their
+              visualisations differently, so this matches at ~1080-tall windows. */}
+          <div className="relative flex justify-center z-20" style={{ bottom: '128px' }}>
             <BinaryToggle
               leftLabel="Left"
               rightLabel="Right"
@@ -1834,6 +1851,7 @@ export default function Mapping() {
           onClose={() => setShowSaveNotification(false)}
         />
       )}
+
     </div>
   );
 }

@@ -867,7 +867,7 @@ export default function TriggerDeadzone() {
         {/* Left Sidebar */}
         <div className="w-[420px] flex flex-col gap-2 shrink-0">
           {/* Trigger Controls Panel */}
-          <div className="bg-[#1a1a1a] rounded-t-2xl flex-1 pt-4 px-4 overflow-y-auto">
+          <div className="bg-[#1a1a1a] rounded-2xl flex-1 pt-4 px-4 overflow-y-auto">
             {/* Header with back button */}
             <div className="mb-6 pb-4 border-b border-[#2e2e2e]">
               <div className="flex items-center gap-4">
