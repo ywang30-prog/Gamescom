@@ -221,6 +221,48 @@ leaderLinePositions.back = {
 - Default: 0
 - Adjustable in Edit Mode
 
+## RENDER TRANSFORMS (2026-09-07 renders)
+
+These offsets are applied to the controller `<img>` only, never to the
+container, so the render moves independently of the hotspots / deadzone ring
+layered on top of it. They are not part of the hotspot tables above — those
+coordinates are unchanged.
+
+### Home page (`/`) — front render
+```javascript
+// src/components/Home.jsx
+const imgGhostController = "/ghost-controller-white-updated.png";
+transform: 'translate(-10.5px, -7px) scale(1.2298)'
+```
+The new render is 3840x3072 (5:4); the previous asset was 2048x1153 (16:9).
+In the fixed 1188x771 box, `object-contain` would fit the 5:4 image ~19%
+smaller and pull all 17 hotspots off their buttons. The scale/offset was
+derived by matching the two silhouettes' area and centroid, so the controller
+keeps the same footprint and the existing hotspot coordinates stay valid.
+
+### Sticks page (`/sticks`) — stick renders
+```javascript
+// src/components/Mapping.jsx
+const STICK_IMAGE_OFFSETS = {
+  left:  { x: -12, y: -10, scale: 1 },
+  right: { x: -12, y: -10, scale: 1 },
+};
+// transform: translate(${x}px, ${y}px) scale(${scale})
+```
+Nudge applied so the render lines up with the deadzone ring, which is
+positioned separately. Values found by hand against the 2026-09-07 renders.
+
+Note the stick page's own container also carries `transform: translateX(-50px)`
+on the `1188x771` wrapper — that is a layout offset and is separate from the
+per-image nudge above.
+
 ## Files
-- Front controller: `/public/ghost-controller-white.png`
+- Home front controller: `/public/ghost-controller-white-updated.png` (3840x3072)
+- Button Remapping front controller: `/public/ghost-controller-white.png` (2048x1153)
 - Back controller: `/public/ghost-controller-back-white.png`
+- Left stick: `/public/ghost-controller-left-stick.png` (7316x4744)
+- Right stick: `/public/ghost-controller-right-stick.png` (7316x4744)
+
+`ghost-controller-white.png` was deliberately not overwritten: the Button
+Remapping page (`/mapping`, `src/components/ButtonMapping.jsx`) still uses it
+with its own hotspot layout.
