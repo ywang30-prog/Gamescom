@@ -351,7 +351,7 @@ export default function Home() {
         activeProfile={
           currentPreset === 'desktop' ? 'Desktop: Default' :
           currentPreset === 'fps' ? 'First Person Shoother' :
-          currentPreset === 'p3ghost' ? 'P3: Ghost' :
+          currentPreset === 'racing' ? 'Racing Game' :
           currentPreset === 'p1' ? 'P1' :
           currentPreset === 'p2' ? 'P2: Ghost' :
           currentPreset === 'p3' ? 'P3' :

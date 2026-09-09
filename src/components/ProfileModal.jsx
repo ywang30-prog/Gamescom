@@ -8,6 +8,26 @@ const imgChevronDownSmall = "/figmaAssets/chevron-down-small.svg";
 const imgMoreOptionsVertical = "/figmaAssets/more-options-vertical.svg";
 const imgOnboardMemoryEmpty = "/figmaAssets/onboard-memory-empty.svg";
 
+// G HUB profiles
+const G_HUB_PROFILES = [
+  { id: 'desktop', name: 'Desktop: Default' },
+  { id: 'fps', name: 'First Person Shoother' },
+  { id: 'racing', name: 'Racing Game' },
+];
+
+// Onboard profiles
+const ONBOARD_PROFILES = [
+  { id: 'p1', name: 'P1' },
+  { id: 'p2', name: 'P2: Ghost' },
+  { id: 'p3', name: 'P3' },
+];
+
+// Derived from the list above rather than an id prefix. The P prefix is
+// reserved for onboard slots, but a prefix test also caught the old G HUB id
+// 'p3ghost', lighting up the Onboard Memory header and auto-expanding the
+// wrong section while the active profile sat in G HUB.
+const isOnboardProfile = (id) => ONBOARD_PROFILES.some((p) => p.id === id);
+
 /**
  * ProfileModal - Profile selector modal with G HUB and Onboard sections
  * Centered on screen, 432px wide
@@ -16,14 +36,14 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
   const [searchQuery, setSearchQuery] = useState('');
 
   // Both sections can be expanded independently, but by default only the one with active profile is expanded
-  const isOnboardActive = activeProfile.startsWith('p');
+  const isOnboardActive = isOnboardProfile(activeProfile);
   const [gHubExpanded, setGHubExpanded] = useState(!isOnboardActive);
   const [onboardExpanded, setOnboardExpanded] = useState(isOnboardActive);
 
   // Reset expansion state when modal opens or active profile changes
   useEffect(() => {
     if (isOpen) {
-      const shouldExpandOnboard = activeProfile.startsWith('p');
+      const shouldExpandOnboard = isOnboardProfile(activeProfile);
       setGHubExpanded(!shouldExpandOnboard);
       setOnboardExpanded(shouldExpandOnboard);
     }
@@ -31,25 +51,11 @@ export default function ProfileModal({ isOpen, onClose, activeProfile, onProfile
 
   if (!isOpen) return null;
 
-  // G HUB profiles
-  const gHubProfiles = [
-    { id: 'desktop', name: 'Desktop: Default' },
-    { id: 'fps', name: 'First Person Shoother' },
-    { id: 'p3ghost', name: 'P3: Ghost' },
-  ];
-
-  // Onboard profiles
-  const onboardProfiles = [
-    { id: 'p1', name: 'P1' },
-    { id: 'p2', name: 'P2: Ghost' },
-    { id: 'p3', name: 'P3' },
-  ];
-
   // Filter profiles based on search
-  const filteredGHub = gHubProfiles.filter(p =>
+  const filteredGHub = G_HUB_PROFILES.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const filteredOnboard = onboardProfiles.filter(p =>
+  const filteredOnboard = ONBOARD_PROFILES.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
